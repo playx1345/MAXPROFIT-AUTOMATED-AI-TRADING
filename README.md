@@ -1,73 +1,279 @@
-# Welcome to your Lovable project
+# Max Forex & Automated Trading Robot Platform
 
-## Project info
+A secure, compliant cryptocurrency investment platform powered by advanced AI trading technology, designed specifically for the Nigerian market and global crypto investors.
 
-**URL**: https://lovable.dev/projects/1c065c77-4857-45ea-936b-68e8d0aaf4bb
+## 🎯 Project Overview
 
-## How can I edit this code?
+Max Forex & Automated Trading Robot Org is a cutting-edge digital investment platform that enables clients to invest in cryptocurrency portfolios managed by AI-driven trading algorithms. The platform prioritizes security, regulatory compliance, transparency, and user experience while providing seamless crypto-based investing with automated profit generation.
 
-There are several ways of editing your application.
+## ✨ Key Features
 
-**Use Lovable**
+### Client Features
+- **Secure Registration & KYC**: Comprehensive onboarding with government ID verification, proof of address, and biometric validation
+- **User Dashboard**: Real-time portfolio tracking, investment management, and transaction history
+- **Multi-Tier Investment Plans**: Three investment tiers ($250, $500, $1000 USDT) with transparent profit-sharing
+- **Crypto Deposits**: Support for USDT (TRC20) and Bitcoin (BTC) with QR code integration
+- **Fast Withdrawals**: 24-hour processing time with transparent fee structure
+- **Live Chat Support**: Real-time communication with platform administrators
+- **Multi-Factor Authentication**: Enhanced security with 2FA support
+- **Referral System**: Earn bonuses when referred users make their first deposit
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1c065c77-4857-45ea-936b-68e8d0aaf4bb) and start prompting.
+### Admin Features
+- **Centralized Dashboard**: Complete oversight of user accounts, transactions, and KYC verification
+- **Deposit/Withdrawal Management**: Real-time approval workflow for all financial transactions
+- **User Management**: Create, edit, and manage client accounts with full audit trails
+- **Notification Center**: Instant alerts for registrations, deposits, and withdrawal requests
+- **Live Chat Management**: Respond to client inquiries with full conversation history
+- **Investment Plan Control**: Configure and manage investment tiers and profit structures
+- **Security Logs**: Comprehensive audit trails for all administrative actions
 
-Changes made via Lovable will be committed automatically to this repo.
+## 💼 Investment Plans
 
-**Use your preferred IDE**
+| Plan Tier | Minimum Deposit | Platform Share | Client Earnings | Withdrawal Time |
+|-----------|----------------|----------------|-----------------|-----------------|
+| **Silver** | $250 USDT | 20% | 100% principal + AI profits (minus 20% share) | ≤ 24 hours |
+| **Gold** | $500 USDT | 20% | 100% principal + AI profits (minus 20% share) | ≤ 24 hours |
+| **Platinum** | $1000 USDT | 20% | 100% principal + AI profits (minus 20% share) | ≤ 24 hours |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Profit Distribution Model
+- Clients retain 100% of their invested principal
+- AI trading robot generates market-based profits
+- Platform retains 20% of trading profits
+- Net profits credited to client accounts
+- Transparent fee disclosure (blockchain charges + VAT)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🏗️ Technical Architecture
 
-Follow these steps:
+### Technology Stack
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI Framework**: Tailwind CSS + shadcn/ui components
+- **Backend**: Lovable Cloud (Supabase)
+- **Database**: PostgreSQL with Row-Level Security (RLS)
+- **Authentication**: Supabase Auth with MFA support
+- **Real-time**: Supabase Realtime for live updates
+- **Routing**: React Router v6
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+### Database Schema
+- **profiles**: User information, KYC status, wallet addresses, balances
+- **user_roles**: Role-based access control (admin/user)
+- **investment_plans**: Configurable investment tiers
+- **investments**: Active and historical user investments
+- **transactions**: Deposit, withdrawal, and profit records
+- **trading_bot_performance**: AI trading activity logs
+- **referrals**: Referral tracking and bonus management
+
+### Security Features
+- Row-Level Security (RLS) policies on all tables
+- Security definer functions for privilege checking
+- Encrypted password storage with bcrypt
+- JWT-based session management
+- IP logging and rate limiting
+- Automated security alerts
+- Cold storage for excess reserves
+- HD wallet systems for address generation
+
+## 🔐 Security & Compliance
+
+### Regulatory Compliance (Nigeria)
+- **KYC/AML**: Robust identity verification compliant with SEC and CBN guidelines
+- **Data Protection**: NDPR-compliant data handling and storage
+- **Tax Compliance**: Automatic VAT calculation and transparent fee disclosure
+- **Consumer Protection**: Clear risk disclosures and investment terms
+- **Platform Registration**: Legal entity establishment per Nigerian regulations
+
+### Security Protocols
+- Multi-factor authentication (MFA) for all users
+- End-to-end encryption for sensitive data
+- Blockchain transaction monitoring
+- Funds segregation (operational vs. client funds)
+- Cold storage for majority of reserves
+- Regular security audits and penetration testing
+- Anti-phishing user education
+
+### AML Monitoring
+- Real-time transaction screening
+- Sanctions list checking (OFAC, UN, EU)
+- PEP (Politically Exposed Person) database screening
+- Suspicious activity pattern detection
+- Automated flagging and reporting
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ and npm
+- Git
+
+### Installation
+
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Environment Variables
+The following environment variables are automatically configured via Lovable Cloud:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_PROJECT_ID`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Admin Access
+**Email**: maxforexautomatedforexroboti@gmail.com  
+**Password**: 338822  
+⚠️ **Important**: Enable 2FA immediately after first login
 
-**Use GitHub Codespaces**
+## 📱 User Journey
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### For Clients
+1. **Register**: Create account with email and password
+2. **Complete KYC**: Upload ID documents and verification selfie
+3. **Choose Investment Plan**: Select Silver, Gold, or Platinum tier
+4. **Deposit Funds**: Transfer USDT or BTC to provided wallet address
+5. **Track Performance**: Monitor investments and profits in real-time
+6. **Request Withdrawal**: Submit withdrawal request (processed within 24 hours)
+7. **Refer Friends**: Share referral link and earn bonuses
 
-## What technologies are used for this project?
+### For Administrators
+1. **Login**: Access admin dashboard with secure credentials
+2. **Review KYC**: Approve or reject identity verification submissions
+3. **Process Deposits**: Verify and approve incoming crypto deposits
+4. **Manage Withdrawals**: Review and process withdrawal requests
+5. **Monitor Platform**: Track user activity, investments, and system health
+6. **Respond to Support**: Handle client inquiries via live chat
 
-This project is built with:
+## 💬 Customer Support
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Live Chat
+- Integrated real-time messaging in client dashboard
+- Encrypted communication
+- Full conversation history
+- Auto-responders for common queries
 
-## How can I deploy this project?
+### FAQ Coverage
+- Investment minimums and plans
+- Deposit/withdrawal procedures
+- KYC requirements
+- Profit calculation methodology
+- Fee structure
+- Security best practices
+- Regulatory compliance
+- Account troubleshooting
 
-Simply open [Lovable](https://lovable.dev/projects/1c065c77-4857-45ea-936b-68e8d0aaf4bb) and click on Share -> Publish.
+## 🤖 AI Trading Robot
 
-## Can I connect a custom domain to my Lovable project?
+### Features
+- Advanced machine learning algorithms
+- Real-time market analysis
+- Statistical arbitrage strategies
+- High-frequency trading capabilities
+- Automated risk management
+- Performance monitoring and alerts
 
-Yes, you can!
+### Security
+- Sandboxed execution environment
+- Encrypted API key storage
+- Real-time anomaly detection
+- Automated fail-safe mechanisms
+- Transparent performance reporting
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📊 Notifications System
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Client Notifications
+- Login alerts (especially from new locations)
+- Deposit confirmations with blockchain details
+- Withdrawal status updates
+- KYC verification results
+- Profit distribution alerts
+- Promotional announcements
+
+### Admin Notifications
+- New user registrations
+- Pending deposit approvals
+- Withdrawal requests
+- Failed login attempts
+- System health alerts
+- Suspicious activity flags
+
+## 🛠️ Development
+
+### Project Structure
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── DashboardLayout.tsx
+│   └── ProtectedRoute.tsx
+├── pages/              # Route pages
+│   ├── Landing.tsx     # Public landing page
+│   ├── Auth.tsx        # Login/signup
+│   ├── Dashboard.tsx   # Client dashboard
+│   ├── Investments.tsx # Investment management
+│   ├── Profile.tsx     # User profile & KYC
+│   └── NotFound.tsx    # 404 page
+├── integrations/       # External service integrations
+│   └── supabase/       # Supabase client & types
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+└── main.tsx            # Application entry point
+```
+
+### Key Commands
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
+
+## 📈 Deployment
+
+### Via Lovable
+1. Click "Publish" in the Lovable editor
+2. Your app will be deployed to `<project-name>.lovable.app`
+3. Configure custom domain in Project > Settings > Domains
+
+### Manual Deployment
+```bash
+npm run build
+# Deploy the dist/ folder to your hosting provider
+```
+
+## 🔗 Useful Resources
+
+- [Lovable Documentation](https://docs.lovable.dev/)
+- [Supabase Documentation](https://supabase.com/docs)
+- [React Documentation](https://react.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui Components](https://ui.shadcn.com/)
+
+## ⚖️ Legal & Compliance
+
+### Risk Disclosures
+- Cryptocurrency investments carry significant risk
+- Past performance does not guarantee future results
+- Clients may lose some or all of their investment
+- Only invest what you can afford to lose
+
+### Terms & Conditions
+- Comprehensive Terms of Service
+- Privacy Policy (GDPR/NDPR compliant)
+- Risk Disclosure Document
+- Cookie Consent Policy
+
+## 📞 Contact
+
+**Platform**: Max Forex & Automated Trading Robot Org  
+**Admin Email**: maxforexautomatedforexroboti@gmail.com  
+**Support**: Available via live chat in client dashboard
+
+---
+
+**⚠️ Disclaimer**: This platform facilitates cryptocurrency investments which are subject to market risk. All users must complete KYC verification and acknowledge investment risks before participating. The platform operates in compliance with Nigerian regulatory requirements as of 2025.

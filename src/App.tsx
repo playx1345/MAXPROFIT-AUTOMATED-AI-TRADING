@@ -14,6 +14,12 @@ import Referrals from "./pages/Referrals";
 import Profile from "./pages/Profile";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminUsers from "./pages/admin/Users";
+import AdminDeposits from "./pages/admin/Deposits";
+import AdminWithdrawals from "./pages/admin/Withdrawals";
+import AdminInvestments from "./pages/admin/Investments";
+import AdminTradingBot from "./pages/admin/TradingBot";
+import AdminSettings from "./pages/admin/Settings";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
@@ -87,6 +93,48 @@ const App = () => (
             <AdminProtectedRoute>
               <AdminLayout>
                 <AdminDashboard />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/users" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminUsers />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/deposits" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminDeposits />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/withdrawals" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminWithdrawals />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/investments" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminInvestments />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/trading-bot" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminTradingBot />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminSettings />
               </AdminLayout>
             </AdminProtectedRoute>
           } />

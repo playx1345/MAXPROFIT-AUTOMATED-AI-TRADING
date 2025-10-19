@@ -7,6 +7,10 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Investments from "./pages/Investments";
+import Transactions from "./pages/Transactions";
+import Deposit from "./pages/Deposit";
+import Withdraw from "./pages/Withdraw";
+import Referrals from "./pages/Referrals";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,6 +38,34 @@ const App = () => (
             <ProtectedRoute>
               <DashboardLayout>
                 <Investments />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/transactions" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Transactions />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/deposit" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Deposit />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/withdraw" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Withdraw />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/referrals" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Referrals />
               </DashboardLayout>
             </ProtectedRoute>
           } />

@@ -50,12 +50,8 @@ All colors MUST be HSL.
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(263 70% 50%) 0%, hsl(263 70% 65%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(263 70% 55%) 0%, hsl(280 70% 60%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(220 15% 97%) 0%, hsl(220 14% 95%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(220 15% 98%) 100%);
-    --gradient-mesh: radial-gradient(at 40% 20%, hsl(263 70% 95%) 0px, transparent 50%),
-                     radial-gradient(at 80% 0%, hsl(280 70% 95%) 0px, transparent 50%),
-                     radial-gradient(at 0% 50%, hsl(240 70% 95%) 0px, transparent 50%);
 
     /* Shadows */
     --shadow-sm: 0 2px 8px hsl(220 13% 13% / 0.05);
@@ -112,12 +108,8 @@ All colors MUST be HSL.
 
     /* Dark mode gradients */
     --gradient-primary: linear-gradient(135deg, hsl(263 70% 55%) 0%, hsl(263 70% 70%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(263 70% 60%) 0%, hsl(280 70% 65%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(220 20% 10%) 0%, hsl(220 18% 12%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(220 18% 13%) 0%, hsl(220 16% 15%) 100%);
-    --gradient-mesh: radial-gradient(at 40% 20%, hsl(263 70% 20%) 0px, transparent 50%),
-                     radial-gradient(at 80% 0%, hsl(280 70% 20%) 0px, transparent 50%),
-                     radial-gradient(at 0% 50%, hsl(240 70% 20%) 0px, transparent 50%);
 
     /* Dark mode shadows */
     --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.3);
@@ -151,23 +143,7 @@ All colors MUST be HSL.
     background: var(--gradient-primary);
   }
   
-  .bg-gradient-accent {
-    background: var(--gradient-accent);
-  }
-  
-  .bg-gradient-mesh {
-    background: var(--gradient-mesh);
-  }
-  
   .perspective-1000 {
     perspective: var(--perspective);
-  }
-  
-  .text-gradient {
-    @apply bg-gradient-primary bg-clip-text text-transparent;
-  }
-  
-  .glass-card {
-    @apply backdrop-blur-md bg-card/50 border-primary/20;
   }
 }

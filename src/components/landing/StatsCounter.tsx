@@ -25,14 +25,13 @@ export const StatsCounter = () => {
             return (
               <Card
                 key={index}
-                className="group relative overflow-hidden glass-card hover:border-primary/40 transition-all duration-300 hover:scale-[1.02] p-6"
+                className="group relative overflow-hidden backdrop-blur-md bg-card/50 border-primary/20 hover:border-primary/40 transition-all duration-500 hover:scale-105 hover:shadow-glow p-6"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="text-4xl font-bold text-gradient mb-2">
+                  <Icon className="h-10 w-10 mb-3 text-primary group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" />
+                  <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
                     {stat.prefix}{count.toLocaleString()}{stat.suffix}
                   </div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>

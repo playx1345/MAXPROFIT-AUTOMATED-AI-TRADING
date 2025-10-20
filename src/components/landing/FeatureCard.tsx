@@ -5,24 +5,29 @@ interface FeatureCardProps {
   icon: LucideIcon;
   title: string;
   description: string;
+  delay?: number;
 }
 
-export const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps) => {
+export const FeatureCard = ({ icon: Icon, title, description, delay = 0 }: FeatureCardProps) => {
   return (
     <Card 
-      className="group relative overflow-hidden glass-card hover:scale-[1.02] hover:shadow-lg hover:border-primary/40 transition-all duration-300"
+      className="group relative overflow-hidden backdrop-blur-md bg-card/50 border-primary/20 hover:scale-105 hover:shadow-glow hover:border-primary/40 transition-all duration-500 animate-fade-in"
+      style={{ animationDelay: `${delay}ms` }}
     >
       {/* Gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Bitcoin watermark */}
+      <div className="absolute top-2 right-2 opacity-5 group-hover:opacity-10 transition-opacity">
+        <Icon className="w-24 h-24 text-primary" />
+      </div>
       
       <CardHeader className="relative z-10">
-        <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-          <Icon className="h-7 w-7 text-primary" />
-        </div>
-        <CardTitle className="text-xl">{title}</CardTitle>
+        <Icon className="h-12 w-12 mb-4 text-primary group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
+        <CardTitle className="text-2xl">{title}</CardTitle>
       </CardHeader>
       <CardContent className="relative z-10">
-        <CardDescription className="text-base leading-relaxed">{description}</CardDescription>
+        <CardDescription className="text-base">{description}</CardDescription>
       </CardContent>
     </Card>
   );

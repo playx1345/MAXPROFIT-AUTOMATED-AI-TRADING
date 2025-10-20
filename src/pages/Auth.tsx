@@ -113,11 +113,19 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome to CryptoInvest</CardTitle>
-          <CardDescription>Sign in to your account or create a new one</CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-accent/20 p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
+      </div>
+
+      <Card className="w-full max-w-md animate-scale-in shadow-lg backdrop-blur-sm bg-card/95 border-border/50 relative z-10">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+            Welcome to CryptoInvest
+          </CardTitle>
+          <CardDescription className="text-base">Sign in to your account or create a new one</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
@@ -126,8 +134,8 @@ const Auth = () => {
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
+            <TabsContent value="signin" className="animate-fade-in">
+              <form onSubmit={handleSignIn} className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
                   <Input
@@ -137,6 +145,7 @@ const Auth = () => {
                     value={signInData.email}
                     onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
                     required
+                    className="transition-all duration-200 focus:shadow-md"
                   />
                 </div>
                 <div className="space-y-2">
@@ -148,16 +157,21 @@ const Auth = () => {
                     value={signInData.password}
                     onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
                     required
+                    className="transition-all duration-200 focus:shadow-md"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button 
+                  type="submit" 
+                  className="w-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]" 
+                  disabled={loading}
+                >
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
+            <TabsContent value="signup" className="animate-fade-in">
+              <form onSubmit={handleSignUp} className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Full Name</Label>
                   <Input
@@ -167,6 +181,7 @@ const Auth = () => {
                     value={signUpData.fullName}
                     onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
                     required
+                    className="transition-all duration-200 focus:shadow-md"
                   />
                 </div>
                 <div className="space-y-2">
@@ -178,6 +193,7 @@ const Auth = () => {
                     value={signUpData.email}
                     onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
                     required
+                    className="transition-all duration-200 focus:shadow-md"
                   />
                 </div>
                 <div className="space-y-2">
@@ -189,10 +205,15 @@ const Auth = () => {
                     value={signUpData.password}
                     onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
                     required
+                    className="transition-all duration-200 focus:shadow-md"
                   />
                   <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button 
+                  type="submit" 
+                  className="w-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]" 
+                  disabled={loading}
+                >
                   {loading ? "Creating account..." : "Create Account"}
                 </Button>
               </form>

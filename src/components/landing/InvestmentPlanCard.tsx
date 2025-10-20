@@ -12,7 +12,6 @@ interface InvestmentPlanCardProps {
   expectedROI: string;
   features: string[];
   popular?: boolean;
-  delay?: number;
   glowColor?: string;
 }
 
@@ -24,26 +23,22 @@ export const InvestmentPlanCard = ({
   expectedROI,
   features,
   popular = false,
-  delay = 0,
   glowColor = "from-blue-400 to-blue-600"
 }: InvestmentPlanCardProps) => {
   return (
-    <div 
-      className="relative group animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      {/* Glow effect */}
-      <div className={`absolute -inset-1 bg-gradient-to-r ${glowColor} rounded-2xl opacity-0 group-hover:opacity-75 blur-xl transition-all duration-500 animate-glow`} />
+    <div className="relative group">
+      {/* Subtle glow effect on hover */}
+      <div className={`absolute -inset-0.5 bg-gradient-to-r ${glowColor} rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300`} />
       
-      <Card className="relative transform group-hover:-translate-y-2 transition-all duration-300 backdrop-blur-md bg-card/80 border-primary/30 overflow-hidden">
+      <Card className="relative group-hover:-translate-y-1 transition-all duration-300 glass-card border-primary/30 overflow-hidden">
         {/* Bitcoin watermark */}
-        <div className="absolute top-0 right-0 opacity-5">
+        <div className="absolute top-0 right-0 opacity-[0.03]">
           <Bitcoin className="w-48 h-48 text-primary" />
         </div>
 
         {popular && (
           <div className="absolute top-4 right-4 z-20">
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-background animate-pulse">
+            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-background">
               POPULAR
             </Badge>
           </div>
@@ -93,9 +88,8 @@ export const InvestmentPlanCard = ({
 
           {/* CTA Button */}
           <Link to="/auth" className="block">
-            <Button className="w-full group/btn relative overflow-hidden bg-primary hover:bg-primary/90 shadow-elegant hover:shadow-glow transition-all duration-300">
-              <span className="relative z-10">Start Investing</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-glow to-accent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+            <Button className="w-full bg-primary hover:bg-primary/90 shadow-elegant transition-all duration-300 hover:scale-[1.02]">
+              Start Investing
             </Button>
           </Link>
         </CardContent>

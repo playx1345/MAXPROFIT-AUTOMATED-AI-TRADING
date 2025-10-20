@@ -10,13 +10,12 @@ import { Link } from "react-router-dom";
 const Landing = () => {
   const featuresRef = useScrollAnimation(0.1);
   const plansRef = useScrollAnimation(0.1);
-  const howItWorksRef = useScrollAnimation(0.1);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Risk Warning Banner */}
-      <Alert className="rounded-none border-x-0 border-t-0 bg-destructive/10 border-destructive/50 animate-slide-in-up">
-        <AlertTriangle className="h-4 w-4 animate-pulse" />
+      <Alert className="rounded-none border-x-0 border-t-0 bg-destructive/10 border-destructive/50">
+        <AlertTriangle className="h-4 w-4" />
         <AlertDescription className="text-sm font-medium">
           <strong>Risk Warning:</strong> Cryptocurrency investments carry significant risk. Past performance does not guarantee future results. You may lose some or all of your investment. Only invest what you can afford to lose.
         </AlertDescription>
@@ -32,12 +31,8 @@ const Landing = () => {
       <section ref={featuresRef.ref} className="relative py-20 bg-muted/30">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
-          <div 
-            className={`text-center mb-16 transition-all duration-700 ${
-              featuresRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">
               Why Choose Max Forex?
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -50,25 +45,21 @@ const Landing = () => {
               icon={Bot}
               title="AI Trading Bot"
               description="Advanced algorithms analyze market trends and execute trades automatically with precision and speed"
-              delay={0}
             />
             <FeatureCard
               icon={Shield}
               title="Secure Platform"
               description="Bank-level security with KYC verification, encrypted transactions, and cold storage protection"
-              delay={100}
             />
             <FeatureCard
               icon={TrendingUp}
               title="Performance Tracking"
               description="Real-time portfolio monitoring with detailed profit/loss analytics and comprehensive reports"
-              delay={200}
             />
             <FeatureCard
               icon={Users}
               title="Referral Program"
               description="Earn generous bonuses when your referrals make their first deposit and start trading"
-              delay={300}
             />
           </div>
         </div>
@@ -77,12 +68,8 @@ const Landing = () => {
       {/* Investment Plans Section */}
       <section ref={plansRef.ref} className="relative py-20">
         <div className="container mx-auto px-4">
-          <div 
-            className={`text-center mb-16 transition-all duration-700 ${
-              plansRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">
               Investment Plans
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -104,7 +91,6 @@ const Landing = () => {
                 "24/7 customer support",
                 "Monthly performance reports"
               ]}
-              delay={0}
               glowColor="from-blue-400 to-cyan-600"
             />
             <InvestmentPlanCard
@@ -121,7 +107,6 @@ const Landing = () => {
                 "Weekly performance reports"
               ]}
               popular={true}
-              delay={100}
               glowColor="from-yellow-400 to-orange-600"
             />
             <InvestmentPlanCard
@@ -137,12 +122,11 @@ const Landing = () => {
                 "VIP support 24/7",
                 "Daily performance reports"
               ]}
-              delay={200}
               glowColor="from-purple-400 to-pink-600"
             />
           </div>
 
-          <div className="text-center mt-12 animate-fade-in" style={{ animationDelay: '400ms' }}>
+          <div className="text-center mt-12">
             <p className="text-sm text-muted-foreground max-w-3xl mx-auto">
               * Expected ROI ranges are estimates based on historical market conditions and are not guaranteed. 
               Actual returns may vary significantly and can be negative. All investments carry risk.
@@ -152,15 +136,11 @@ const Landing = () => {
       </section>
 
       {/* How It Works Section */}
-      <section ref={howItWorksRef.ref} className="relative py-20 bg-muted/30">
+      <section className="relative py-20 bg-muted/30">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
-          <div 
-            className={`text-center mb-16 transition-all duration-700 ${
-              howItWorksRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">
               How It Works
             </h2>
             <p className="text-xl text-muted-foreground">Get started in four simple steps</p>
@@ -173,13 +153,9 @@ const Landing = () => {
               { num: "3", title: "Choose Plan", desc: "Select an investment strategy that fits your goals and risk profile" },
               { num: "4", title: "Track & Earn", desc: "Monitor your portfolio performance and withdraw profits anytime" }
             ].map((step, index) => (
-              <div 
-                key={index} 
-                className="text-center group animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+              <div key={index} className="text-center group">
                 <div className="relative mb-6">
-                  <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center text-3xl font-bold text-primary-foreground mx-auto shadow-elegant group-hover:scale-110 group-hover:shadow-glow transition-all duration-300">
+                  <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center text-3xl font-bold text-primary-foreground mx-auto shadow-elegant group-hover:scale-110 transition-all duration-300">
                     {step.num}
                   </div>
                   {index < 3 && (

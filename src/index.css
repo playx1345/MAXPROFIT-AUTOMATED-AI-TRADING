@@ -57,7 +57,14 @@ All colors MUST be HSL.
     --shadow-sm: 0 2px 8px hsl(220 13% 13% / 0.05);
     --shadow-md: 0 4px 16px hsl(220 13% 13% / 0.08);
     --shadow-lg: 0 8px 32px hsl(220 13% 13% / 0.12);
-    --shadow-glow: 0 0 40px hsl(263 70% 65% / 0.3);
+    --shadow-elegant: 0 10px 30px -10px hsl(263 70% 50% / 0.3);
+    --shadow-glow: 0 0 40px hsl(263 70% 65% / 0.4);
+    
+    /* Bitcoin Brand Color */
+    --bitcoin-orange: 25 95% 53%;
+    
+    /* Perspective */
+    --perspective: 1000px;
   }
 
   .dark {
@@ -108,7 +115,8 @@ All colors MUST be HSL.
     --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.3);
     --shadow-md: 0 4px 16px hsl(0 0% 0% / 0.4);
     --shadow-lg: 0 8px 32px hsl(0 0% 0% / 0.5);
-    --shadow-glow: 0 0 40px hsl(263 70% 70% / 0.4);
+    --shadow-elegant: 0 10px 30px -10px hsl(263 70% 55% / 0.4);
+    --shadow-glow: 0 0 40px hsl(263 70% 70% / 0.5);
   }
 }
 
@@ -119,5 +127,23 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .perspective-1000 {
+    perspective: var(--perspective);
   }
 }

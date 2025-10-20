@@ -21,41 +21,40 @@ export const AnimatedHero = () => {
             </div>
 
             {/* Main heading */}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="text-gradient">
                 Max Forex &
               </span>
               <br />
-              <span className="bg-gradient-to-r from-accent via-primary to-primary-glow bg-clip-text text-transparent">
+              <span className="text-gradient">
                 Automated Trading Robot
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
               Harness the power of AI-driven algorithms to maximize your returns in the crypto and forex markets. Professional trading made accessible.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/auth">
-                <Button size="lg" className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-105">
+                <Button size="lg" className="group relative overflow-hidden px-8 py-6 text-lg shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-105">
                   <span className="relative z-10 flex items-center gap-2">
                     Get Started
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary-glow to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </Button>
               </Link>
               <Link to="/auth">
-                <Button size="lg" variant="outline" className="backdrop-blur-sm bg-background/50 border-primary/30 hover:bg-primary/10 hover:border-primary/50 px-8 py-6 text-lg transition-all duration-300 hover:scale-105">
+                <Button size="lg" variant="outline" className="px-8 py-6 text-lg transition-all duration-300 hover:scale-105">
                   Sign In
                 </Button>
               </Link>
             </div>
 
             {/* Trust indicators */}
-            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                 <span>KYC Verified</span>

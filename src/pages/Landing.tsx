@@ -50,25 +50,21 @@ const Landing = () => {
               icon={Bot}
               title="AI Trading Bot"
               description="Advanced algorithms analyze market trends and execute trades automatically with precision and speed"
-              delay={0}
             />
             <FeatureCard
               icon={Shield}
               title="Secure Platform"
               description="Bank-level security with KYC verification, encrypted transactions, and cold storage protection"
-              delay={100}
             />
             <FeatureCard
               icon={TrendingUp}
               title="Performance Tracking"
               description="Real-time portfolio monitoring with detailed profit/loss analytics and comprehensive reports"
-              delay={200}
             />
             <FeatureCard
               icon={Users}
               title="Referral Program"
               description="Earn generous bonuses when your referrals make their first deposit and start trading"
-              delay={300}
             />
           </div>
         </div>
@@ -104,7 +100,6 @@ const Landing = () => {
                 "24/7 customer support",
                 "Monthly performance reports"
               ]}
-              delay={0}
               glowColor="from-blue-400 to-cyan-600"
             />
             <InvestmentPlanCard
@@ -121,7 +116,6 @@ const Landing = () => {
                 "Weekly performance reports"
               ]}
               popular={true}
-              delay={100}
               glowColor="from-yellow-400 to-orange-600"
             />
             <InvestmentPlanCard
@@ -137,12 +131,11 @@ const Landing = () => {
                 "VIP support 24/7",
                 "Daily performance reports"
               ]}
-              delay={200}
               glowColor="from-purple-400 to-pink-600"
             />
           </div>
 
-          <div className="text-center mt-12 animate-fade-in" style={{ animationDelay: '400ms' }}>
+          <div className="text-center mt-12">
             <p className="text-sm text-muted-foreground max-w-3xl mx-auto">
               * Expected ROI ranges are estimates based on historical market conditions and are not guaranteed. 
               Actual returns may vary significantly and can be negative. All investments carry risk.
@@ -173,11 +166,8 @@ const Landing = () => {
               { num: "3", title: "Choose Plan", desc: "Select an investment strategy that fits your goals and risk profile" },
               { num: "4", title: "Track & Earn", desc: "Monitor your portfolio performance and withdraw profits anytime" }
             ].map((step, index) => (
-              <div 
-                key={index} 
-                className="text-center group animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+              <div key={index} className="text-center group">
+
                 <div className="relative mb-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center text-3xl font-bold text-primary-foreground mx-auto shadow-elegant group-hover:scale-110 group-hover:shadow-glow transition-all duration-300">
                     {step.num}

@@ -5,15 +5,12 @@ interface FeatureCardProps {
   icon: LucideIcon;
   title: string;
   description: string;
-  delay?: number;
 }
 
-export const FeatureCard = ({ icon: Icon, title, description, delay = 0 }: FeatureCardProps) => {
+export const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps) => {
   return (
-    <Card 
-      className="group relative overflow-hidden backdrop-blur-md bg-card/50 border-primary/20 hover:scale-105 hover:shadow-glow hover:border-primary/40 transition-all duration-500 animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
-    >
+    <Card className="group relative overflow-hidden glass-card hover:scale-105 hover:shadow-glow hover:border-primary/40 transition-all duration-300">
+
       {/* Gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       

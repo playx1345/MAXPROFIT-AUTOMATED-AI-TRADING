@@ -12,7 +12,6 @@ interface InvestmentPlanCardProps {
   expectedROI: string;
   features: string[];
   popular?: boolean;
-  delay?: number;
   glowColor?: string;
 }
 
@@ -24,14 +23,11 @@ export const InvestmentPlanCard = ({
   expectedROI,
   features,
   popular = false,
-  delay = 0,
   glowColor = "from-blue-400 to-blue-600"
 }: InvestmentPlanCardProps) => {
   return (
-    <div 
-      className="relative group animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
-    >
+    <div className="relative group">
+
       {/* Glow effect */}
       <div className={`absolute -inset-1 bg-gradient-to-r ${glowColor} rounded-2xl opacity-0 group-hover:opacity-75 blur-xl transition-all duration-500 animate-glow`} />
       
@@ -43,7 +39,7 @@ export const InvestmentPlanCard = ({
 
         {popular && (
           <div className="absolute top-4 right-4 z-20">
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-background animate-pulse">
+            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-background">
               POPULAR
             </Badge>
           </div>
@@ -93,9 +89,8 @@ export const InvestmentPlanCard = ({
 
           {/* CTA Button */}
           <Link to="/auth" className="block">
-            <Button className="w-full group/btn relative overflow-hidden bg-primary hover:bg-primary/90 shadow-elegant hover:shadow-glow transition-all duration-300">
-              <span className="relative z-10">Start Investing</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-glow to-accent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+            <Button className="w-full shadow-elegant hover:shadow-glow transition-all duration-300">
+              Start Investing
             </Button>
           </Link>
         </CardContent>

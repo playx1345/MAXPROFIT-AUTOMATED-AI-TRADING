@@ -228,6 +228,7 @@ const Landing = () => {
                 <li><a href="#faq" className="hover:text-primary transition-colors">FAQ</a></li>
                 <li><a href="#contact" className="hover:text-primary transition-colors">Contact Us</a></li>
                 <li><a href="#help" className="hover:text-primary transition-colors">Help Center</a></li>
+                <li><Link to="/admin/login" className="hover:text-primary transition-colors text-xs opacity-50 hover:opacity-100">Admin Portal</Link></li>
               </ul>
             </div>
           </div>

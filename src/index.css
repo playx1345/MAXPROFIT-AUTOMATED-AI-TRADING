@@ -147,6 +147,11 @@ All colors MUST be HSL.
   @apply backdrop-blur-md bg-card/30 border border-primary/20;
 }
 
+/* Gradient Utilities */
+.bg-gradient-accent {
+  background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
+}
+
 /* Shadow utilities */
 .shadow-elegant {
   box-shadow: 0 10px 40px -10px hsl(var(--primary) / 0.3);

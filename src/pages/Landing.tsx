@@ -4,6 +4,8 @@ import { AnimatedHero } from "@/components/landing/AnimatedHero";
 import { StatsCounter } from "@/components/landing/StatsCounter";
 import { FeatureCard } from "@/components/landing/FeatureCard";
 import { InvestmentPlanCard } from "@/components/landing/InvestmentPlanCard";
+import { CryptoTicker } from "@/components/landing/CryptoTicker";
+import { MarketStats } from "@/components/landing/MarketStats";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Link } from "react-router-dom";
 
@@ -24,6 +26,12 @@ const Landing = () => {
 
       {/* Hero Section */}
       <AnimatedHero />
+
+      {/* Crypto Ticker */}
+      <CryptoTicker />
+
+      {/* Market Stats Section */}
+      <MarketStats />
 
       {/* Stats Counter Section */}
       <StatsCounter />

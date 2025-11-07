@@ -147,6 +147,31 @@ All colors MUST be HSL.
   @apply backdrop-blur-md bg-card/30 border border-primary/20;
 }
 
+/* Performance utilities */
+.animate-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Enhanced glass effect */
+.glass-card-enhanced {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth hover transitions */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-elegant);
+}
+
 /* Gradient Utilities */
 .bg-gradient-accent {
   background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));

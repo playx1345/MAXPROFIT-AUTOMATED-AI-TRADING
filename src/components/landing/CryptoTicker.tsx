@@ -54,7 +54,7 @@ export const CryptoTicker = () => {
   return (
     <div className="bg-gradient-to-r from-muted/30 via-muted/50 to-muted/30 border-y border-border/50 py-4 overflow-hidden relative">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 animate-shimmer" />
-      <div className="relative flex animate-scroll-left">
+      <div className="relative flex animate-scroll-left animate-optimized">
         {duplicatedCryptos.map((crypto, index) => (
           <div
             key={`${crypto.id}-${index}`}

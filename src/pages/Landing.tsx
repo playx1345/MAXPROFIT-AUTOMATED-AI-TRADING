@@ -18,7 +18,7 @@ const Landing = () => {
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Risk Warning Banner */}
       <Alert className="rounded-none border-x-0 border-t-0 bg-destructive/10 border-destructive/50 animate-slide-in-up">
-        <AlertTriangle className="h-4 w-4 animate-pulse" />
+        <AlertTriangle className="h-4 w-4" />
         <AlertDescription className="text-sm font-medium">
           <strong>Risk Warning:</strong> Cryptocurrency investments carry significant risk. Past performance does not guarantee future results. You may lose some or all of your investment. Only invest what you can afford to lose.
         </AlertDescription>
@@ -41,7 +41,7 @@ const Landing = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
           <div 
-            className={`text-center mb-16 transition-all duration-700 ${
+            className={`text-center mb-16 transition-all duration-400 ${
               featuresRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
           >
@@ -82,7 +82,7 @@ const Landing = () => {
       <section ref={plansRef.ref} className="relative py-20">
         <div className="container mx-auto px-4">
           <div 
-            className={`text-center mb-16 transition-all duration-700 ${
+            className={`text-center mb-16 transition-all duration-400 ${
               plansRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
           >
@@ -157,7 +157,7 @@ const Landing = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
           <div 
-            className={`text-center mb-16 transition-all duration-700 ${
+            className={`text-center mb-16 transition-all duration-400 ${
               howItWorksRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
           >
@@ -175,9 +175,8 @@ const Landing = () => {
               { num: "4", title: "Track & Earn", desc: "Monitor your portfolio performance and withdraw profits anytime" }
             ].map((step, index) => (
               <div key={index} className="text-center group">
-
                 <div className="relative mb-6">
-                  <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center text-3xl font-bold text-primary-foreground mx-auto shadow-elegant group-hover:scale-110 group-hover:shadow-glow transition-all duration-300">
+                  <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center text-3xl font-bold text-primary-foreground mx-auto shadow-elegant hover-lift animate-optimized">
                     {step.num}
                   </div>
                   {index < 3 && (

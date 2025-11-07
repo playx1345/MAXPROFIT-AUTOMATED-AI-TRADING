@@ -60,9 +60,9 @@ export const MarketStats = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className={`glass-card p-6 rounded-xl shadow-elegant hover:shadow-glow transition-all duration-500 group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`glass-card p-6 rounded-xl hover-lift animate-optimized transition-all duration-300 group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
                 <DollarSign className="w-6 h-6 text-primary" />
               </div>
               {marketData && (
@@ -78,9 +78,9 @@ export const MarketStats = () => {
             </p>
           </div>
 
-          <div className={`glass-card p-6 rounded-xl shadow-elegant hover:shadow-glow transition-all duration-500 group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '100ms' }}>
+          <div className={`glass-card p-6 rounded-xl hover-lift animate-optimized transition-all duration-300 [transition-delay:100ms] group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+              <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors duration-200">
                 <Activity className="w-6 h-6 text-accent" />
               </div>
             </div>
@@ -90,9 +90,9 @@ export const MarketStats = () => {
             </p>
           </div>
 
-          <div className={`glass-card p-6 rounded-xl shadow-elegant hover:shadow-glow transition-all duration-500 group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '200ms' }}>
+          <div className={`glass-card p-6 rounded-xl hover-lift animate-optimized transition-all duration-300 [transition-delay:200ms] group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
             </div>

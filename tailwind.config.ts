@@ -58,6 +58,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        bitcoin: "hsl(var(--bitcoin-orange))",
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -134,8 +139,8 @@ export default {
           "100%": { transform: "translateX(-50%)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(139, 92, 246, 0.3)" },
-          "50%": { boxShadow: "0 0 40px rgba(139, 92, 246, 0.6)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(45 93% 58% / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(45 93% 58% / 0.6)" },
         },
         "fade-in-fast": {
           "0%": { opacity: "0", transform: "translateY(5px)" },

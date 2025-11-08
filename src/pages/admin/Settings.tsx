@@ -114,7 +114,7 @@ const AdminSettings = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-muted-foreground">Platform Name</Label>
-              <p className="font-medium">Max Forex & Automated Trading Robot</p>
+              <p className="font-medium">Golden Return AI Trading Platform</p>
             </div>
             <div>
               <Label className="text-muted-foreground">Support Email</Label>

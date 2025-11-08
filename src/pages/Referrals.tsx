@@ -105,7 +105,7 @@ const Referrals = () => {
 
   const shareWhatsApp = () => {
     const message = encodeURIComponent(
-      `Join Max Forex & Automated Trading Robot and start investing in crypto! Use my referral link: ${referralLink}`
+      `Join Golden Return AI Trading Platform and start investing in crypto! Use my referral link: ${referralLink}`
     );
     window.open(`https://wa.me/?text=${message}`, "_blank");
   };

@@ -79,7 +79,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               <div>
                 <h1 className="text-xl font-bold">Admin Panel</h1>
                 <Badge variant="secondary" className="text-xs">
-                  Max Forex
+                  Golden Return
                 </Badge>
               </div>
             </div>

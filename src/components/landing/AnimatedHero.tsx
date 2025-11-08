@@ -23,11 +23,11 @@ export const AnimatedHero = () => {
             {/* Main heading */}
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
               <span className="text-gradient">
-                Max Forex &
+                Golden Return
               </span>
               <br />
               <span className="text-gradient">
-                Automated Trading Robot
+                AI Trading Platform
               </span>
             </h1>
 

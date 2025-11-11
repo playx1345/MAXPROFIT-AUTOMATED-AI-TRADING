@@ -6,6 +6,7 @@ import { FeatureCard } from "@/components/landing/FeatureCard";
 import { InvestmentPlanCard } from "@/components/landing/InvestmentPlanCard";
 import { CryptoTicker } from "@/components/landing/CryptoTicker";
 import { MarketStats } from "@/components/landing/MarketStats";
+import { FAQ } from "@/components/landing/FAQ";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Link } from "react-router-dom";
 
@@ -13,6 +14,7 @@ const Landing = () => {
   const featuresRef = useScrollAnimation(0.1);
   const plansRef = useScrollAnimation(0.1);
   const howItWorksRef = useScrollAnimation(0.1);
+  const faqRef = useScrollAnimation(0.1);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -187,6 +189,32 @@ const Landing = () => {
                 <p className="text-sm text-muted-foreground">{step.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section ref={faqRef.ref} className="relative py-20">
+        <div className="container mx-auto px-4">
+          <div 
+            className={`text-center mb-16 transition-all duration-400 ${
+              faqRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Find answers to common questions about our platform
+            </p>
+          </div>
+          
+          <div 
+            className={`transition-all duration-400 delay-200 ${
+              faqRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <FAQ />
           </div>
         </div>
       </section>

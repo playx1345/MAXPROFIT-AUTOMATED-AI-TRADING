@@ -23,7 +23,7 @@ export const AnimatedHero = () => {
             {/* Main heading */}
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
               <span className="text-gradient">
-                Golden Return
+                Win Trade Invest
               </span>
               <br />
               <span className="text-gradient">

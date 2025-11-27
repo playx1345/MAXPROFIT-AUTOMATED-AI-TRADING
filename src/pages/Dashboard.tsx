@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Wallet, TrendingUp, ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -10,42 +11,6 @@ interface DashboardStats {
   totalProfit: number;
   activeInvestments: number;
 }
-
-interface AnimatedNumberProps {
-  value: number;
-  prefix?: string;
-  suffix?: string;
-  decimals?: number;
-}
-
-const AnimatedNumber = ({ value, prefix = "", suffix = "", decimals = 2 }: AnimatedNumberProps) => {
-  const [displayValue, setDisplayValue] = useState(0);
-  
-  useEffect(() => {
-    const duration = 1000;
-    const steps = 30;
-    const stepValue = value / steps;
-    let current = 0;
-    
-    const timer = setInterval(() => {
-      current += stepValue;
-      if (current >= value) {
-        setDisplayValue(value);
-        clearInterval(timer);
-      } else {
-        setDisplayValue(current);
-      }
-    }, duration / steps);
-    
-    return () => clearInterval(timer);
-  }, [value]);
-  
-  return (
-    <span className="animate-count-up">
-      {prefix}{displayValue.toFixed(decimals)}{suffix}
-    </span>
-  );
-};
 
 const Dashboard = () => {
   const { toast } = useToast();

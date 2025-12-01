@@ -1,0 +1,19 @@
+-- Migration: Create user SHAWN SPICER
+-- Email: SHAWNSPICER55@GMAIL.COM
+-- 
+-- NOTE: Supabase user creation requires the Auth Admin API.
+-- This migration documents the user that needs to be created.
+-- 
+-- To create this user:
+-- 1. Go to Supabase Dashboard > Authentication > Users
+-- 2. Click "Add User" > "Create New User"
+-- 3. Enter the following details:
+--    - Email: SHAWNSPICER55@GMAIL.COM
+--    - Full Name: SHAWN SPICER
+--    - Set a secure password
+--
+-- Alternatively, the user can sign up through the application at /auth
+-- using the email SHAWNSPICER55@GMAIL.COM
+
+-- The profile will be created automatically by the handle_new_user trigger
+-- when the user signs up or is created via the Supabase dashboard.

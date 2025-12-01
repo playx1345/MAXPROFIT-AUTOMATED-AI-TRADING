@@ -24,11 +24,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import {
   CheckCircle,
   Clock,
+  Loader2,
   Mail,
   MessageSquare,
   Trash2,
@@ -59,6 +70,8 @@ const AdminContactInquiries = () => {
   const [replyText, setReplyText] = useState("");
   const [processing, setProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -194,14 +207,19 @@ const AdminContactInquiries = () => {
     }
   };
 
-  const handleDelete = async (messageId: string) => {
-    if (!confirm("Are you sure you want to delete this message?")) return;
+  const handleDeleteClick = (messageId: string) => {
+    setMessageToDelete(messageId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!messageToDelete) return;
 
     try {
       const { error } = await supabase
         .from("contact_messages")
         .delete()
-        .eq("id", messageId);
+        .eq("id", messageToDelete);
 
       if (error) throw error;
 
@@ -219,6 +237,9 @@ const AdminContactInquiries = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setDeleteDialogOpen(false);
+      setMessageToDelete(null);
     }
   };
 
@@ -296,7 +317,7 @@ const AdminContactInquiries = () => {
                     size="sm"
                     variant="ghost"
                     className="text-destructive hover:text-destructive"
-                    onClick={() => handleDelete(message.id)}
+                    onClick={() => handleDeleteClick(message.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -503,8 +524,8 @@ const AdminContactInquiries = () => {
                 >
                   {processing ? (
                     <>
-                      <span className="animate-spin mr-2">⏳</span>
-                      Sending...
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+                      <span>Sending...</span>
                     </>
                   ) : (
                     <>
@@ -518,6 +539,29 @@ const AdminContactInquiries = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this message? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setMessageToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

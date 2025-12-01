@@ -20,6 +20,7 @@ import AdminWithdrawals from "./pages/admin/Withdrawals";
 import AdminInvestments from "./pages/admin/Investments";
 import AdminTradingBot from "./pages/admin/TradingBot";
 import AdminSettings from "./pages/admin/Settings";
+import AdminContactInquiries from "./pages/admin/ContactInquiries";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
@@ -135,6 +136,13 @@ const App = () => (
             <AdminProtectedRoute>
               <AdminLayout>
                 <AdminSettings />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/contact-inquiries" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminContactInquiries />
               </AdminLayout>
             </AdminProtectedRoute>
           } />

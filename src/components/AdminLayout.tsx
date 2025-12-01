@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Shield,
+  MessageSquare,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -49,6 +50,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { path: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpRight },
     { path: "/admin/investments", label: "Investments", icon: TrendingUp },
     { path: "/admin/trading-bot", label: "Trading Bot", icon: Bot },
+    { path: "/admin/contact-inquiries", label: "Contact Inquiries", icon: MessageSquare },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 

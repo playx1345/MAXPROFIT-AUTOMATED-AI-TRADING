@@ -18,14 +18,6 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Risk Warning Banner */}
-      <Alert className="rounded-none border-x-0 border-t-0 bg-destructive/10 border-destructive/50 animate-slide-in-up">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription className="text-sm font-medium">
-          <strong>Risk Warning:</strong> Cryptocurrency investments carry significant risk. Past performance does not guarantee future results. You may lose some or all of your investment. Only invest what you can afford to lose.
-        </AlertDescription>
-      </Alert>
-
       {/* Hero Section */}
       <AnimatedHero />
 
@@ -277,6 +269,14 @@ const Landing = () => {
               Users must be 18+ and comply with local regulations.
             </p>
           </div>
+
+          {/* Risk Warning Banner - Footer */}
+          <Alert className="mt-8 bg-destructive/10 border-destructive/50">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription className="text-sm font-medium">
+              <strong>Risk Warning:</strong> Cryptocurrency investments carry significant risk. Past performance does not guarantee future results. You may lose some or all of your investment. Only invest what you can afford to lose.
+            </AlertDescription>
+          </Alert>
         </div>
       </footer>
     </div>

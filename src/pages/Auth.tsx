@@ -122,8 +122,11 @@ const Auth = () => {
 
       <Card className="w-full max-w-md animate-scale-in shadow-lg backdrop-blur-sm bg-card/95 border-border/50 relative z-10">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-            Welcome to CryptoInvest
+          <div className="flex justify-center mb-2">
+            <img src="/logo.svg" alt="Win Trade Invest" className="h-16 w-16" />
+          </div>
+          <CardTitle className="text-3xl font-bold text-gradient">
+            Win Trade Invest
           </CardTitle>
           <CardDescription className="text-base">Sign in to your account or create a new one</CardDescription>
         </CardHeader>

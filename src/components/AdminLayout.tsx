@@ -15,7 +15,6 @@ import {
   LogOut,
   Menu,
   X,
-  Shield,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -72,17 +71,15 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b">
-            <div className="flex items-center gap-2">
-              <div className="h-10 w-10 bg-primary rounded-lg flex items-center justify-center">
-                <Shield className="h-6 w-6 text-primary-foreground" />
-              </div>
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/logo.svg" alt="Win Trade Invest" className="h-10 w-10" />
               <div>
                 <h1 className="text-xl font-bold">Admin Panel</h1>
                 <Badge variant="secondary" className="text-xs">
                   Win Trade Invest
                 </Badge>
               </div>
-            </div>
+            </Link>
           </div>
 
           <ScrollArea className="flex-1 py-4">

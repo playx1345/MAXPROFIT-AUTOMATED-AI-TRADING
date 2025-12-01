@@ -14,6 +14,11 @@ export const AnimatedHero = () => {
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="max-w-5xl mx-auto text-center">
           <div className="backdrop-blur-md bg-card/30 rounded-3xl p-8 md:p-12 border border-primary/20 shadow-elegant animate-scale-in">
+            {/* Logo */}
+            <div className="flex justify-center mb-6 animate-fade-in">
+              <img src="/logo.svg" alt="Win Trade Invest" className="h-20 w-20 md:h-24 md:w-24" />
+            </div>
+
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 animate-fade-in">
               <Sparkles className="w-4 h-4 text-primary" />

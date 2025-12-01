@@ -31,7 +31,7 @@ export const StatsCounter = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
                   <Icon className="h-10 w-10 mb-3 text-primary group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" />
-                  <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+                  <div className="text-4xl font-bold text-yellow-400 mb-2">
                     {stat.prefix}{count.toLocaleString()}{stat.suffix}
                   </div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>

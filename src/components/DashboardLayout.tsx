@@ -17,6 +17,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -93,11 +94,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative overflow-hidden ${
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative overflow-hidden",
                       isActive
                         ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-elegant"
                         : "hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/5 hover:translate-x-1 hover:border-primary/20"
-                    }`}
+                    )}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {/* Active indicator with glow */}
@@ -108,7 +110,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     {/* Hover effect background with glass */}
                     <span className={`absolute inset-0 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${isActive ? 'opacity-0' : ''}`} />
                     
-                    <Icon className={`h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary ${isActive ? 'drop-shadow-glow' : ''}`} />
+                    <Icon className={cn(
+                      "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary",
+                      isActive && "drop-shadow-glow"
+                    )} />
                     <span className="relative font-medium">{item.label}</span>
                     
                     {/* Arrow indicator with accent color on hover */}

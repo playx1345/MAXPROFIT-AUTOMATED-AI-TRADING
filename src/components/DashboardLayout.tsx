@@ -53,30 +53,31 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div className="min-h-screen flex w-full bg-background">
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button with Glass Effect */}
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden transition-transform duration-300 hover:scale-110 active:scale-95"
+        className="fixed top-4 left-4 z-50 lg:hidden transition-all duration-300 hover:scale-110 active:scale-95 glass-card border border-primary/20 hover:border-primary/40 hover:shadow-glow backdrop-blur-lg"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         <div className={`transition-transform duration-300 ${sidebarOpen ? 'rotate-90' : 'rotate-0'}`}>
-          {sidebarOpen ? <X /> : <Menu />}
+          {sidebarOpen ? <X className="text-primary" /> : <Menu className="text-primary" />}
         </div>
       </Button>
 
-      {/* Sidebar */}
+      {/* Sidebar with Glass Effect */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-card border-r transform transition-all duration-300 ease-out ${
-          sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 glass-card-enhanced border-r border-primary/20 transform transition-all duration-300 ease-out ${
+          sidebarOpen ? "translate-x-0 shadow-glow" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent" />
+          <div className="p-6 border-b border-primary/10 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
             <h1 className="text-2xl font-bold relative flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-              <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+              <Sparkles className="h-5 w-5 text-primary animate-pulse drop-shadow-glow" />
+              <span className="text-gradient-premium font-display">
                 CryptoInvest
               </span>
             </h1>
@@ -94,24 +95,24 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative overflow-hidden ${
                       isActive
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                        : "hover:bg-muted hover:translate-x-1"
+                        ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-elegant"
+                        : "hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/5 hover:translate-x-1 hover:border-primary/20"
                     }`}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    {/* Active indicator */}
+                    {/* Active indicator with glow */}
                     {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary-foreground rounded-r-full" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-accent rounded-r-full shadow-accent" />
                     )}
                     
-                    {/* Hover effect background */}
-                    <span className={`absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isActive ? 'opacity-0' : ''}`} />
+                    {/* Hover effect background with glass */}
+                    <span className={`absolute inset-0 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${isActive ? 'opacity-0' : ''}`} />
                     
-                    <Icon className={`h-5 w-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'animate-pulse' : ''}`} />
-                    <span className="relative">{item.label}</span>
+                    <Icon className={`h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary ${isActive ? 'drop-shadow-glow' : ''}`} />
+                    <span className="relative font-medium">{item.label}</span>
                     
-                    {/* Arrow indicator on hover */}
-                    <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ${isActive ? 'opacity-100 translate-x-0' : ''}`}>
+                    {/* Arrow indicator with accent color on hover */}
+                    <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent ${isActive ? 'opacity-100 translate-x-0' : ''}`}>
                       <ArrowUpRight className="h-4 w-4" />
                     </span>
                   </Link>
@@ -120,14 +121,14 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </nav>
           </ScrollArea>
 
-          <div className="p-4 border-t">
+          <div className="p-4 border-t border-primary/10 bg-gradient-to-t from-background/40 to-transparent">
             <Button
               variant="ghost"
-              className="w-full justify-start group hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+              className="w-full justify-start group hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:shadow-md border border-transparent hover:border-destructive/20"
               onClick={handleSignOut}
             >
-              <LogOut className="h-5 w-5 mr-3 transition-transform duration-300 group-hover:-translate-x-1" />
-              <span>Sign Out</span>
+              <LogOut className="h-5 w-5 mr-3 transition-transform duration-300 group-hover:-translate-x-1 group-hover:rotate-12" />
+              <span className="font-medium">Sign Out</span>
             </Button>
           </div>
         </div>

@@ -301,4 +301,8 @@ All colors MUST be HSL.
   .perspective-1000 {
     perspective: var(--perspective);
   }
+
+  .drop-shadow-glow {
+    filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.5));
+  }
 }

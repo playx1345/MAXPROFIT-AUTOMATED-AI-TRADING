@@ -37,6 +37,10 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    
+    // Set mounted state for animations after a brief delay
+    const timer = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchDashboardData = async () => {
@@ -123,7 +127,6 @@ const AdminDashboard = () => {
       });
     } finally {
       setLoading(false);
-      setTimeout(() => setMounted(true), 100);
     }
   };
 
@@ -132,8 +135,6 @@ const AdminDashboard = () => {
       title: "Total Users",
       icon: Users,
       value: stats.totalUsers,
-      prefix: "",
-      suffix: "",
       description: "Platform users",
       colorClass: "text-primary",
       iconBgClass: "bg-primary/10",
@@ -145,7 +146,6 @@ const AdminDashboard = () => {
       icon: DollarSign,
       value: stats.totalPlatformValue,
       prefix: "$",
-      suffix: "",
       description: "Total AUM",
       colorClass: "text-success",
       iconBgClass: "bg-success/10",
@@ -155,8 +155,6 @@ const AdminDashboard = () => {
       title: "Pending Deposits",
       icon: AlertCircle,
       value: stats.pendingDeposits,
-      prefix: "",
-      suffix: "",
       description: "Awaiting approval",
       colorClass: "text-warning",
       iconBgClass: "bg-warning/10",
@@ -167,8 +165,6 @@ const AdminDashboard = () => {
       title: "Pending Withdrawals",
       icon: AlertCircle,
       value: stats.pendingWithdrawals,
-      prefix: "",
-      suffix: "",
       description: "Awaiting processing",
       colorClass: "text-accent",
       iconBgClass: "bg-accent/10",
@@ -179,8 +175,6 @@ const AdminDashboard = () => {
       title: "Active Investments",
       icon: TrendingUp,
       value: stats.activeInvestments,
-      prefix: "",
-      suffix: "",
       description: "Currently running",
       colorClass: "text-primary-glow",
       iconBgClass: "bg-primary-glow/10",
@@ -240,9 +234,9 @@ const AdminDashboard = () => {
               <CardContent>
                 <div className={`text-2xl font-bold font-display ${card.colorClass}`}>
                   {card.isInteger ? (
-                    <AnimatedNumber value={card.value} prefix={card.prefix} suffix={card.suffix} decimals={0} />
+                    <AnimatedNumber value={card.value} prefix={card.prefix || ""} suffix={card.suffix || ""} decimals={0} />
                   ) : (
-                    <AnimatedNumber value={card.value} prefix={card.prefix} suffix={card.suffix} />
+                    <AnimatedNumber value={card.value} prefix={card.prefix || ""} suffix={card.suffix || ""} />
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">{card.description}</p>

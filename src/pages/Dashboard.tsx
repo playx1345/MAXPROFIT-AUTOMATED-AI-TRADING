@@ -88,6 +88,7 @@ const Dashboard = () => {
       description: "USDT",
       colorClass: "text-primary",
       iconBgClass: "bg-primary/10",
+      borderClass: "border-primary/30",
     },
     {
       title: "Total Invested",
@@ -96,8 +97,9 @@ const Dashboard = () => {
       prefix: "$",
       suffix: "",
       description: "Across all investments",
-      colorClass: "text-blue-500",
-      iconBgClass: "bg-blue-500/10",
+      colorClass: "text-accent",
+      iconBgClass: "bg-accent/10",
+      borderClass: "border-accent/30",
     },
     {
       title: "Total Profit/Loss",
@@ -106,8 +108,9 @@ const Dashboard = () => {
       prefix: "$",
       suffix: "",
       description: `${stats.totalProfit >= 0 ? "+" : ""}${stats.totalInvested > 0 ? ((stats.totalProfit / stats.totalInvested) * 100).toFixed(2) : "0.00"}%`,
-      colorClass: stats.totalProfit >= 0 ? "text-green-500" : "text-red-500",
-      iconBgClass: stats.totalProfit >= 0 ? "bg-green-500/10" : "bg-red-500/10",
+      colorClass: stats.totalProfit >= 0 ? "text-success" : "text-destructive",
+      iconBgClass: stats.totalProfit >= 0 ? "bg-success/10" : "bg-destructive/10",
+      borderClass: stats.totalProfit >= 0 ? "border-success/30" : "border-destructive/30",
     },
     {
       title: "Active Investments",
@@ -116,8 +119,9 @@ const Dashboard = () => {
       prefix: "",
       suffix: "",
       description: "Currently running",
-      colorClass: "text-purple-500",
-      iconBgClass: "bg-purple-500/10",
+      colorClass: "text-primary-glow",
+      iconBgClass: "bg-primary-glow/10",
+      borderClass: "border-primary-glow/30",
       isInteger: true,
     },
   ], [stats]);
@@ -125,8 +129,11 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="h-10 w-10 text-primary animate-spin-slow" />
-        <div className="animate-pulse-soft text-muted-foreground font-medium">Loading dashboard...</div>
+        <div className="relative">
+          <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+          <Loader2 className="h-10 w-10 text-primary animate-spin relative z-10" />
+        </div>
+        <div className="animate-pulse text-muted-foreground font-medium">Loading dashboard...</div>
       </div>
     );
   }
@@ -135,7 +142,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       {/* Header with fade-in animation */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold mb-2 font-display bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
           Dashboard
         </h1>
         <p className="text-muted-foreground">Welcome to your investment dashboard</p>
@@ -148,24 +155,27 @@ const Dashboard = () => {
           return (
             <Card
               key={card.title}
-              className={`group relative overflow-hidden transition-all duration-500 ${
+              className={`group relative overflow-hidden transition-all duration-500 glass-card-enhanced ${card.borderClass} hover:shadow-none hover:scale-100 ${
                 mounted 
                   ? 'opacity-100 translate-y-0' 
                   : 'opacity-0 translate-y-8'
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
+              {/* Gradient accent line */}
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+              
               {/* Gradient background on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                <div className={`p-2 rounded-lg ${card.iconBgClass} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
+                <div className={`p-2.5 rounded-xl ${card.iconBgClass} transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                   <Icon className={`h-4 w-4 ${card.colorClass}`} />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${card.colorClass}`}>
+                <div className={`text-2xl font-bold font-display ${card.colorClass}`}>
                   {card.isInteger ? (
                     <AnimatedNumber value={card.value} prefix={card.prefix} suffix={card.suffix} decimals={0} />
                   ) : (
@@ -180,9 +190,9 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Transactions with slide-in animation */}
-      <Card className={`transition-all duration-500 delay-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <Card className={`glass-card-enhanced border-border/50 transition-all duration-500 delay-500 hover:shadow-none hover:scale-100 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 font-display">
             <span className="relative">
               Recent Transactions
               <span className="absolute -right-3 -top-1 h-2 w-2 bg-primary rounded-full animate-pulse" />
@@ -192,7 +202,7 @@ const Dashboard = () => {
         <CardContent>
           {recentTransactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mb-4 animate-bounce-subtle">
+              <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mb-4 animate-bounce">
                 <ArrowUpRight className="h-8 w-8 text-muted-foreground" />
               </div>
               <p className="text-muted-foreground font-medium">No transactions yet</p>
@@ -203,20 +213,20 @@ const Dashboard = () => {
               {recentTransactions.map((tx, index) => (
                 <div 
                   key={tx.id} 
-                  className={`flex items-center justify-between border-b border-border/50 pb-3 last:border-0 group hover:bg-muted/30 rounded-lg px-3 py-2 -mx-3 transition-all duration-300 ${
+                  className={`flex items-center justify-between border-b border-border/30 pb-3 last:border-0 group hover:bg-muted/20 rounded-lg px-3 py-2 -mx-3 transition-all duration-300 ${
                     mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                   }`}
                   style={{ transitionDelay: `${600 + index * 100}ms` }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
-                      tx.type === 'deposit' ? 'bg-green-500/10' : 
-                      tx.type === 'withdrawal' ? 'bg-red-500/10' : 'bg-primary/10'
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
+                      tx.type === 'deposit' ? 'bg-success/10' : 
+                      tx.type === 'withdrawal' ? 'bg-destructive/10' : 'bg-primary/10'
                     }`}>
                       {tx.type === 'deposit' ? (
-                        <ArrowDownLeft className="h-5 w-5 text-green-500" />
+                        <ArrowDownLeft className="h-5 w-5 text-success" />
                       ) : tx.type === 'withdrawal' ? (
-                        <ArrowUpRight className="h-5 w-5 text-red-500" />
+                        <ArrowUpRight className="h-5 w-5 text-destructive" />
                       ) : (
                         <TrendingUp className="h-5 w-5 text-primary" />
                       )}
@@ -229,11 +239,12 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold">${Number(tx.amount).toFixed(2)}</div>
+                    <div className="font-bold font-display">${Number(tx.amount).toFixed(2)}</div>
                     <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block ${
-                      tx.status === "completed" ? "bg-green-500/10 text-green-500" :
-                      tx.status === "pending" ? "bg-yellow-500/10 text-yellow-500" :
-                      tx.status === "rejected" ? "bg-red-500/10 text-red-500" : ""
+                      tx.status === "completed" ? "bg-success/10 text-success" :
+                      tx.status === "pending" ? "bg-warning/10 text-warning" :
+                      tx.status === "rejected" ? "bg-destructive/10 text-destructive" :
+                      tx.status === "approved" ? "bg-primary/10 text-primary" : ""
                     }`}>
                       {tx.status}
                     </div>

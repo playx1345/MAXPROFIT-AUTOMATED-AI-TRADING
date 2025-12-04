@@ -7,6 +7,7 @@ import { InvestmentPlanCard } from "@/components/landing/InvestmentPlanCard";
 import { CryptoTicker } from "@/components/landing/CryptoTicker";
 import { MarketStats } from "@/components/landing/MarketStats";
 import { FAQ } from "@/components/landing/FAQ";
+import { FloatingContactButton } from "@/components/landing/FloatingContactButton";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Link } from "react-router-dom";
 
@@ -282,6 +283,9 @@ const Landing = () => {
           </Alert>
         </div>
       </footer>
+
+      {/* Floating Contact Button */}
+      <FloatingContactButton />
     </div>
   );
 };

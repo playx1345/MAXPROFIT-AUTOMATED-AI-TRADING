@@ -63,6 +63,14 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -139,8 +147,7 @@ export default {
           "100%": { transform: "translateX(-50%)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(160 84% 45% / 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsl(160 84% 45% / 0.6)" },
+
         },
         "fade-in-fast": {
           "0%": { opacity: "0", transform: "translateY(5px)" },

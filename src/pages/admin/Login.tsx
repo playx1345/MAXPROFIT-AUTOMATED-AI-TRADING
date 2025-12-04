@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Shield } from "lucide-react";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -73,9 +72,7 @@ const AdminLogin = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 bg-primary rounded-full flex items-center justify-center">
-              <Shield className="h-8 w-8 text-primary-foreground" />
-            </div>
+            <img src="/logo.svg" alt="Win Trade Invest" className="h-16 w-16" />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>

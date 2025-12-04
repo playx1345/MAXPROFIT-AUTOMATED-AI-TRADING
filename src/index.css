@@ -8,8 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Win Trade Invest - Premium Trading Brand Identity */
-    /* Deep slate with electric cyan and warm amber accents */
+
     
     --background: 220 25% 8%;
     --foreground: 210 20% 96%;
@@ -72,72 +71,19 @@ All colors MUST be HSL.
     /* Bitcoin/Crypto Brand Color */
     --bitcoin-orange: 32 95% 52%;
     
-    /* Success/Growth Color */
-    --success: 158 70% 42%;
-    --success-foreground: 210 20% 96%;
 
-    /* Warning Color */
-    --warning: 45 95% 55%;
-    --warning-foreground: 220 25% 8%;
     
     /* Perspective */
     --perspective: 1200px;
   }
 
   .dark {
-    --background: 220 30% 5%;
-    --foreground: 210 20% 96%;
 
-    --card: 220 28% 9%;
-    --card-foreground: 210 20% 96%;
-
-    --popover: 220 28% 9%;
-    --popover-foreground: 210 20% 96%;
-
-    --primary: 185 90% 55%;
-    --primary-foreground: 220 30% 5%;
-    --primary-glow: 185 95% 70%;
-
-    --secondary: 220 22% 14%;
-    --secondary-foreground: 210 20% 96%;
-
-    --muted: 220 22% 12%;
-    --muted-foreground: 220 15% 50%;
-
-    --accent: 35 95% 58%;
-    --accent-foreground: 220 30% 5%;
 
     --destructive: 0 72% 55%;
     --destructive-foreground: 210 20% 96%;
 
-    --border: 220 22% 16%;
-    --input: 220 22% 16%;
-    --ring: 185 90% 55%;
 
-    --sidebar-background: 220 28% 7%;
-    --sidebar-foreground: 210 20% 94%;
-    --sidebar-primary: 185 90% 55%;
-    --sidebar-primary-foreground: 220 30% 5%;
-    --sidebar-accent: 220 22% 12%;
-    --sidebar-accent-foreground: 210 20% 96%;
-    --sidebar-border: 220 22% 14%;
-    --sidebar-ring: 185 90% 55%;
-
-    /* Dark mode gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(185 90% 55%) 0%, hsl(185 95% 70%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(35 95% 58%) 0%, hsl(45 95% 68%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(220 30% 5%) 0%, hsl(220 25% 8%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(220 28% 9%) 0%, hsl(220 22% 12%) 100%);
-    --gradient-premium: linear-gradient(135deg, hsl(220 35% 6%) 0%, hsl(220 28% 9%) 40%, hsl(185 35% 12%) 100%);
-    --gradient-hero: linear-gradient(145deg, hsl(220 30% 5%) 0%, hsl(220 35% 3%) 50%, hsl(185 25% 6%) 100%);
-
-    /* Dark mode shadows */
-    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.5);
-    --shadow-md: 0 4px 20px hsl(0 0% 0% / 0.6);
-    --shadow-lg: 0 8px 40px hsl(0 0% 0% / 0.7);
-    --shadow-elegant: 0 12px 50px -15px hsl(185 90% 55% / 0.4);
-    --shadow-glow: 0 0 60px hsl(185 90% 55% / 0.3);
-    --shadow-accent: 0 8px 30px -10px hsl(35 95% 58% / 0.45);
   }
 }
 

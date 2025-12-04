@@ -41,7 +41,7 @@ export const InvestmentPlanCard = ({
 
         {popular && (
           <div className="absolute top-4 right-4 z-20">
-            <Badge className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground border-0 shadow-lg">
+
               POPULAR
             </Badge>
           </div>
@@ -62,16 +62,7 @@ export const InvestmentPlanCard = ({
 
         <CardContent className="relative z-10 space-y-6">
           {/* Investment range */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50 border border-border/50">
-              <span className="text-muted-foreground text-sm">Min Investment</span>
-              <span className="text-xl font-bold text-primary">
-                {minInvestment}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50 border border-border/50">
-              <span className="text-muted-foreground text-sm">Max Investment</span>
-              <span className="text-xl font-bold text-primary">
+
                 {maxInvestment}
               </span>
             </div>
@@ -80,7 +71,7 @@ export const InvestmentPlanCard = ({
           {/* Expected ROI */}
           <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 border border-primary/20">
             <div className="text-sm text-muted-foreground mb-1">Expected ROI</div>
-            <div className="text-3xl font-bold font-display bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-transparent">
+
               {expectedROI}
             </div>
           </div>

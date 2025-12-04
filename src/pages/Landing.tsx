@@ -7,7 +7,6 @@ import { InvestmentPlanCard } from "@/components/landing/InvestmentPlanCard";
 import { CryptoTicker } from "@/components/landing/CryptoTicker";
 import { MarketStats } from "@/components/landing/MarketStats";
 import { FAQ } from "@/components/landing/FAQ";
-import { FloatingContactButton } from "@/components/landing/FloatingContactButton";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Link } from "react-router-dom";
 
@@ -103,7 +102,7 @@ const Landing = () => {
                 "24/7 customer support",
                 "Monthly performance reports"
               ]}
-              glowColor="from-cyan-400 to-cyan-600"
+              glowColor="from-blue-400 to-cyan-600"
             />
             <InvestmentPlanCard
               title="Growth Plan"
@@ -119,7 +118,7 @@ const Landing = () => {
                 "Weekly performance reports"
               ]}
               popular={true}
-              glowColor="from-emerald-400 to-teal-600"
+              glowColor="from-yellow-400 to-orange-600"
             />
             <InvestmentPlanCard
               title="Professional"
@@ -134,7 +133,7 @@ const Landing = () => {
                 "VIP support 24/7",
                 "Daily performance reports"
               ]}
-              glowColor="from-teal-400 to-emerald-600"
+              glowColor="from-purple-400 to-pink-600"
             />
           </div>
 
@@ -227,12 +226,9 @@ const Landing = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <img src="/logo.svg" alt="Win Trade Invest" className="h-10 w-10" />
-                <h3 className="font-bold text-2xl text-gradient">
-                  Win Trade Invest
-                </h3>
-              </div>
+              <h3 className="font-bold text-2xl mb-4 bg-gradient-primary bg-clip-text text-transparent">
+                Win Trade Invest
+              </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Professional cryptocurrency investment platform with AI-powered automated trading strategies.
               </p>
@@ -283,9 +279,6 @@ const Landing = () => {
           </Alert>
         </div>
       </footer>
-
-      {/* Floating Contact Button */}
-      <FloatingContactButton />
     </div>
   );
 };

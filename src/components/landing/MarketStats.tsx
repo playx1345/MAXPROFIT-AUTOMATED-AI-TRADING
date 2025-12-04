@@ -73,7 +73,7 @@ export const MarketStats = () => {
               )}
             </div>
             <h3 className="text-sm text-muted-foreground mb-2">Global Market Cap</h3>
-            <p className="text-3xl font-bold text-primary">
+            <p className="text-3xl font-bold text-yellow-400">
               ${marketCap}B+
             </p>
           </div>
@@ -85,7 +85,7 @@ export const MarketStats = () => {
               </div>
             </div>
             <h3 className="text-sm text-muted-foreground mb-2">24h Trading Volume</h3>
-            <p className="text-3xl font-bold text-primary">
+            <p className="text-3xl font-bold text-yellow-400">
               ${volume}B+
             </p>
           </div>
@@ -97,7 +97,7 @@ export const MarketStats = () => {
               </div>
             </div>
             <h3 className="text-sm text-muted-foreground mb-2">Active Markets</h3>
-            <p className="text-3xl font-bold text-primary">10,000+</p>
+            <p className="text-3xl font-bold text-yellow-400">10,000+</p>
           </div>
         </div>
       </div>

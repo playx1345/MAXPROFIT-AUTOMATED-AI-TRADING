@@ -166,7 +166,17 @@ const Auth = () => {
             </h1>
           </div>
 
-
+          <Card className="glass-card-enhanced border-primary/20 shadow-2xl shadow-primary/10 animate-scale-in">
+            <CardHeader className="text-center space-y-2 pb-4">
+              <CardTitle className="text-2xl font-display font-semibold text-foreground">
+                Reset Password
+              </CardTitle>
+              <CardDescription className="text-base text-muted-foreground">
+                Enter your email to receive a password reset link
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="reset-email" className="text-foreground font-medium">Email</Label>
                   <Input

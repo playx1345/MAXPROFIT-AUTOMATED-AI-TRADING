@@ -5,12 +5,18 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import {
+  LayoutDashboard,
+  Users,
   ArrowDownLeft,
   ArrowUpRight,
+  TrendingUp,
   Bot,
-  LayoutDashboard,
+  Settings,
   LogOut,
   Menu,
+  X,
+  Shield,
+  Activity,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -45,7 +51,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { path: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpRight },
     { path: "/admin/investments", label: "Investments", icon: TrendingUp },
     { path: "/admin/trading-bot", label: "Trading Bot", icon: Bot },
-
+    { path: "/admin/activity-log", label: "Activity Log", icon: Activity },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
@@ -58,9 +64,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         className="fixed top-4 left-4 z-50 lg:hidden glass-card border border-primary/20 hover:border-primary/40 hover:shadow-glow backdrop-blur-lg transition-all duration-300 hover:scale-110 active:scale-95"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        <div className={`transition-transform duration-300 ${sidebarOpen ? 'rotate-90' : 'rotate-0'}`}>
-          {sidebarOpen ? <X className="text-primary" /> : <Menu className="text-primary" />}
-        </div>
+        {sidebarOpen ? <X className="text-primary" /> : <Menu className="text-primary" />}
       </Button>
 
       {/* Sidebar with Glass Effect */}
@@ -70,19 +74,25 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         }`}
       >
         <div className="flex flex-col h-full">
-
+          <div className="p-6 border-b border-primary/10 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
+            <div className="flex items-center gap-2 relative">
+              <div className="h-10 w-10 bg-gradient-to-br from-primary to-primary-glow rounded-lg flex items-center justify-center shadow-elegant">
+                <Shield className="h-6 w-6 text-primary-foreground drop-shadow-glow" />
+              </div>
               <div>
                 <h1 className="text-xl font-bold font-display text-gradient-premium">Admin Panel</h1>
                 <Badge variant="secondary" className="text-xs bg-accent/20 text-accent border border-accent/30">
                   Win Trade Invest
                 </Badge>
               </div>
-            </Link>
+            </div>
           </div>
 
           <ScrollArea className="flex-1 py-4">
             <nav className="space-y-1 px-3">
-              {menuItems.map((item, index) => {
+              {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
@@ -96,7 +106,6 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                         ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-elegant"
                         : "hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/5 hover:translate-x-1 hover:border-primary/20"
                     )}
-                    style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {/* Active indicator with glow */}
                     {isActive && (
@@ -111,11 +120,6 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                       isActive && "drop-shadow-glow"
                     )} />
                     <span className="relative font-medium">{item.label}</span>
-                    
-                    {/* Arrow indicator with accent color on hover */}
-                    <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent ${isActive ? 'opacity-100 translate-x-0' : ''}`}>
-                      <ArrowUpRight className="h-4 w-4" />
-                    </span>
                   </Link>
                 );
               })}
@@ -135,17 +139,17 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         </div>
       </aside>
 
-      {/* Overlay for mobile with fade animation */}
+      {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden animate-fade-in"
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Main Content with smooth transition */}
+      {/* Main Content */}
       <main className="flex-1 overflow-auto">
-        <div className="container mx-auto p-6 lg:p-8 animate-fade-in">
+        <div className="container mx-auto p-6 lg:p-8">
           {children}
         </div>
       </main>

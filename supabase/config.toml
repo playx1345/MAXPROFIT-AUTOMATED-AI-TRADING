@@ -1,1 +1,4 @@
 project_id = "kxjbankkuapchkezjjeq"
+
+[functions.admin-reset-password]
+verify_jwt = false

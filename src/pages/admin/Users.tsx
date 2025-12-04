@@ -75,6 +75,8 @@ const AdminUsers = () => {
 
   const handleKycAction = async (userId: string, action: "verified" | "rejected") => {
     try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -83,6 +85,19 @@ const AdminUsers = () => {
         .eq("id", userId);
 
       if (error) throw error;
+
+      // Log the admin action
+      if (adminUser) {
+        await supabase.from("admin_activity_logs").insert({
+          admin_id: adminUser.id,
+          admin_email: adminUser.email || "",
+          action: `kyc_${action}`,
+          target_type: "user",
+          target_id: userId,
+          target_email: selectedUser?.email,
+          details: { reason: kycReason || null },
+        });
+      }
 
       toast({
         title: `KYC ${action}`,

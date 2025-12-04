@@ -87,6 +87,22 @@ serve(async (req: Request) => {
       );
     }
 
+    // Log the admin action
+    const { error: logError } = await supabaseAdmin
+      .from("admin_activity_logs")
+      .insert({
+        admin_id: user.id,
+        admin_email: user.email,
+        action: "password_reset",
+        target_type: "user",
+        target_email: user_email,
+        details: { initiated_at: new Date().toISOString() },
+      });
+
+    if (logError) {
+      console.error("Failed to log admin action:", logError);
+    }
+
     console.log(`Password reset email sent successfully to: ${user_email}`);
 
     return new Response(

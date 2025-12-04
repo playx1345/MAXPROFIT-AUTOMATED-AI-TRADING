@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Shield,
+  Activity,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { path: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpRight },
     { path: "/admin/investments", label: "Investments", icon: TrendingUp },
     { path: "/admin/trading-bot", label: "Trading Bot", icon: Bot },
+    { path: "/admin/activity-log", label: "Activity Log", icon: Activity },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 

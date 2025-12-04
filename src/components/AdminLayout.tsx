@@ -15,8 +15,10 @@ import {
   LogOut,
   Menu,
   X,
+
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -48,34 +50,33 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { path: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpRight },
     { path: "/admin/investments", label: "Investments", icon: TrendingUp },
     { path: "/admin/trading-bot", label: "Trading Bot", icon: Bot },
+    { path: "/admin/activity-log", label: "Activity Log", icon: Activity },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (
     <div className="min-h-screen flex w-full bg-background">
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button with Glass Effect */}
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden"
+        className="fixed top-4 left-4 z-50 lg:hidden glass-card border border-primary/20 hover:border-primary/40 hover:shadow-glow backdrop-blur-lg transition-all duration-300 hover:scale-110 active:scale-95"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        {sidebarOpen ? <X /> : <Menu />}
+        {sidebarOpen ? <X className="text-primary" /> : <Menu className="text-primary" />}
       </Button>
 
-      {/* Sidebar */}
+      {/* Sidebar with Glass Effect */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-card border-r transform transition-transform duration-200 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 glass-card-enhanced border-r border-primary/20 transform transition-all duration-300 ease-out ${
+          sidebarOpen ? "translate-x-0 shadow-glow" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b">
-            <Link to="/" className="flex items-center gap-3">
-              <img src="/logo.svg" alt="Win Trade Invest" className="h-10 w-10" />
+
               <div>
-                <h1 className="text-xl font-bold">Admin Panel</h1>
-                <Badge variant="secondary" className="text-xs">
+                <h1 className="text-xl font-bold font-display text-gradient-premium">Admin Panel</h1>
+                <Badge variant="secondary" className="text-xs bg-accent/20 text-accent border border-accent/30">
                   Win Trade Invest
                 </Badge>
               </div>
@@ -92,28 +93,40 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative overflow-hidden",
                       isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted"
-                    }`}
+                        ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-elegant"
+                        : "hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/5 hover:translate-x-1 hover:border-primary/20"
+                    )}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span>{item.label}</span>
+                    {/* Active indicator with glow */}
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-accent rounded-r-full shadow-accent" />
+                    )}
+                    
+                    {/* Hover effect background with glass */}
+                    <span className={`absolute inset-0 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${isActive ? 'opacity-0' : ''}`} />
+                    
+                    <Icon className={cn(
+                      "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary relative",
+                      isActive && "drop-shadow-glow"
+                    )} />
+                    <span className="relative font-medium">{item.label}</span>
                   </Link>
                 );
               })}
             </nav>
           </ScrollArea>
 
-          <div className="p-4 border-t">
+          <div className="p-4 border-t border-primary/10 bg-gradient-to-t from-background/40 to-transparent">
             <Button
               variant="ghost"
-              className="w-full justify-start"
+              className="w-full justify-start group hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:shadow-md border border-transparent hover:border-destructive/20"
               onClick={handleSignOut}
             >
-              <LogOut className="h-5 w-5 mr-3" />
-              Sign Out
+              <LogOut className="h-5 w-5 mr-3 transition-transform duration-300 group-hover:-translate-x-1 group-hover:rotate-12" />
+              <span className="font-medium">Sign Out</span>
             </Button>
           </div>
         </div>

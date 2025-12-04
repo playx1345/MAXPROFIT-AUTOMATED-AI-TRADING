@@ -8,9 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Search, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface User {
   id: string;
@@ -30,6 +31,7 @@ const AdminUsers = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [resetLoading, setResetLoading] = useState(false);
   const [kycReason, setKycReason] = useState("");
   const { toast } = useToast();
 
@@ -73,6 +75,8 @@ const AdminUsers = () => {
 
   const handleKycAction = async (userId: string, action: "verified" | "rejected") => {
     try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -81,6 +85,19 @@ const AdminUsers = () => {
         .eq("id", userId);
 
       if (error) throw error;
+
+      // Log the admin action
+      if (adminUser) {
+        await supabase.from("admin_activity_logs").insert({
+          admin_id: adminUser.id,
+          admin_email: adminUser.email || "",
+          action: `kyc_${action}`,
+          target_type: "user",
+          target_id: userId,
+          target_email: selectedUser?.email,
+          details: { reason: kycReason || null },
+        });
+      }
 
       toast({
         title: `KYC ${action}`,
@@ -96,6 +113,32 @@ const AdminUsers = () => {
         description: error.message,
         variant: "destructive",
       });
+    }
+  };
+
+  const handlePasswordReset = async (email: string) => {
+    setResetLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-reset-password", {
+        body: { user_email: email },
+      });
+
+      if (error) throw error;
+
+      if (data.error) throw new Error(data.error);
+
+      toast({
+        title: "Password reset email sent",
+        description: `A password reset link has been sent to ${email}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error sending reset email",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -242,6 +285,37 @@ const AdminUsers = () => {
                     {format(new Date(selectedUser.created_at), "MMM dd, yyyy")}
                   </p>
                 </div>
+              </div>
+
+              {/* Password Reset Section */}
+              <div className="border-t pt-4">
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <KeyRound className="h-4 w-4" />
+                  Password Management
+                </h3>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" disabled={resetLoading}>
+                      <Mail className="h-4 w-4 mr-2" />
+                      {resetLoading ? "Sending..." : "Send Password Reset Email"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Send Password Reset Email</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will send a password reset link to <strong>{selectedUser.email}</strong>. 
+                        The user will be able to set a new password using that link.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handlePasswordReset(selectedUser.email)}>
+                        Send Reset Email
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
 
               {selectedUser.kyc_status === "pending" && selectedUser.kyc_submitted_at && (

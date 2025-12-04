@@ -20,6 +20,7 @@ import AdminWithdrawals from "./pages/admin/Withdrawals";
 import AdminInvestments from "./pages/admin/Investments";
 import AdminTradingBot from "./pages/admin/TradingBot";
 import AdminSettings from "./pages/admin/Settings";
+import AdminActivityLog from "./pages/admin/ActivityLog";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
@@ -135,6 +136,13 @@ const App = () => (
             <AdminProtectedRoute>
               <AdminLayout>
                 <AdminSettings />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          } />
+          <Route path="/admin/activity-log" element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <AdminActivityLog />
               </AdminLayout>
             </AdminProtectedRoute>
           } />

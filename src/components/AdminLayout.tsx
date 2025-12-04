@@ -15,8 +15,7 @@ import {
   LogOut,
   Menu,
   X,
-  Shield,
-  Activity,
+
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -74,20 +73,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-primary/10 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
-            <div className="flex items-center gap-2 relative">
-              <div className="h-10 w-10 bg-gradient-to-br from-primary to-primary-glow rounded-lg flex items-center justify-center shadow-elegant">
-                <Shield className="h-6 w-6 text-primary-foreground drop-shadow-glow" />
-              </div>
+
               <div>
                 <h1 className="text-xl font-bold font-display text-gradient-premium">Admin Panel</h1>
                 <Badge variant="secondary" className="text-xs bg-accent/20 text-accent border border-accent/30">
                   Win Trade Invest
                 </Badge>
               </div>
-            </div>
+            </Link>
           </div>
 
           <ScrollArea className="flex-1 py-4">

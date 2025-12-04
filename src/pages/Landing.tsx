@@ -226,9 +226,12 @@ const Landing = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
-              <h3 className="font-bold text-2xl mb-4 bg-gradient-primary bg-clip-text text-transparent">
-                Win Trade Invest
-              </h3>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/logo.svg" alt="Win Trade Invest" className="h-10 w-10" />
+                <h3 className="font-bold text-2xl text-gradient">
+                  Win Trade Invest
+                </h3>
+              </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Professional cryptocurrency investment platform with AI-powered automated trading strategies.
               </p>

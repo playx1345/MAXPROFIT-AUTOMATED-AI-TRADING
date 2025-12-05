@@ -7,8 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Settings as SettingsIcon, Save } from "lucide-react";
 
 const AdminSettings = () => {
-  const [walletUSDT, setWalletUSDT] = useState("TYourPlatformUSDTAddress123456789");
-  const [walletBTC, setWalletBTC] = useState("bc1YourPlatformBTCAddress123456789");
+  const [walletUSDT, setWalletUSDT] = useState("TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur");
+  const [walletBTC, setWalletBTC] = useState("bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h");
   const [minWithdrawal, setMinWithdrawal] = useState("50");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();

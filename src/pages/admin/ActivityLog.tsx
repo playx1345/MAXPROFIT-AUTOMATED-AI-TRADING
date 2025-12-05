@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Activity, KeyRound, UserCheck, UserX, DollarSign, Ban } from "lucide-react";
+import { Activity, KeyRound, UserCheck, UserX, DollarSign, Ban, UserPlus, Edit, Trash2, CheckCheck } from "lucide-react";
 import type { Json } from "@/integrations/supabase/types";
 
 interface ActivityLog {
@@ -22,6 +22,7 @@ interface ActivityLog {
 
 const actionConfig: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   password_reset: { label: "Password Reset", icon: <KeyRound className="h-4 w-4" />, color: "bg-blue-500" },
+  password_set: { label: "Password Set", icon: <KeyRound className="h-4 w-4" />, color: "bg-blue-500" },
   kyc_verified: { label: "KYC Approved", icon: <UserCheck className="h-4 w-4" />, color: "bg-green-500" },
   kyc_rejected: { label: "KYC Rejected", icon: <UserX className="h-4 w-4" />, color: "bg-red-500" },
   deposit_approved: { label: "Deposit Approved", icon: <DollarSign className="h-4 w-4" />, color: "bg-green-500" },
@@ -29,6 +30,11 @@ const actionConfig: Record<string, { label: string; icon: React.ReactNode; color
   withdrawal_approved: { label: "Withdrawal Approved", icon: <DollarSign className="h-4 w-4" />, color: "bg-green-500" },
   withdrawal_rejected: { label: "Withdrawal Rejected", icon: <Ban className="h-4 w-4" />, color: "bg-red-500" },
   balance_update: { label: "Balance Updated", icon: <DollarSign className="h-4 w-4" />, color: "bg-yellow-500" },
+  user_created: { label: "User Created", icon: <UserPlus className="h-4 w-4" />, color: "bg-green-500" },
+  user_updated: { label: "User Updated", icon: <Edit className="h-4 w-4" />, color: "bg-blue-500" },
+  user_deleted: { label: "User Deleted", icon: <Trash2 className="h-4 w-4" />, color: "bg-red-500" },
+  user_suspended: { label: "User Suspended", icon: <Ban className="h-4 w-4" />, color: "bg-orange-500" },
+  user_activated: { label: "User Activated", icon: <CheckCheck className="h-4 w-4" />, color: "bg-green-500" },
 };
 
 const AdminActivityLog = () => {

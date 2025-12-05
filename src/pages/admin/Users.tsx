@@ -100,78 +100,26 @@ const AdminUsers = () => {
     try {
       const { data: { user: adminUser } } = await supabase.auth.getUser();
       
-      // If verifying KYC, deduct $400 fee and create a fee transaction
+      if (!adminUser) {
+        throw new Error("Not authenticated as admin");
+      }
+
+      // If verifying KYC, use the atomic function to deduct $400 fee
       if (action === "verified") {
-        // Get user's current balance and fee status
-        const { data: userProfile, error: fetchError } = await supabase
-          .from("profiles")
-          .select("balance_usdt, kyc_fee_paid, kyc_status")
-          .eq("id", userId)
-          .single();
+        // Call the atomic function to handle KYC verification, fee deduction, and transaction creation
+        const { data, error } = await supabase.rpc('verify_kyc_atomic', {
+          p_user_id: userId,
+          p_admin_id: adminUser.id,
+          p_admin_email: adminUser.email || "",
+          p_reason: kycReason || null,
+        });
 
-        if (fetchError) throw fetchError;
+        if (error) throw error;
 
-        // Check if fee has already been paid to prevent duplicate charges
-        if (userProfile?.kyc_fee_paid) {
-          toast({
-            title: "Fee already paid",
-            description: "KYC verification fee has already been deducted for this user",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const currentBalance = userProfile?.balance_usdt ?? null;
-        const kycFee = 400;
-
-        // Check if balance is valid and sufficient
-        if (currentBalance === null || currentBalance < kycFee) {
-          toast({
-            title: "Insufficient balance",
-            description: `User needs at least $${kycFee} balance to complete KYC verification. Current balance: ${currentBalance === null ? 'N/A' : `$${currentBalance}`}`,
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Update profile with verified status, fee paid flag, and deduct balance
-        // This uses optimistic concurrency control by checking the current balance
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({
-            kyc_status: action,
-            kyc_fee_paid: true,
-            balance_usdt: currentBalance - kycFee,
-          })
-          .eq("id", userId)
-          .eq("balance_usdt", currentBalance); // Ensure balance hasn't changed
-
-        if (updateError) throw updateError;
-
-        // Create fee transaction record
-        const { error: transactionError } = await supabase
-          .from("transactions")
-          .insert({
-            user_id: userId,
-            type: "fee",
-            amount: kycFee,
-            currency: "usdt",
-            status: "completed",
-            admin_notes: "KYC verification fee",
-            processed_by: adminUser?.id,
-            processed_at: new Date().toISOString(),
-          });
-
-        if (transactionError) {
-          // If transaction creation fails, log the error but don't rollback
-          // The profile update has already been committed
-          console.error("Failed to create transaction record:", transactionError);
-          toast({
-            title: "Warning",
-            description: "KYC verified and fee deducted, but transaction record creation failed. Please check logs.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "KYC verified",
+          description: `User KYC has been verified and $${data.fee_amount} fee has been deducted. New balance: $${data.new_balance}`,
+        });
       } else {
         // For rejection, just update the status
         const { error } = await supabase
@@ -182,10 +130,8 @@ const AdminUsers = () => {
           .eq("id", userId);
 
         if (error) throw error;
-      }
 
-      // Log the admin action
-      if (adminUser) {
+        // Log the admin action for rejection
         await supabase.from("admin_activity_logs").insert({
           admin_id: adminUser.id,
           admin_email: adminUser.email || "",
@@ -193,16 +139,14 @@ const AdminUsers = () => {
           target_type: "user",
           target_id: userId,
           target_email: selectedUser?.email,
-          details: { reason: kycReason || null, fee_deducted: action === "verified" ? 400 : 0 },
+          details: { reason: kycReason || null, fee_deducted: 0 },
+        });
+
+        toast({
+          title: `KYC ${action}`,
+          description: `User KYC has been ${action}`,
         });
       }
-
-      toast({
-        title: `KYC ${action}`,
-        description: action === "verified" 
-          ? `User KYC has been verified and $400 fee has been deducted` 
-          : `User KYC has been ${action}`,
-      });
 
       fetchUsers();
       setDetailsOpen(false);

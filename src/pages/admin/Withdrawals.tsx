@@ -85,47 +85,18 @@ const AdminWithdrawals = () => {
     try {
       // Get admin user info
       const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
 
-      // Deduct from user balance
-      const newBalance = selectedWithdrawal.profiles.balance_usdt - selectedWithdrawal.amount;
+      // Use atomic function to approve withdrawal and debit balance
+      const { data, error } = await supabase.rpc("approve_withdrawal_atomic", {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_transaction_hash: txHash || null,
+        p_admin_notes: adminNotes || null,
+      });
 
-      const { error: balanceError } = await supabase
-        .from("profiles")
-        .update({ balance_usdt: newBalance })
-        .eq("id", selectedWithdrawal.user_id);
-
-      if (balanceError) throw balanceError;
-
-      // Update transaction status
-      const { error: txError } = await supabase
-        .from("transactions")
-        .update({
-          status: "completed",
-          admin_notes: adminNotes,
-          transaction_hash: txHash || null,
-          processed_at: new Date().toISOString(),
-        })
-        .eq("id", selectedWithdrawal.id);
-
-      if (txError) throw txError;
-
-      // Log admin action
-      if (adminUser) {
-        await supabase.from("admin_activity_logs").insert({
-          admin_id: adminUser.id,
-          admin_email: adminUser.email || "",
-          action: "withdrawal_approved",
-          target_type: "transaction",
-          target_id: selectedWithdrawal.id,
-          target_email: selectedWithdrawal.profiles.email,
-          details: {
-            amount: selectedWithdrawal.amount,
-            currency: selectedWithdrawal.currency,
-            transaction_hash: txHash,
-            admin_notes: adminNotes,
-          },
-        });
-      }
+      if (error) throw error;
 
       toast({
         title: "Withdrawal approved",
@@ -154,34 +125,17 @@ const AdminWithdrawals = () => {
     try {
       // Get admin user info
       const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
 
-      const { error } = await supabase
-        .from("transactions")
-        .update({
-          status: "rejected",
-          admin_notes: adminNotes,
-          processed_at: new Date().toISOString(),
-        })
-        .eq("id", selectedWithdrawal.id);
+      // Use atomic function to reject withdrawal
+      const { data, error } = await supabase.rpc("reject_withdrawal_atomic", {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_admin_notes: adminNotes || null,
+      });
 
       if (error) throw error;
-
-      // Log admin action
-      if (adminUser) {
-        await supabase.from("admin_activity_logs").insert({
-          admin_id: adminUser.id,
-          admin_email: adminUser.email || "",
-          action: "withdrawal_rejected",
-          target_type: "transaction",
-          target_id: selectedWithdrawal.id,
-          target_email: selectedWithdrawal.profiles.email,
-          details: {
-            amount: selectedWithdrawal.amount,
-            currency: selectedWithdrawal.currency,
-            admin_notes: adminNotes,
-          },
-        });
-      }
 
       toast({
         title: "Withdrawal rejected",

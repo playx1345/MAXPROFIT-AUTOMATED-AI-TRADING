@@ -71,53 +71,17 @@ const AdminDeposits = () => {
     try {
       // Get admin user info
       const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
 
-      // Update transaction status
-      const { error: txError } = await supabase
-        .from("transactions")
-        .update({
-          status: "completed",
-          admin_notes: adminNotes,
-          processed_at: new Date().toISOString(),
-        })
-        .eq("id", selectedDeposit.id);
+      // Use atomic function to approve deposit and credit balance
+      const { data, error } = await supabase.rpc("approve_deposit_atomic", {
+        p_transaction_id: selectedDeposit.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_admin_notes: adminNotes || null,
+      });
 
-      if (txError) throw txError;
-
-      // Update user balance
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("balance_usdt")
-        .eq("id", selectedDeposit.user_id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      const newBalance = (profile.balance_usdt || 0) + selectedDeposit.amount;
-
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ balance_usdt: newBalance })
-        .eq("id", selectedDeposit.user_id);
-
-      if (updateError) throw updateError;
-
-      // Log admin action
-      if (adminUser) {
-        await supabase.from("admin_activity_logs").insert({
-          admin_id: adminUser.id,
-          admin_email: adminUser.email || "",
-          action: "deposit_approved",
-          target_type: "transaction",
-          target_id: selectedDeposit.id,
-          target_email: selectedDeposit.profiles.email,
-          details: {
-            amount: selectedDeposit.amount,
-            currency: selectedDeposit.currency,
-            admin_notes: adminNotes,
-          },
-        });
-      }
+      if (error) throw error;
 
       toast({
         title: "Deposit approved",
@@ -145,34 +109,17 @@ const AdminDeposits = () => {
     try {
       // Get admin user info
       const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
 
-      const { error } = await supabase
-        .from("transactions")
-        .update({
-          status: "rejected",
-          admin_notes: adminNotes,
-          processed_at: new Date().toISOString(),
-        })
-        .eq("id", selectedDeposit.id);
+      // Use atomic function to reject deposit
+      const { data, error } = await supabase.rpc("reject_deposit_atomic", {
+        p_transaction_id: selectedDeposit.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_admin_notes: adminNotes || null,
+      });
 
       if (error) throw error;
-
-      // Log admin action
-      if (adminUser) {
-        await supabase.from("admin_activity_logs").insert({
-          admin_id: adminUser.id,
-          admin_email: adminUser.email || "",
-          action: "deposit_rejected",
-          target_type: "transaction",
-          target_id: selectedDeposit.id,
-          target_email: selectedDeposit.profiles.email,
-          details: {
-            amount: selectedDeposit.amount,
-            currency: selectedDeposit.currency,
-            admin_notes: adminNotes,
-          },
-        });
-      }
 
       toast({
         title: "Deposit rejected",

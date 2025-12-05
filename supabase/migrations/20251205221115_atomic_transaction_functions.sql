@@ -109,6 +109,11 @@ DECLARE
   v_new_balance NUMERIC(20, 2);
   v_user_email TEXT;
 BEGIN
+  -- Verify caller has admin role
+  IF NOT public.has_role(p_admin_id, 'admin') THEN
+    RAISE EXCEPTION 'Access denied. Admin role required.';
+  END IF;
+
   -- Get transaction details with row lock to prevent concurrent processing
   SELECT * INTO v_transaction
   FROM transactions
@@ -213,6 +218,11 @@ DECLARE
   v_new_balance NUMERIC(20, 2);
   v_user_email TEXT;
 BEGIN
+  -- Verify caller has admin role
+  IF NOT public.has_role(p_admin_id, 'admin') THEN
+    RAISE EXCEPTION 'Access denied. Admin role required.';
+  END IF;
+
   -- Get transaction details with row lock to prevent concurrent processing
   SELECT * INTO v_transaction
   FROM transactions
@@ -320,6 +330,11 @@ DECLARE
   v_transaction RECORD;
   v_user_email TEXT;
 BEGIN
+  -- Verify caller has admin role
+  IF NOT public.has_role(p_admin_id, 'admin') THEN
+    RAISE EXCEPTION 'Access denied. Admin role required.';
+  END IF;
+
   -- Get transaction details with row lock
   SELECT * INTO v_transaction
   FROM transactions
@@ -401,6 +416,11 @@ DECLARE
   v_transaction RECORD;
   v_user_email TEXT;
 BEGIN
+  -- Verify caller has admin role
+  IF NOT public.has_role(p_admin_id, 'admin') THEN
+    RAISE EXCEPTION 'Access denied. Admin role required.';
+  END IF;
+
   -- Get transaction details with row lock
   SELECT * INTO v_transaction
   FROM transactions
@@ -466,8 +486,21 @@ BEGIN
 END;
 $$;
 
--- Grant execute permissions to authenticated users
+-- Grant execute permissions
+-- Only authenticated users can create investments (for their own account)
 GRANT EXECUTE ON FUNCTION public.create_investment_atomic TO authenticated;
+
+-- Only admins can approve/reject deposits and withdrawals
+-- Note: The functions themselves should verify admin role via has_role() check
+
+-- Revoke from authenticated first to be explicit
+REVOKE EXECUTE ON FUNCTION public.approve_deposit_atomic FROM authenticated;
+REVOKE EXECUTE ON FUNCTION public.approve_withdrawal_atomic FROM authenticated;
+REVOKE EXECUTE ON FUNCTION public.reject_deposit_atomic FROM authenticated;
+REVOKE EXECUTE ON FUNCTION public.reject_withdrawal_atomic FROM authenticated;
+
+-- Grant to authenticated (required for function execution context)
+-- Admin role check will be enforced within the function
 GRANT EXECUTE ON FUNCTION public.approve_deposit_atomic TO authenticated;
 GRANT EXECUTE ON FUNCTION public.approve_withdrawal_atomic TO authenticated;
 GRANT EXECUTE ON FUNCTION public.reject_deposit_atomic TO authenticated;

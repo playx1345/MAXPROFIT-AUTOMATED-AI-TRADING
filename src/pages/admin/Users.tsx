@@ -100,14 +100,68 @@ const AdminUsers = () => {
     try {
       const { data: { user: adminUser } } = await supabase.auth.getUser();
       
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          kyc_status: action,
-        })
-        .eq("id", userId);
+      // If verifying KYC, deduct $400 fee and create a fee transaction
+      if (action === "verified") {
+        // Get user's current balance
+        const { data: userProfile, error: fetchError } = await supabase
+          .from("profiles")
+          .select("balance_usdt")
+          .eq("id", userId)
+          .single();
 
-      if (error) throw error;
+        if (fetchError) throw fetchError;
+
+        const currentBalance = userProfile?.balance_usdt || 0;
+        const kycFee = 400;
+
+        // Check if user has sufficient balance
+        if (currentBalance < kycFee) {
+          toast({
+            title: "Insufficient balance",
+            description: `User needs at least $${kycFee} balance to complete KYC verification. Current balance: $${currentBalance}`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Update profile with verified status, fee paid flag, and deduct balance
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({
+            kyc_status: action,
+            kyc_fee_paid: true,
+            balance_usdt: currentBalance - kycFee,
+          })
+          .eq("id", userId);
+
+        if (updateError) throw updateError;
+
+        // Create fee transaction record
+        const { error: transactionError } = await supabase
+          .from("transactions")
+          .insert({
+            user_id: userId,
+            type: "fee",
+            amount: kycFee,
+            currency: "usdt",
+            status: "completed",
+            admin_notes: "KYC verification fee",
+            processed_by: adminUser?.id,
+            processed_at: new Date().toISOString(),
+          });
+
+        if (transactionError) throw transactionError;
+      } else {
+        // For rejection, just update the status
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            kyc_status: action,
+          })
+          .eq("id", userId);
+
+        if (error) throw error;
+      }
 
       // Log the admin action
       if (adminUser) {
@@ -118,13 +172,15 @@ const AdminUsers = () => {
           target_type: "user",
           target_id: userId,
           target_email: selectedUser?.email,
-          details: { reason: kycReason || null },
+          details: { reason: kycReason || null, fee_deducted: action === "verified" ? 400 : 0 },
         });
       }
 
       toast({
         title: `KYC ${action}`,
-        description: `User KYC has been ${action}`,
+        description: action === "verified" 
+          ? `User KYC has been verified and $400 fee has been deducted` 
+          : `User KYC has been ${action}`,
       });
 
       fetchUsers();

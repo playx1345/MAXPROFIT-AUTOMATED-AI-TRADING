@@ -123,7 +123,6 @@ $$;
 
 -- Grant execute permissions to authenticated users
 -- Note: The function itself enforces admin role check
-REVOKE EXECUTE ON FUNCTION public.verify_kyc_atomic FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.verify_kyc_atomic TO authenticated;
 
 -- Add helpful comment

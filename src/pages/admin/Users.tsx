@@ -118,7 +118,7 @@ const AdminUsers = () => {
 
         toast({
           title: "KYC verified",
-          description: `User KYC has been verified and $${data.fee_amount} fee has been deducted. New balance: $${data.new_balance}`,
+          description: `User KYC has been verified and $${data.fee_amount.toFixed(2)} fee has been deducted. New balance: $${data.new_balance.toFixed(2)}`,
         });
       } else {
         // For rejection, just update the status

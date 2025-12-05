@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface User {
   id: string;
@@ -22,6 +23,16 @@ interface User {
   kyc_status: string;
   kyc_submitted_at: string | null;
   created_at: string;
+  is_suspended?: boolean;
+}
+
+interface UserFormData {
+  email: string;
+  full_name: string;
+  phone: string;
+  password: string;
+  balance_usdt: number;
+  kyc_status: string;
 }
 
 const AdminUsers = () => {
@@ -30,11 +41,21 @@ const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [resetLoading, setResetLoading] = useState(false);
   const [setPasswordLoading, setSetPasswordLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [kycReason, setKycReason] = useState("");
+  const [formData, setFormData] = useState<UserFormData>({
+    email: "",
+    full_name: "",
+    phone: "",
+    password: "",
+    balance_usdt: 0,
+    kyc_status: "unverified",
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -180,6 +201,159 @@ const AdminUsers = () => {
     }
   };
 
+  const handleCreateUser = async () => {
+    if (!formData.email || !formData.password || formData.password.length < 6) {
+      toast({
+        title: "Invalid input",
+        description: "Email and password (min 6 chars) are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Create user via edge function
+      const { data, error } = await supabase.functions.invoke("admin-create-user", {
+        body: formData,
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      toast({
+        title: "User created successfully",
+        description: `New user ${formData.email} has been created`,
+      });
+
+      // Reset form
+      setFormData({
+        email: "",
+        full_name: "",
+        phone: "",
+        password: "",
+        balance_usdt: 0,
+        kyc_status: "unverified",
+      });
+      setCreateDialogOpen(false);
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error creating user",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return;
+
+    setLoading(true);
+    try {
+      // Update profile data
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: formData.full_name,
+          phone: formData.phone,
+          balance_usdt: formData.balance_usdt,
+          kyc_status: formData.kyc_status,
+        })
+        .eq("id", selectedUser.id);
+
+      if (error) throw error;
+
+      // Log admin action
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (adminUser) {
+        await supabase.from("admin_activity_logs").insert({
+          admin_id: adminUser.id,
+          admin_email: adminUser.email || "",
+          action: "user_updated",
+          target_type: "user",
+          target_id: selectedUser.id,
+          target_email: selectedUser.email,
+          details: { 
+            updated_fields: {
+              full_name: formData.full_name,
+              phone: formData.phone,
+              balance_usdt: formData.balance_usdt,
+              kyc_status: formData.kyc_status,
+            }
+          },
+        });
+      }
+
+      toast({
+        title: "User updated successfully",
+        description: `Changes to ${selectedUser.email} have been saved`,
+      });
+
+      setEditDialogOpen(false);
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error updating user",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSuspendUser = async (userId: string, email: string, suspend: boolean) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-suspend-user", {
+        body: { user_id: userId, suspend },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      toast({
+        title: suspend ? "User suspended" : "User activated",
+        description: `${email} has been ${suspend ? "suspended" : "activated"}`,
+      });
+
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error updating user status",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, email: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { user_id: userId },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      toast({
+        title: "User deleted",
+        description: `${email} has been permanently deleted`,
+      });
+
+      setDetailsOpen(false);
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error deleting user",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const getKycBadgeColor = (status: string) => {
     switch (status) {
       case "verified":
@@ -208,9 +382,15 @@ const AdminUsers = () => {
           <h1 className="text-3xl font-bold">User Management</h1>
           <p className="text-muted-foreground">Manage users and KYC verification</p>
         </div>
-        <Badge variant="secondary" className="text-lg">
-          {users.length} Total Users
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant="secondary" className="text-lg">
+            {users.length} Total Users
+          </Badge>
+          <Button onClick={() => setCreateDialogOpen(true)}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Create User
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -260,17 +440,38 @@ const AdminUsers = () => {
                       {format(new Date(user.created_at), "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setDetailsOpen(true);
-                        }}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setDetailsOpen(true);
+                          }}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setFormData({
+                              email: user.email,
+                              full_name: user.full_name || "",
+                              phone: user.phone || "",
+                              password: "",
+                              balance_usdt: user.balance_usdt,
+                              kyc_status: user.kyc_status,
+                            });
+                            setEditDialogOpen(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -413,8 +614,225 @@ const AdminUsers = () => {
                   </div>
                 </div>
               )}
+
+              {/* Account Management Actions */}
+              <div className="border-t pt-4">
+                <h3 className="font-semibold mb-3">Account Management</h3>
+                <div className="flex gap-2">
+                  {selectedUser.is_suspended === true ? (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, false)}
+                    >
+                      <CheckCheck className="h-4 w-4 mr-2" />
+                      Activate Account
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, true)}
+                    >
+                      <Ban className="h-4 w-4 mr-2" />
+                      Suspend Account
+                    </Button>
+                  )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="flex-1">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete User
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the user account
+                          for <strong>{selectedUser.email}</strong> and remove all associated data.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => handleDeleteUser(selectedUser.id, selectedUser.email)}
+                        >
+                          Delete Permanently
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create User Dialog */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+            <DialogDescription>
+              Add a new client account to the platform
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="create-email">Email *</Label>
+                <Input
+                  id="create-email"
+                  type="email"
+                  placeholder="user@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="create-password">Password *</Label>
+                <Input
+                  id="create-password"
+                  type="password"
+                  placeholder="Minimum 6 characters"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="create-name">Full Name</Label>
+                <Input
+                  id="create-name"
+                  placeholder="John Doe"
+                  value={formData.full_name}
+                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="create-phone">Phone</Label>
+                <Input
+                  id="create-phone"
+                  placeholder="+1234567890"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="create-balance">Initial Balance (USDT)</Label>
+                <Input
+                  id="create-balance"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.balance_usdt}
+                  onChange={(e) => setFormData({ ...formData, balance_usdt: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="create-kyc">KYC Status</Label>
+                <Select 
+                  value={formData.kyc_status}
+                  onValueChange={(value) => setFormData({ ...formData, kyc_status: value })}
+                >
+                  <SelectTrigger id="create-kyc">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unverified">Unverified</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="verified">Verified</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateUser} disabled={loading}>
+              {loading ? "Creating..." : "Create User"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Update user information and settings
+            </DialogDescription>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input value={selectedUser.email} disabled />
+                  <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">Full Name</Label>
+                  <Input
+                    id="edit-name"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-phone">Phone</Label>
+                  <Input
+                    id="edit-phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-balance">Balance (USDT)</Label>
+                  <Input
+                    id="edit-balance"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.balance_usdt}
+                    onChange={(e) => setFormData({ ...formData, balance_usdt: parseFloat(e.target.value) || 0 })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-kyc">KYC Status</Label>
+                  <Select 
+                    value={formData.kyc_status}
+                    onValueChange={(value) => setFormData({ ...formData, kyc_status: value })}
+                  >
+                    <SelectTrigger id="edit-kyc">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unverified">Unverified</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="verified">Verified</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateUser} disabled={loading}>
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

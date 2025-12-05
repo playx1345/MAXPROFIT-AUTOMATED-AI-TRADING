@@ -83,6 +83,9 @@ const AdminWithdrawals = () => {
     setProcessing(true);
 
     try {
+      // Get admin user info
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+
       // Deduct from user balance
       const newBalance = selectedWithdrawal.profiles.balance_usdt - selectedWithdrawal.amount;
 
@@ -105,6 +108,24 @@ const AdminWithdrawals = () => {
         .eq("id", selectedWithdrawal.id);
 
       if (txError) throw txError;
+
+      // Log admin action
+      if (adminUser) {
+        await supabase.from("admin_activity_logs").insert({
+          admin_id: adminUser.id,
+          admin_email: adminUser.email || "",
+          action: "withdrawal_approved",
+          target_type: "transaction",
+          target_id: selectedWithdrawal.id,
+          target_email: selectedWithdrawal.profiles.email,
+          details: {
+            amount: selectedWithdrawal.amount,
+            currency: selectedWithdrawal.currency,
+            transaction_hash: txHash,
+            admin_notes: adminNotes,
+          },
+        });
+      }
 
       toast({
         title: "Withdrawal approved",
@@ -131,6 +152,9 @@ const AdminWithdrawals = () => {
     setProcessing(true);
 
     try {
+      // Get admin user info
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+
       const { error } = await supabase
         .from("transactions")
         .update({
@@ -141,6 +165,23 @@ const AdminWithdrawals = () => {
         .eq("id", selectedWithdrawal.id);
 
       if (error) throw error;
+
+      // Log admin action
+      if (adminUser) {
+        await supabase.from("admin_activity_logs").insert({
+          admin_id: adminUser.id,
+          admin_email: adminUser.email || "",
+          action: "withdrawal_rejected",
+          target_type: "transaction",
+          target_id: selectedWithdrawal.id,
+          target_email: selectedWithdrawal.profiles.email,
+          details: {
+            amount: selectedWithdrawal.amount,
+            currency: selectedWithdrawal.currency,
+            admin_notes: adminNotes,
+          },
+        });
+      }
 
       toast({
         title: "Withdrawal rejected",

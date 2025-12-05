@@ -7,6 +7,7 @@ import { InvestmentPlanCard } from "@/components/landing/InvestmentPlanCard";
 import { CryptoTicker } from "@/components/landing/CryptoTicker";
 import { MarketStats } from "@/components/landing/MarketStats";
 import { FAQ } from "@/components/landing/FAQ";
+import { Header } from "@/components/landing/Header";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Link } from "react-router-dom";
 
@@ -18,6 +19,9 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Header */}
+      <Header />
+      
       {/* Hero Section */}
       <AnimatedHero />
 
@@ -31,7 +35,7 @@ const Landing = () => {
       <StatsCounter />
 
       {/* Features Section */}
-      <section ref={featuresRef.ref} className="relative py-20 bg-muted/30">
+      <section id="features" ref={featuresRef.ref} className="relative py-20 bg-muted/30">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
           <div 
@@ -73,7 +77,7 @@ const Landing = () => {
       </section>
 
       {/* Investment Plans Section */}
-      <section ref={plansRef.ref} className="relative py-20">
+      <section id="plans" ref={plansRef.ref} className="relative py-20">
         <div className="container mx-auto px-4">
           <div 
             className={`text-center mb-16 transition-all duration-400 ${
@@ -147,7 +151,7 @@ const Landing = () => {
       </section>
 
       {/* How It Works Section */}
-      <section ref={howItWorksRef.ref} className="relative py-20 bg-muted/30">
+      <section id="how-it-works" ref={howItWorksRef.ref} className="relative py-20 bg-muted/30">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
           <div 
@@ -186,7 +190,7 @@ const Landing = () => {
       </section>
 
       {/* FAQ Section */}
-      <section ref={faqRef.ref} className="relative py-20">
+      <section id="faq" ref={faqRef.ref} className="relative py-20">
         <div className="container mx-auto px-4">
           <div 
             className={`text-center mb-16 transition-all duration-400 ${

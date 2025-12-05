@@ -8,7 +8,7 @@ const corsHeaders = {
 
 interface ResetPasswordRequest {
   user_email: string;
-  admin_user_id: string;
+  new_password?: string; // Optional: if provided, set password directly
 }
 
 serve(async (req: Request) => {
@@ -63,7 +63,7 @@ serve(async (req: Request) => {
       );
     }
 
-    const { user_email }: ResetPasswordRequest = await req.json();
+    const { user_email, new_password }: ResetPasswordRequest = await req.json();
 
     if (!user_email) {
       return new Response(
@@ -72,9 +72,68 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`Admin ${user.email} requesting password reset for: ${user_email}`);
+    console.log(`Admin ${user.email} requesting password action for: ${user_email}`);
 
-    // Send password reset email using admin client
+    // If new_password is provided, set it directly
+    if (new_password) {
+      // First, find the user by email
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.listUsers();
+      
+      if (userError) {
+        console.error("Error listing users:", userError);
+        return new Response(
+          JSON.stringify({ error: userError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const targetUser = userData.users.find(u => u.email === user_email);
+      
+      if (!targetUser) {
+        return new Response(
+          JSON.stringify({ error: "User not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Update the user's password
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        targetUser.id,
+        { password: new_password }
+      );
+
+      if (updateError) {
+        console.error("Password update error:", updateError);
+        return new Response(
+          JSON.stringify({ error: updateError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Log the admin action
+      await supabaseAdmin
+        .from("admin_activity_logs")
+        .insert({
+          admin_id: user.id,
+          admin_email: user.email,
+          action: "password_set",
+          target_type: "user",
+          target_email: user_email,
+          details: { initiated_at: new Date().toISOString() },
+        });
+
+      console.log(`Password set successfully for: ${user_email}`);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: `Password set successfully for ${user_email}` 
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Otherwise, send password reset email
     const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(user_email, {
       redirectTo: `${req.headers.get("origin") || supabaseUrl}/auth`,
     });

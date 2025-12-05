@@ -32,6 +32,8 @@ const AdminUsers = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [resetLoading, setResetLoading] = useState(false);
+  const [setPasswordLoading, setSetPasswordLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
   const [kycReason, setKycReason] = useState("");
   const { toast } = useToast();
 
@@ -139,6 +141,42 @@ const AdminUsers = () => {
       });
     } finally {
       setResetLoading(false);
+    }
+  };
+
+  const handleSetPassword = async (email: string) => {
+    if (!newPassword || newPassword.length < 6) {
+      toast({
+        title: "Invalid password",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSetPasswordLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-reset-password", {
+        body: { user_email: email, new_password: newPassword },
+      });
+
+      if (error) throw error;
+
+      if (data.error) throw new Error(data.error);
+
+      toast({
+        title: "Password set successfully",
+        description: `Password has been set for ${email}`,
+      });
+      setNewPassword("");
+    } catch (error: any) {
+      toast({
+        title: "Error setting password",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSetPasswordLoading(false);
     }
   };
 
@@ -293,29 +331,54 @@ const AdminUsers = () => {
                   <KeyRound className="h-4 w-4" />
                   Password Management
                 </h3>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" disabled={resetLoading}>
-                      <Mail className="h-4 w-4 mr-2" />
-                      {resetLoading ? "Sending..." : "Send Password Reset Email"}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Send Password Reset Email</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will send a password reset link to <strong>{selectedUser.email}</strong>. 
-                        The user will be able to set a new password using that link.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handlePasswordReset(selectedUser.email)}>
-                        Send Reset Email
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <div className="space-y-4">
+                  {/* Set Password Directly */}
+                  <div className="space-y-2">
+                    <Label>Set New Password</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="password"
+                        placeholder="Enter new password (min 6 chars)"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button 
+                        onClick={() => handleSetPassword(selectedUser.email)}
+                        disabled={setPasswordLoading || !newPassword}
+                      >
+                        {setPasswordLoading ? "Setting..." : "Set Password"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Or Send Reset Email */}
+                  <div className="text-center text-sm text-muted-foreground">or</div>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full" disabled={resetLoading}>
+                        <Mail className="h-4 w-4 mr-2" />
+                        {resetLoading ? "Sending..." : "Send Password Reset Email"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Send Password Reset Email</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will send a password reset link to <strong>{selectedUser.email}</strong>. 
+                          The user will be able to set a new password using that link.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handlePasswordReset(selectedUser.email)}>
+                          Send Reset Email
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
 
               {selectedUser.kyc_status === "pending" && selectedUser.kyc_submitted_at && (

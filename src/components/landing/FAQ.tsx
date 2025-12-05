@@ -29,7 +29,7 @@ export const FAQ = () => {
     },
     {
       question: "Do I need KYC verification?",
-      answer: "Yes, KYC (Know Your Customer) verification is required for all users. This is a regulatory requirement and helps protect your account from fraud. The verification process typically takes 24-48 hours and requires valid government-issued ID and proof of address."
+      answer: "Yes, KYC (Know Your Customer) verification is required for all users. This is a regulatory requirement and helps protect your account from fraud. The verification process typically takes 24-48 hours and requires valid government-issued ID and proof of address. A one-time verification fee of $400 will be deducted from your account balance upon KYC approval."
     },
     {
       question: "How does the referral program work?",

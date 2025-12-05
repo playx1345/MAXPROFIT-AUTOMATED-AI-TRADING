@@ -100,17 +100,38 @@ const AdminUsers = () => {
     try {
       const { data: { user: adminUser } } = await supabase.auth.getUser();
       
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          kyc_status: action,
-        })
-        .eq("id", userId);
+      if (!adminUser) {
+        throw new Error("Not authenticated as admin");
+      }
 
-      if (error) throw error;
+      // If verifying KYC, use the atomic function to deduct $400 fee
+      if (action === "verified") {
+        // Call the atomic function to handle KYC verification, fee deduction, and transaction creation
+        const { data, error } = await supabase.rpc('verify_kyc_atomic', {
+          p_user_id: userId,
+          p_admin_id: adminUser.id,
+          p_admin_email: adminUser.email || "",
+          p_reason: kycReason || null,
+        });
 
-      // Log the admin action
-      if (adminUser) {
+        if (error) throw error;
+
+        toast({
+          title: "KYC verified",
+          description: `User KYC has been verified and $${data.fee_amount.toFixed(2)} fee has been deducted. New balance: $${data.new_balance.toFixed(2)}`,
+        });
+      } else {
+        // For rejection, just update the status
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            kyc_status: action,
+          })
+          .eq("id", userId);
+
+        if (error) throw error;
+
+        // Log the admin action for rejection
         await supabase.from("admin_activity_logs").insert({
           admin_id: adminUser.id,
           admin_email: adminUser.email || "",
@@ -118,14 +139,14 @@ const AdminUsers = () => {
           target_type: "user",
           target_id: userId,
           target_email: selectedUser?.email,
-          details: { reason: kycReason || null },
+          details: { reason: kycReason || null, fee_deducted: 0 },
+        });
+
+        toast({
+          title: `KYC ${action}`,
+          description: `User KYC has been ${action}`,
         });
       }
-
-      toast({
-        title: `KYC ${action}`,
-        description: `User KYC has been ${action}`,
-      });
 
       fetchUsers();
       setDetailsOpen(false);

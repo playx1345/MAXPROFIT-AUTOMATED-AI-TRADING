@@ -102,29 +102,40 @@ const AdminUsers = () => {
       
       // If verifying KYC, deduct $400 fee and create a fee transaction
       if (action === "verified") {
-        // Get user's current balance
+        // Get user's current balance and fee status
         const { data: userProfile, error: fetchError } = await supabase
           .from("profiles")
-          .select("balance_usdt")
+          .select("balance_usdt, kyc_fee_paid, kyc_status")
           .eq("id", userId)
           .single();
 
         if (fetchError) throw fetchError;
 
-        const currentBalance = userProfile?.balance_usdt || 0;
+        // Check if fee has already been paid to prevent duplicate charges
+        if (userProfile?.kyc_fee_paid) {
+          toast({
+            title: "Fee already paid",
+            description: "KYC verification fee has already been deducted for this user",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const currentBalance = userProfile?.balance_usdt ?? null;
         const kycFee = 400;
 
-        // Check if user has sufficient balance
-        if (currentBalance < kycFee) {
+        // Check if balance is valid and sufficient
+        if (currentBalance === null || currentBalance < kycFee) {
           toast({
             title: "Insufficient balance",
-            description: `User needs at least $${kycFee} balance to complete KYC verification. Current balance: $${currentBalance}`,
+            description: `User needs at least $${kycFee} balance to complete KYC verification. Current balance: ${currentBalance === null ? 'N/A' : `$${currentBalance}`}`,
             variant: "destructive",
           });
           return;
         }
 
         // Update profile with verified status, fee paid flag, and deduct balance
+        // This uses optimistic concurrency control by checking the current balance
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
@@ -132,7 +143,8 @@ const AdminUsers = () => {
             kyc_fee_paid: true,
             balance_usdt: currentBalance - kycFee,
           })
-          .eq("id", userId);
+          .eq("id", userId)
+          .eq("balance_usdt", currentBalance); // Ensure balance hasn't changed
 
         if (updateError) throw updateError;
 
@@ -150,7 +162,16 @@ const AdminUsers = () => {
             processed_at: new Date().toISOString(),
           });
 
-        if (transactionError) throw transactionError;
+        if (transactionError) {
+          // If transaction creation fails, log the error but don't rollback
+          // The profile update has already been committed
+          console.error("Failed to create transaction record:", transactionError);
+          toast({
+            title: "Warning",
+            description: "KYC verified and fee deducted, but transaction record creation failed. Please check logs.",
+            variant: "destructive",
+          });
+        }
       } else {
         // For rejection, just update the status
         const { error } = await supabase

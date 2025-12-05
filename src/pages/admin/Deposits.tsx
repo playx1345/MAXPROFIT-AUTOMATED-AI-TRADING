@@ -69,6 +69,9 @@ const AdminDeposits = () => {
     setProcessing(true);
 
     try {
+      // Get admin user info
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+
       // Update transaction status
       const { error: txError } = await supabase
         .from("transactions")
@@ -99,6 +102,23 @@ const AdminDeposits = () => {
 
       if (updateError) throw updateError;
 
+      // Log admin action
+      if (adminUser) {
+        await supabase.from("admin_activity_logs").insert({
+          admin_id: adminUser.id,
+          admin_email: adminUser.email || "",
+          action: "deposit_approved",
+          target_type: "transaction",
+          target_id: selectedDeposit.id,
+          target_email: selectedDeposit.profiles.email,
+          details: {
+            amount: selectedDeposit.amount,
+            currency: selectedDeposit.currency,
+            admin_notes: adminNotes,
+          },
+        });
+      }
+
       toast({
         title: "Deposit approved",
         description: "User balance has been updated",
@@ -123,6 +143,9 @@ const AdminDeposits = () => {
     setProcessing(true);
 
     try {
+      // Get admin user info
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+
       const { error } = await supabase
         .from("transactions")
         .update({
@@ -133,6 +156,23 @@ const AdminDeposits = () => {
         .eq("id", selectedDeposit.id);
 
       if (error) throw error;
+
+      // Log admin action
+      if (adminUser) {
+        await supabase.from("admin_activity_logs").insert({
+          admin_id: adminUser.id,
+          admin_email: adminUser.email || "",
+          action: "deposit_rejected",
+          target_type: "transaction",
+          target_id: selectedDeposit.id,
+          target_email: selectedDeposit.profiles.email,
+          details: {
+            amount: selectedDeposit.amount,
+            currency: selectedDeposit.currency,
+            admin_notes: adminNotes,
+          },
+        });
+      }
 
       toast({
         title: "Deposit rejected",

@@ -76,12 +76,31 @@ serve(async (req: Request) => {
       kyc_status = "unverified",
     }: CreateUserRequest = await req.json();
 
-    if (!email || !password || password.length < 6) {
+    // Validate password requirements
+    if (!email || !password) {
       return new Response(
-        JSON.stringify({ error: "Email and password (min 6 chars) are required" }),
+        JSON.stringify({ error: "Email and password are required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    if (password.length < 6) {
+      return new Response(
+        JSON.stringify({ error: "Password must be at least 6 characters long" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Optional: Add stronger password validation (commented for flexibility)
+    // const hasUpperCase = /[A-Z]/.test(password);
+    // const hasLowerCase = /[a-z]/.test(password);
+    // const hasNumber = /[0-9]/.test(password);
+    // if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+    //   return new Response(
+    //     JSON.stringify({ error: "Password must contain uppercase, lowercase, and numbers" }),
+    //     { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    //   );
+    // }
 
     console.log(`Admin ${user.email} creating new user: ${email}`);
 
@@ -113,8 +132,12 @@ serve(async (req: Request) => {
 
     if (profileError) {
       console.error("Profile update error:", profileError);
-      // User was created but profile update failed - still log it as success
-      console.log("User created but profile update failed:", profileError.message);
+      // Profile update failed - delete the user to maintain consistency
+      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+      return new Response(
+        JSON.stringify({ error: `Failed to create user profile: ${profileError.message}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Log the admin action

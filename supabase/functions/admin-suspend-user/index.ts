@@ -81,10 +81,14 @@ serve(async (req: Request) => {
       .eq("id", user_id)
       .single();
 
+    // Indefinite suspension duration (~100 years) for suspended accounts
+    // Using "none" to lift the ban and restore account access
+    const INDEFINITE_BAN_DURATION = "876000h"; // ~100 years, effectively permanent until admin lifts it
+
     // Update user's ban status in auth.users
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       user_id,
-      { ban_duration: suspend ? "876000h" : "none" } // Suspend for ~100 years or lift ban
+      { ban_duration: suspend ? INDEFINITE_BAN_DURATION : "none" }
     );
 
     if (updateError) {

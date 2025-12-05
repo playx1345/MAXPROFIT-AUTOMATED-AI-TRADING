@@ -619,7 +619,7 @@ const AdminUsers = () => {
               <div className="border-t pt-4">
                 <h3 className="font-semibold mb-3">Account Management</h3>
                 <div className="flex gap-2">
-                  {selectedUser.is_suspended ? (
+                  {selectedUser.is_suspended === true ? (
                     <Button
                       variant="outline"
                       className="flex-1"

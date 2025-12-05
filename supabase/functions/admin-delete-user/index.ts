@@ -88,7 +88,10 @@ serve(async (req: Request) => {
       .eq("id", user_id)
       .single();
 
-    // Delete the user from auth (this will cascade to related tables with proper foreign keys)
+    // Delete the user from auth
+    // Note: Cascade deletion should be configured in the database schema
+    // The following tables should have ON DELETE CASCADE for user_id foreign keys:
+    // - profiles, transactions, investments, referrals, user_roles
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id);
 
     if (deleteError) {

@@ -11,8 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
 const PLATFORM_WALLETS = {
-  usdt_trc20: "TYourPlatformUSDTAddress123456789",
-  btc: "bc1YourPlatformBTCAddress123456789",
+  usdt_trc20: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
+  btc: "bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h",
 };
 
 interface RecentDeposit {

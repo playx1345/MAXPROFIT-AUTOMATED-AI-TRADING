@@ -94,23 +94,14 @@ const Investments = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase.from("investments").insert({
-        user_id: user.id,
-        plan_id: selectedPlan.id,
-        amount_usdt: parsedAmount,
-        current_value: parsedAmount,
-        status: "active",
-        started_at: new Date().toISOString(),
-        ends_at: new Date(Date.now() + selectedPlan.duration_days * 24 * 60 * 60 * 1000).toISOString(),
+      // Use atomic function to create investment and update balance
+      const { data, error } = await supabase.rpc("create_investment_atomic", {
+        p_user_id: user.id,
+        p_plan_id: selectedPlan.id,
+        p_amount_usdt: parsedAmount,
       });
 
       if (error) throw error;
-
-      // Deduct from balance
-      await supabase
-        .from("profiles")
-        .update({ balance_usdt: balance - parsedAmount })
-        .eq("id", user.id);
 
       toast({
         title: "Investment created successfully!",

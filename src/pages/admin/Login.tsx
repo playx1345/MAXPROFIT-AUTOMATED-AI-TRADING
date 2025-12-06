@@ -188,13 +188,14 @@ const AdminLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <button
+              <Button
                 type="button"
+                variant="link"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-sm text-primary hover:text-primary/80 hover:underline transition-colors"
+                className="text-sm p-0 h-auto text-primary hover:text-primary/80"
               >
                 Forgot password?
-              </button>
+              </Button>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>

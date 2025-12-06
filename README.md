@@ -126,9 +126,38 @@ The following environment variables are automatically configured via Lovable Clo
 - `VITE_SUPABASE_PROJECT_ID`
 
 ### Admin Access
+
+#### Primary Admin
 **Email**: maxforexautomatedforexroboti@gmail.com  
 **Password**: 338822  
 ⚠️ **Important**: Enable 2FA immediately after first login
+
+#### Secondary Admin Setup
+**Email**: djplayxsilas134@gmail.com  
+
+To set up the secondary admin account:
+
+1. Get your Supabase service role key from:
+   - Supabase Dashboard → Project Settings → API → `service_role` key (secret)
+
+2. Run the setup script:
+   ```bash
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key ADMIN_PASSWORD=your_secure_password npm run setup:admin
+   ```
+
+3. The script will:
+   - Create the admin user account (if it doesn't exist)
+   - Set the password from `ADMIN_PASSWORD` env var, or generate a secure random one
+   - Display the password if it was generated (save it immediately!)
+   - Assign admin role in the database
+
+4. **⚠️ IMPORTANT**: Change the password immediately after first login!
+
+For more details, see `scripts/README.md`.
+
+**Alternative method**: You can also create the admin user manually via:
+- Supabase Dashboard → Authentication → Users → Add User
+- Then assign admin role by inserting into `user_roles` table
 
 ## 📱 User Journey
 

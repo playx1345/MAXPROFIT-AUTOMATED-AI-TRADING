@@ -133,7 +133,7 @@ async function createAdminUser() {
       
       for (let i = 0; i < maxRetries; i++) {
         // Use exponential backoff: 500ms, 1000ms, 2000ms, 4000ms, 8000ms
-        const delay = i === 0 ? baseDelay : baseDelay * Math.pow(2, i);
+        const delay = baseDelay * Math.pow(2, i);
         await new Promise(resolve => setTimeout(resolve, delay));
         
         const { data: profile, error: profileCheckError } = await supabase

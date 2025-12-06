@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, FileText, Eye } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +24,9 @@ const Profile = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [showKycDialog, setShowKycDialog] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState({
     full_name: "",
     phone: "",
@@ -32,6 +34,7 @@ const Profile = () => {
     wallet_btc: "",
     wallet_usdt: "",
     kyc_status: "pending",
+    kyc_id_card_url: "",
   });
 
   useEffect(() => {
@@ -59,6 +62,7 @@ const Profile = () => {
           wallet_btc: data.wallet_btc || "",
           wallet_usdt: data.wallet_usdt || "",
           kyc_status: data.kyc_status,
+          kyc_id_card_url: data.kyc_id_card_url || "",
         });
       }
     } catch (error: any) {
@@ -119,6 +123,15 @@ const Profile = () => {
         return;
       }
 
+      if (!profile.kyc_id_card_url) {
+        toast({
+          title: "Submission failed",
+          description: "Please upload your ID card before submitting KYC",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Show confirmation dialog
       setShowKycDialog(true);
     } catch (error: any) {
@@ -160,6 +173,98 @@ const Profile = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a JPG, PNG, WEBP, or PDF file",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please upload a file smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setUploading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Delete old file if exists
+      if (profile.kyc_id_card_url) {
+        const oldFilePath = profile.kyc_id_card_url.split('/').pop();
+        if (oldFilePath) {
+          await supabase.storage
+            .from('kyc-documents')
+            .remove([`${user.id}/${oldFilePath}`]);
+        }
+      }
+
+      // Upload new file
+      const fileExt = file.name.split('.').pop();
+      const fileName = `id-card-${Date.now()}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('kyc-documents')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('kyc-documents')
+        .getPublicUrl(filePath);
+
+      // Update profile with new URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ kyc_id_card_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setProfile({ ...profile, kyc_id_card_url: publicUrl });
+
+      toast({
+        title: "ID card uploaded",
+        description: "Your ID card has been uploaded successfully",
+      });
+
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      toast({
+        title: "Upload failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleViewIdCard = () => {
+    if (profile.kyc_id_card_url) {
+      window.open(profile.kyc_id_card_url, '_blank');
     }
   };
 
@@ -237,6 +342,47 @@ const Profile = () => {
               placeholder="+1234567890"
               disabled={profile.kyc_status === "verified"}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="id_card">ID Card / Passport *</Label>
+            <div className="flex gap-2">
+              <Input
+                ref={fileInputRef}
+                id="id_card"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
+                onChange={handleFileUpload}
+                disabled={uploading || profile.kyc_status === "verified"}
+                className="flex-1"
+              />
+              {profile.kyc_id_card_url && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleViewIdCard}
+                  title="View uploaded ID card"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            {uploading && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Uploading...</span>
+              </div>
+            )}
+            {profile.kyc_id_card_url && !uploading && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <FileText className="h-4 w-4" />
+                <span>ID card uploaded</span>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Upload a clear photo of your government-issued ID card or passport (JPG, PNG, WEBP, or PDF, max 5MB)
+            </p>
           </div>
         </CardContent>
       </Card>

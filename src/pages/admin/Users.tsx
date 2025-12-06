@@ -22,6 +22,7 @@ interface User {
   balance_usdt: number;
   kyc_status: string;
   kyc_submitted_at: string | null;
+  kyc_id_card_url: string | null;
   created_at: string;
   is_suspended?: boolean;
 }
@@ -548,6 +549,21 @@ const AdminUsers = () => {
                 </div>
               </div>
 
+              {/* ID Card Section - Show for all KYC statuses */}
+              {selectedUser.kyc_id_card_url && (
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold mb-3">ID Card Document</h3>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.open(selectedUser.kyc_id_card_url!, '_blank')}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Uploaded ID Card
+                  </Button>
+                </div>
+              )}
+
               {/* Password Reset Section */}
               <div className="border-t pt-4">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -608,6 +624,24 @@ const AdminUsers = () => {
                 <div className="border-t pt-4">
                   <h3 className="font-semibold mb-3">KYC Verification</h3>
                   <div className="space-y-3">
+                    {selectedUser.kyc_id_card_url && (
+                      <div>
+                        <Label>Uploaded ID Card</Label>
+                        <Button
+                          variant="outline"
+                          className="w-full mt-2"
+                          onClick={() => window.open(selectedUser.kyc_id_card_url!, '_blank')}
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          View ID Card Document
+                        </Button>
+                      </div>
+                    )}
+                    {!selectedUser.kyc_id_card_url && (
+                      <div className="text-sm text-muted-foreground bg-amber-50 dark:bg-amber-950 p-3 rounded-md border border-amber-200 dark:border-amber-800">
+                        ⚠️ No ID card uploaded by user
+                      </div>
+                    )}
                     <div>
                       <Label>Admin Notes (Optional)</Label>
                       <Textarea

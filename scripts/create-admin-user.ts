@@ -45,7 +45,7 @@ async function createAdminUser() {
       process.exit(1);
     }
 
-    const existingUser = existingUsers.users.find(u => u.email === ADMIN_EMAIL);
+    const existingUser = existingUsers?.users?.find((u: any) => u.email === ADMIN_EMAIL);
     
     if (existingUser) {
       console.log('User already exists with ID:', existingUser.id);

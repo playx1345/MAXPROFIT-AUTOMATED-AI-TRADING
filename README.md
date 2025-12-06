@@ -62,6 +62,14 @@ Max Forex & Automated Trading Robot Org is a cutting-edge digital investment pla
 - **trading_bot_performance**: AI trading activity logs
 - **referrals**: Referral tracking and bonus management
 
+### Storage Buckets
+- **kyc-documents**: KYC verification documents (private, 5MB limit)
+- **profile-pictures**: User avatars (public, 2MB limit)
+- **transaction-receipts**: Deposit/withdrawal receipts (private, 10MB limit)
+- **platform-documents**: Terms, policies, guides (public, 50MB limit)
+
+For detailed information about storage buckets, see [Storage Buckets Documentation](./docs/STORAGE_BUCKETS.md)
+
 ### Security Features
 - Row-Level Security (RLS) policies on all tables
 - Security definer functions for privilege checking

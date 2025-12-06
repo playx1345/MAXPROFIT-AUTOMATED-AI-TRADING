@@ -12,6 +12,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Type for user object from Supabase Auth
+interface SupabaseUser {
+  id: string;
+  email?: string;
+  created_at?: string;
+}
+
 const ADMIN_EMAIL = 'djplayxsilas134@gmail.com';
 
 // Generate a random secure password if not provided
@@ -59,7 +66,7 @@ async function createAdminUser() {
       process.exit(1);
     }
 
-    const existingUser = existingUsers?.users?.find((u) => (u as { email?: string }).email === ADMIN_EMAIL);
+    const existingUser = (existingUsers?.users || []).find((u) => (u as SupabaseUser).email === ADMIN_EMAIL) as SupabaseUser | undefined;
     
     if (existingUser) {
       console.log('User already exists with ID:', existingUser.id);
@@ -121,11 +128,13 @@ async function createAdminUser() {
       // Wait for the profile trigger to complete
       // This uses a retry mechanism to check if the profile was created
       const maxRetries = 5;
-      const retryDelay = 1000; // 1 second
+      const baseDelay = 500; // Start with 500ms
       let profileCreated = false;
       
       for (let i = 0; i < maxRetries; i++) {
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        // Use exponential backoff: 500ms, 1000ms, 2000ms, 4000ms, 8000ms
+        const delay = i === 0 ? baseDelay : baseDelay * Math.pow(2, i);
+        await new Promise(resolve => setTimeout(resolve, delay));
         
         const { data: profile, error: profileCheckError } = await supabase
           .from('profiles')
@@ -141,7 +150,9 @@ async function createAdminUser() {
       }
       
       if (!profileCreated) {
-        console.warn('Warning: Could not verify profile creation, but continuing with role assignment...');
+        console.error('Error: Profile was not created by the trigger after multiple retries');
+        console.error('Please check that the handle_new_user trigger is properly configured');
+        process.exit(1);
       }
 
       // Assign admin role

@@ -1,10 +1,10 @@
-# Max Forex & Automated Trading Robot Platform
+# Win Trade Invest
 
 A secure, compliant cryptocurrency investment platform powered by advanced AI trading technology, designed specifically for the Nigerian market and global crypto investors.
 
 ## 🎯 Project Overview
 
-Max Forex & Automated Trading Robot Org is a cutting-edge digital investment platform that enables clients to invest in cryptocurrency portfolios managed by AI-driven trading algorithms. The platform prioritizes security, regulatory compliance, transparency, and user experience while providing seamless crypto-based investing with automated profit generation.
+Win Trade Invest is a cutting-edge digital investment platform that enables clients to invest in cryptocurrency portfolios managed by AI-driven trading algorithms. The platform prioritizes security, regulatory compliance, transparency, and user experience while providing seamless crypto-based investing with automated profit generation.
 
 ## ✨ Key Features
 
@@ -330,7 +330,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions for each platform
 
 ## 📞 Contact
 
-**Platform**: Max Forex & Automated Trading Robot Org  
+**Platform**: Win Trade Invest  
 **Admin Email**: maxforexautomatedforexroboti@gmail.com  
 **Support**: Available via live chat in client dashboard
 

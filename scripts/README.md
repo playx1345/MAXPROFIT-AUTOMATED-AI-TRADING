@@ -36,23 +36,29 @@ Creates or updates the admin user account for `djplayxsilas134@gmail.com`.
 ### What it does
 
 - Creates the admin user `djplayxsilas134@gmail.com` if it doesn't exist
-- Sets a secure password for the account
+- Sets a password from `ADMIN_PASSWORD` env var, or generates a secure random password
 - Assigns the admin role in the `user_roles` table
 - If the user already exists, it updates the password
+- Uses a retry mechanism to verify profile creation
 
 ### Security Notes
 
 - The script requires the Supabase service role key, which has admin privileges
-- **Set a strong password** via the `ADMIN_PASSWORD` environment variable
-- **Change the password immediately after first login** if using the default
+- **Recommended**: Set a strong password via the `ADMIN_PASSWORD` environment variable
+- If `ADMIN_PASSWORD` is not set, a secure random password will be generated and displayed
+- **Save the generated password** - it will only be shown once
+- **Change the password immediately after first login**
 - The service role key should never be committed to version control
 - Store the service role key securely (e.g., in environment variables or a secrets manager)
-- Passwords are not logged to console for security
 
-### Default Credentials
+### Credentials
 
 After running the script, the admin can login with:
 - **Email**: djplayxsilas134@gmail.com
-- **Password**: The value you set in `ADMIN_PASSWORD` env var, or the default `Admin@2024!Secure`
+- **Password**: 
+  - If you set `ADMIN_PASSWORD`: Your custom password
+  - If not set: A randomly generated password (displayed in console output)
 
-**⚠️ IMPORTANT**: Change this password immediately after first login for security!
+**⚠️ IMPORTANT**: 
+- Save the password immediately when shown
+- Change this password after first login for security!

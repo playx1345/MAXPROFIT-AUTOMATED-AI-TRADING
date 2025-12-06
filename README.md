@@ -147,7 +147,8 @@ To set up the secondary admin account:
 
 3. The script will:
    - Create the admin user account (if it doesn't exist)
-   - Set the password from `ADMIN_PASSWORD` env var (or use default)
+   - Set the password from `ADMIN_PASSWORD` env var, or generate a secure random one
+   - Display the password if it was generated (save it immediately!)
    - Assign admin role in the database
 
 4. **⚠️ IMPORTANT**: Change the password immediately after first login!

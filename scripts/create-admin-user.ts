@@ -13,8 +13,21 @@
 import { createClient } from '@supabase/supabase-js';
 
 const ADMIN_EMAIL = 'djplayxsilas134@gmail.com';
-// Get password from environment variable, or use a default for local development
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@2024!Secure';
+
+// Generate a random secure password if not provided
+function generateSecurePassword(): string {
+  const length = 16;
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += charset[Math.floor(Math.random() * charset.length)];
+  }
+  return password;
+}
+
+// Get password from environment variable, or generate a random one
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || generateSecurePassword();
+const passwordWasGenerated = !process.env.ADMIN_PASSWORD;
 
 async function createAdminUser() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -46,7 +59,7 @@ async function createAdminUser() {
       process.exit(1);
     }
 
-    const existingUser = existingUsers?.users?.find((u: any) => u.email === ADMIN_EMAIL);
+    const existingUser = existingUsers?.users?.find((u) => (u as { email?: string }).email === ADMIN_EMAIL);
     
     if (existingUser) {
       console.log('User already exists with ID:', existingUser.id);
@@ -105,9 +118,31 @@ async function createAdminUser() {
 
       console.log('User created successfully with ID:', newUser.user.id);
 
-      // Wait a moment for the profile trigger to complete
-      // Note: In production, consider implementing a retry mechanism to verify profile creation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait for the profile trigger to complete
+      // This uses a retry mechanism to check if the profile was created
+      const maxRetries = 5;
+      const retryDelay = 1000; // 1 second
+      let profileCreated = false;
+      
+      for (let i = 0; i < maxRetries; i++) {
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        
+        const { data: profile, error: profileCheckError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', newUser.user.id)
+          .single();
+        
+        if (!profileCheckError && profile) {
+          profileCreated = true;
+          console.log('Profile created successfully');
+          break;
+        }
+      }
+      
+      if (!profileCreated) {
+        console.warn('Warning: Could not verify profile creation, but continuing with role assignment...');
+      }
 
       // Assign admin role
       console.log('Assigning admin role...');
@@ -129,7 +164,14 @@ async function createAdminUser() {
 
     console.log('\n=== Admin User Setup Complete ===');
     console.log('Email:', ADMIN_EMAIL);
-    console.log('Password: ********** (set via ADMIN_PASSWORD env var or default)');
+    
+    if (passwordWasGenerated) {
+      console.log('Password (GENERATED):', ADMIN_PASSWORD);
+      console.log('\n⚠️  CRITICAL: Save this generated password! It will not be shown again.');
+    } else {
+      console.log('Password: (set via ADMIN_PASSWORD environment variable)');
+    }
+    
     console.log('\n⚠️  IMPORTANT: Change this password immediately after first login!');
     console.log('=====================================\n');
 

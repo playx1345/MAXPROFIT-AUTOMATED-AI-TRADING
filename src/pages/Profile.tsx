@@ -105,9 +105,9 @@ const Profile = () => {
     }
   };
 
-  const handleSubmitKYC = () => {
+  const handleSubmitKYC = async () => {
     try {
-      const { data: { user } } = supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       if (!profile.full_name || !profile.phone) {

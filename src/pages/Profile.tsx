@@ -18,6 +18,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+const KYC_FEE_AMOUNT = 400;
+
 const Profile = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -103,26 +105,28 @@ const Profile = () => {
     }
   };
 
-  const handleSubmitKYC = async () => {
+  const handleSubmitKYC = () => {
     try {
-      setSaving(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = supabase.auth.getUser();
       if (!user) return;
 
       if (!profile.full_name || !profile.phone) {
-        throw new Error("Please fill in all required fields before submitting KYC");
+        toast({
+          title: "Submission failed",
+          description: "Please fill in all required fields before submitting KYC",
+          variant: "destructive",
+        });
+        return;
       }
 
-      // Show confirmation dialog instead of directly submitting
+      // Show confirmation dialog
       setShowKycDialog(true);
     } catch (error: any) {
       toast({
-        title: "Submission failed",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -187,7 +191,7 @@ const Profile = () => {
             </Badge>
           </div>
           <CardDescription>
-            {profile.kyc_status === "pending" && "Complete your profile and submit for verification. A $400 verification fee will be deducted from your balance upon approval."}
+            {profile.kyc_status === "pending" && `Complete your profile and submit for verification. A $${KYC_FEE_AMOUNT} verification fee will be deducted from your balance upon approval.`}
             {profile.kyc_status === "verified" && "Your account is verified"}
             {profile.kyc_status === "rejected" && "Please contact support for more information"}
           </CardDescription>
@@ -291,7 +295,7 @@ const Profile = () => {
                 Please confirm that you understand the following:
               </p>
               <ul className="list-disc list-inside space-y-1 mt-2">
-                <li>A one-time verification fee of <strong>$400</strong> will be deducted from your account balance upon KYC approval.</li>
+                <li>A one-time verification fee of <strong>${KYC_FEE_AMOUNT}</strong> will be deducted from your account balance upon KYC approval.</li>
                 <li>This fee is non-refundable.</li>
                 <li>The verification process may take 24-48 hours.</li>
               </ul>

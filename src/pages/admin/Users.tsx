@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getKycDocumentSignedUrl } from "@/lib/kyc-utils";
 
 interface User {
   id: string;
@@ -22,6 +23,7 @@ interface User {
   balance_usdt: number;
   kyc_status: string;
   kyc_submitted_at: string | null;
+  kyc_id_card_url: string | null;
   created_at: string;
   is_suspended?: boolean;
 }
@@ -155,6 +157,28 @@ const AdminUsers = () => {
     } catch (error: any) {
       toast({
         title: "Error updating KYC",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleViewIdCard = async (idCardUrl: string) => {
+    try {
+      const signedUrl = await getKycDocumentSignedUrl(idCardUrl);
+      
+      if (signedUrl) {
+        window.open(signedUrl, '_blank');
+      } else {
+        toast({
+          title: "Error",
+          description: "Invalid file path",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error viewing document",
         description: error.message,
         variant: "destructive",
       });
@@ -548,6 +572,21 @@ const AdminUsers = () => {
                 </div>
               </div>
 
+              {/* ID Card Section - Show for all KYC statuses */}
+              {selectedUser.kyc_id_card_url && (
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold mb-3">ID Card Document</h3>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleViewIdCard(selectedUser.kyc_id_card_url!)}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Uploaded ID Card
+                  </Button>
+                </div>
+              )}
+
               {/* Password Reset Section */}
               <div className="border-t pt-4">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -608,6 +647,24 @@ const AdminUsers = () => {
                 <div className="border-t pt-4">
                   <h3 className="font-semibold mb-3">KYC Verification</h3>
                   <div className="space-y-3">
+                    {selectedUser.kyc_id_card_url && (
+                      <div>
+                        <Label>Uploaded ID Card</Label>
+                        <Button
+                          variant="outline"
+                          className="w-full mt-2"
+                          onClick={() => handleViewIdCard(selectedUser.kyc_id_card_url!)}
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          View ID Card Document
+                        </Button>
+                      </div>
+                    )}
+                    {!selectedUser.kyc_id_card_url && (
+                      <div className="text-sm text-muted-foreground bg-amber-50 dark:bg-amber-950 p-3 rounded-md border border-amber-200 dark:border-amber-800">
+                        ⚠️ No ID card uploaded by user
+                      </div>
+                    )}
                     <div>
                       <Label>Admin Notes (Optional)</Label>
                       <Textarea

@@ -384,12 +384,62 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_deposit_atomic: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_admin_notes?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      approve_withdrawal_atomic: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_admin_notes?: string
+          p_transaction_hash?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      create_investment_atomic: {
+        Args: { p_amount_usdt: number; p_plan_id: string; p_user_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      reject_deposit_atomic: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_admin_notes?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reject_withdrawal_atomic: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_admin_notes?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      verify_kyc_atomic: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
+          p_user_id: string
+        }
+        Returns: Json
       }
     }
     Enums: {

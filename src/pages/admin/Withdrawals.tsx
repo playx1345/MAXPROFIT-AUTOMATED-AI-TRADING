@@ -88,7 +88,7 @@ const AdminWithdrawals = () => {
       if (!adminUser) throw new Error("Not authenticated as admin");
 
       // Use atomic function to approve withdrawal and debit balance
-      const { data, error } = await supabase.rpc("approve_withdrawal_atomic", {
+      const { data, error } = await supabase.rpc("approve_withdrawal_atomic" as any, {
         p_transaction_id: selectedWithdrawal.id,
         p_admin_id: adminUser.id,
         p_admin_email: adminUser.email || "",
@@ -128,7 +128,7 @@ const AdminWithdrawals = () => {
       if (!adminUser) throw new Error("Not authenticated as admin");
 
       // Use atomic function to reject withdrawal
-      const { data, error } = await supabase.rpc("reject_withdrawal_atomic", {
+      const { data, error } = await supabase.rpc("reject_withdrawal_atomic" as any, {
         p_transaction_id: selectedWithdrawal.id,
         p_admin_id: adminUser.id,
         p_admin_email: adminUser.email || "",

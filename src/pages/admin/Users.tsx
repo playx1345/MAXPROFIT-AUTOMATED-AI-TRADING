@@ -54,7 +54,7 @@ const AdminUsers = () => {
     phone: "",
     password: "",
     balance_usdt: 0,
-    kyc_status: "unverified",
+    kyc_status: "pending",
   });
   const { toast } = useToast();
 
@@ -107,7 +107,7 @@ const AdminUsers = () => {
       // If verifying KYC, use the atomic function to deduct $400 fee
       if (action === "verified") {
         // Call the atomic function to handle KYC verification, fee deduction, and transaction creation
-        const { data, error } = await supabase.rpc('verify_kyc_atomic', {
+        const { data, error } = await supabase.rpc('verify_kyc_atomic' as any, {
           p_user_id: userId,
           p_admin_id: adminUser.id,
           p_admin_email: adminUser.email || "",
@@ -116,9 +116,10 @@ const AdminUsers = () => {
 
         if (error) throw error;
 
+        const result = data as { fee_amount: number; new_balance: number };
         toast({
           title: "KYC verified",
-          description: `User KYC has been verified and $${data.fee_amount.toFixed(2)} fee has been deducted. New balance: $${data.new_balance.toFixed(2)}`,
+          description: `User KYC has been verified and $${result.fee_amount.toFixed(2)} fee has been deducted. New balance: $${result.new_balance.toFixed(2)}`,
         });
       } else {
         // For rejection, just update the status
@@ -254,7 +255,7 @@ const AdminUsers = () => {
         phone: "",
         password: "",
         balance_usdt: 0,
-        kyc_status: "unverified",
+        kyc_status: "pending",
       });
       setCreateDialogOpen(false);
       fetchUsers();
@@ -281,7 +282,7 @@ const AdminUsers = () => {
           full_name: formData.full_name,
           phone: formData.phone,
           balance_usdt: formData.balance_usdt,
-          kyc_status: formData.kyc_status,
+          kyc_status: formData.kyc_status as "pending" | "rejected" | "verified",
         })
         .eq("id", selectedUser.id);
 

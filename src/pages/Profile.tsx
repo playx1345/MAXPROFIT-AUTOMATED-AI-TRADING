@@ -7,11 +7,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+const KYC_FEE_AMOUNT = 400;
 
 const Profile = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showKycDialog, setShowKycDialog] = useState(false);
   const [profile, setProfile] = useState({
     full_name: "",
     phone: "",
@@ -94,13 +107,34 @@ const Profile = () => {
 
   const handleSubmitKYC = async () => {
     try {
-      setSaving(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       if (!profile.full_name || !profile.phone) {
-        throw new Error("Please fill in all required fields before submitting KYC");
+        toast({
+          title: "Submission failed",
+          description: "Please fill in all required fields before submitting KYC",
+          variant: "destructive",
+        });
+        return;
       }
+
+      // Show confirmation dialog
+      setShowKycDialog(true);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const confirmKycSubmission = async () => {
+    try {
+      setSaving(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
       const { error } = await supabase
         .from("profiles")
@@ -117,6 +151,7 @@ const Profile = () => {
       });
 
       fetchProfile();
+      setShowKycDialog(false);
     } catch (error: any) {
       toast({
         title: "Submission failed",
@@ -156,7 +191,7 @@ const Profile = () => {
             </Badge>
           </div>
           <CardDescription>
-            {profile.kyc_status === "pending" && "Complete your profile and submit for verification. A $400 verification fee will be deducted from your balance upon approval."}
+            {profile.kyc_status === "pending" && `Complete your profile and submit for verification. A $${KYC_FEE_AMOUNT} verification fee will be deducted from your balance upon approval.`}
             {profile.kyc_status === "verified" && "Your account is verified"}
             {profile.kyc_status === "rejected" && "Please contact support for more information"}
           </CardDescription>
@@ -249,6 +284,35 @@ const Profile = () => {
           </Button>
         )}
       </div>
+
+      {/* KYC Fee Confirmation Dialog */}
+      <AlertDialog open={showKycDialog} onOpenChange={setShowKycDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>KYC Verification Fee</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                Please confirm that you understand the following:
+              </p>
+              <ul className="list-disc list-inside space-y-1 mt-2">
+                <li>A one-time verification fee of <strong>${KYC_FEE_AMOUNT}</strong> will be deducted from your account balance upon KYC approval.</li>
+                <li>This fee is non-refundable.</li>
+                <li>The verification process may take 24-48 hours.</li>
+              </ul>
+              <p className="mt-2">
+                Do you wish to proceed with your KYC submission?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={saving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmKycSubmission} disabled={saving}>
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Confirm Submission
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -69,8 +69,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Sora', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'Sora', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

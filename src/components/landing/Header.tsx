@@ -40,8 +40,8 @@ export const Header = () => {
                 </svg>
               </div>
             </div>
-            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Win Trade Invest
+            <span className="text-lg font-bold bg-gradient-primary bg-clip-text text-transparent whitespace-nowrap">
+              Live Win Trade
             </span>
           </Link>
 

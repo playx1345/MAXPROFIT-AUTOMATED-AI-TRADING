@@ -35,8 +35,8 @@ const Profile = () => {
     wallet_btc: "",
     wallet_usdt: "",
     kyc_status: "pending",
-    kyc_id_card_url: "",
   });
+  const [kycIdCardUrl, setKycIdCardUrl] = useState("");
 
   useEffect(() => {
     fetchProfile();
@@ -63,8 +63,8 @@ const Profile = () => {
           wallet_btc: data.wallet_btc || "",
           wallet_usdt: data.wallet_usdt || "",
           kyc_status: data.kyc_status,
-          kyc_id_card_url: data.kyc_id_card_url || "",
         });
+        // KYC ID card URL is stored separately (not in profiles table)
       }
     } catch (error: any) {
       toast({
@@ -124,7 +124,7 @@ const Profile = () => {
         return;
       }
 
-      if (!profile.kyc_id_card_url) {
+      if (!kycIdCardUrl) {
         toast({
           title: "Submission failed",
           description: "Please upload your ID card before submitting KYC",
@@ -207,10 +207,10 @@ const Profile = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Delete old file if exists (store the file path in the database, not the URL)
-      if (profile.kyc_id_card_url) {
+      // Delete old file if exists
+      if (kycIdCardUrl) {
         try {
-          const oldPath = extractKycFilePath(profile.kyc_id_card_url);
+          const oldPath = extractKycFilePath(kycIdCardUrl);
           if (oldPath) {
             await supabase.storage
               .from(KYC_DOCUMENTS_BUCKET)
@@ -237,15 +237,8 @@ const Profile = () => {
       // The file can be accessed via signed URLs when needed
       const storedValue = `${KYC_DOCUMENTS_BUCKET}/${filePath}`;
 
-      // Update profile with file path
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ kyc_id_card_url: storedValue })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      setProfile({ ...profile, kyc_id_card_url: storedValue });
+      // Store locally (KYC ID card is managed via storage, not in profiles table)
+      setKycIdCardUrl(storedValue);
 
       toast({
         title: "ID card uploaded",
@@ -268,10 +261,10 @@ const Profile = () => {
   };
 
   const handleViewIdCard = async () => {
-    if (!profile.kyc_id_card_url) return;
+    if (!kycIdCardUrl) return;
     
     try {
-      const signedUrl = await getKycDocumentSignedUrl(profile.kyc_id_card_url);
+      const signedUrl = await getKycDocumentSignedUrl(kycIdCardUrl);
       
       if (signedUrl) {
         window.open(signedUrl, '_blank');
@@ -379,7 +372,7 @@ const Profile = () => {
                 disabled={uploading || profile.kyc_status === "verified"}
                 className="flex-1"
               />
-              {profile.kyc_id_card_url && (
+              {kycIdCardUrl && (
                 <Button
                   type="button"
                   variant="outline"
@@ -397,7 +390,7 @@ const Profile = () => {
                 <span>Uploading...</span>
               </div>
             )}
-            {profile.kyc_id_card_url && !uploading && (
+            {kycIdCardUrl && !uploading && (
               <div className="flex items-center gap-2 text-sm text-green-600">
                 <FileText className="h-4 w-4" />
                 <span>ID card uploaded</span>

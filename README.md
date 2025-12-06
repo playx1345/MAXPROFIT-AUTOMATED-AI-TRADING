@@ -272,16 +272,39 @@ npm run lint         # Run ESLint
 
 ## 📈 Deployment
 
-### Via Lovable
-1. Click "Publish" in the Lovable editor
-2. Your app will be deployed to `<project-name>.lovable.app`
-3. Configure custom domain in Project > Settings > Domains
+For complete deployment instructions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+
+### Quick Start with Deployment Helper
+
+```bash
+# Make the script executable (first time only)
+chmod +x deploy.sh
+
+# Run the deployment helper
+./deploy.sh
+```
+
+The deployment helper provides options for:
+- Installing dependencies
+- Building the application
+- Deploying Edge Functions
+- Applying database migrations
+- Setting up admin users
+- Running dev/production builds
 
 ### Manual Deployment
 ```bash
 npm run build
 # Deploy the dist/ folder to your hosting provider
 ```
+
+### Deployment Platforms Supported
+- **Vercel** (Recommended)
+- **Netlify**
+- **Custom VPS/Cloud Server**
+- **Lovable Platform**
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions for each platform.
 
 ## 🔗 Useful Resources
 

@@ -9,6 +9,7 @@ import { Copy, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { depositAmountSchema, transactionHashSchema, validateField } from "@/lib/validation";
 
 const PLATFORM_WALLETS = {
   usdt_trc20: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
@@ -29,6 +30,7 @@ const Deposit = () => {
   const [transactionHash, setTransactionHash] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [recentDeposits, setRecentDeposits] = useState<RecentDeposit[]>([]);
+  const [errors, setErrors] = useState<{ amount?: string; txHash?: string }>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -50,7 +52,7 @@ const Deposit = () => {
 
       if (error) throw error;
       setRecentDeposits(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching deposits:", error);
     }
   };
@@ -63,11 +65,30 @@ const Deposit = () => {
     });
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: { amount?: string; txHash?: string } = {};
+
+    const amountValidation = validateField(depositAmountSchema, amount);
+    if (!amountValidation.isValid) {
+      newErrors.amount = amountValidation.error;
+    }
+
+    if (transactionHash.trim()) {
+      const txHashValidation = validateField(transactionHashSchema, transactionHash);
+      if (!txHashValidation.isValid) {
+        newErrors.txHash = txHashValidation.error;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmitDeposit = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!validateForm()) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid deposit amount",
+        title: "Validation Error",
+        description: "Please fix the errors before submitting",
         variant: "destructive",
       });
       return;
@@ -85,7 +106,7 @@ const Deposit = () => {
         currency: currency,
         status: "pending",
         wallet_address: currency === "usdt" ? PLATFORM_WALLETS.usdt_trc20 : PLATFORM_WALLETS.btc,
-        transaction_hash: transactionHash || null,
+        transaction_hash: transactionHash.trim() || null,
       });
 
       if (error) throw error;
@@ -97,11 +118,13 @@ const Deposit = () => {
 
       setAmount("");
       setTransactionHash("");
+      setErrors({});
       fetchRecentDeposits();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Error submitting deposit",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -202,11 +225,24 @@ const Deposit = () => {
                 type="number"
                 placeholder="Enter amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  if (errors.amount) {
+                    const validation = validateField(depositAmountSchema, e.target.value);
+                    if (validation.isValid) {
+                      setErrors((prev) => ({ ...prev, amount: undefined }));
+                    }
+                  }
+                }}
+                className={errors.amount ? "border-destructive" : ""}
               />
-              <p className="text-xs text-muted-foreground">
-                Minimum deposit: $250 USDT
-              </p>
+              {errors.amount ? (
+                <p className="text-xs text-destructive">{errors.amount}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Minimum deposit: $250 USDT
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -215,11 +251,24 @@ const Deposit = () => {
                 id="txHash"
                 placeholder="Enter transaction hash"
                 value={transactionHash}
-                onChange={(e) => setTransactionHash(e.target.value)}
+                onChange={(e) => {
+                  setTransactionHash(e.target.value);
+                  if (errors.txHash) {
+                    const validation = validateField(transactionHashSchema, e.target.value);
+                    if (validation.isValid) {
+                      setErrors((prev) => ({ ...prev, txHash: undefined }));
+                    }
+                  }
+                }}
+                className={errors.txHash ? "border-destructive" : ""}
               />
-              <p className="text-xs text-muted-foreground">
-                You can submit this later if you don't have it yet
-              </p>
+              {errors.txHash ? (
+                <p className="text-xs text-destructive">{errors.txHash}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  You can submit this later if you don't have it yet
+                </p>
+              )}
             </div>
 
             <Button

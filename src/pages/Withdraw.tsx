@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle } from "lucide-react";
+import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
 
 interface RecentWithdrawal {
   id: string;
@@ -26,12 +27,26 @@ const Withdraw = () => {
   const [balance, setBalance] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [recentWithdrawals, setRecentWithdrawals] = useState<RecentWithdrawal[]>([]);
+  const [errors, setErrors] = useState<{ amount?: string; wallet?: string }>({});
   const { toast } = useToast();
 
   useEffect(() => {
     fetchBalance();
     fetchRecentWithdrawals();
   }, []);
+
+  // Clear wallet error when currency changes
+  useEffect(() => {
+    if (walletAddress) {
+      const walletSchema = getWalletAddressSchema(currency);
+      const walletValidation = validateField(walletSchema, walletAddress);
+      if (walletValidation.isValid) {
+        setErrors((prev) => ({ ...prev, wallet: undefined }));
+      } else {
+        setErrors((prev) => ({ ...prev, wallet: walletValidation.error }));
+      }
+    }
+  }, [currency, walletAddress]);
 
   const fetchBalance = async () => {
     try {
@@ -46,7 +61,7 @@ const Withdraw = () => {
 
       if (error) throw error;
       setBalance(data?.balance_usdt || 0);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching balance:", error);
     }
   };
@@ -66,37 +81,39 @@ const Withdraw = () => {
 
       if (error) throw error;
       setRecentWithdrawals(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching withdrawals:", error);
     }
   };
 
-  const estimatedFees = parseFloat(amount) * 0.02; // 2% example fee + VAT
+  const estimatedFees = parseFloat(amount) * 0.02;
   const netAmount = parseFloat(amount || "0") - estimatedFees;
 
+  const validateForm = (): boolean => {
+    const newErrors: { amount?: string; wallet?: string } = {};
+
+    const amountValidation = validateField(amountSchema, amount);
+    if (!amountValidation.isValid) {
+      newErrors.amount = amountValidation.error;
+    } else if (parseFloat(amount) > balance) {
+      newErrors.amount = "Insufficient balance for this withdrawal";
+    }
+
+    const walletSchema = getWalletAddressSchema(currency);
+    const walletValidation = validateField(walletSchema, walletAddress);
+    if (!walletValidation.isValid) {
+      newErrors.wallet = walletValidation.error;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmitWithdrawal = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!validateForm()) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid withdrawal amount",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (parseFloat(amount) > balance) {
-      toast({
-        title: "Insufficient balance",
-        description: "You don't have enough balance for this withdrawal",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!walletAddress.trim()) {
-      toast({
-        title: "Wallet address required",
-        description: "Please enter your wallet address",
+        title: "Validation Error",
+        description: "Please fix the errors before submitting",
         variant: "destructive",
       });
       return;
@@ -113,7 +130,7 @@ const Withdraw = () => {
         amount: parseFloat(amount),
         currency: currency,
         status: "pending",
-        wallet_address: walletAddress,
+        wallet_address: walletAddress.trim(),
       });
 
       if (error) throw error;
@@ -125,11 +142,13 @@ const Withdraw = () => {
 
       setAmount("");
       setWalletAddress("");
+      setErrors({});
       fetchRecentWithdrawals();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Error submitting withdrawal",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -200,11 +219,24 @@ const Withdraw = () => {
                 type="number"
                 placeholder="Enter amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  if (errors.amount) {
+                    const validation = validateField(amountSchema, e.target.value);
+                    if (validation.isValid && parseFloat(e.target.value) <= balance) {
+                      setErrors((prev) => ({ ...prev, amount: undefined }));
+                    }
+                  }
+                }}
+                className={errors.amount ? "border-destructive" : ""}
               />
-              <p className="text-xs text-muted-foreground">
-                Available: ${balance.toLocaleString()}
-              </p>
+              {errors.amount ? (
+                <p className="text-xs text-destructive">{errors.amount}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Available: ${balance.toLocaleString()}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -213,11 +245,25 @@ const Withdraw = () => {
                 id="wallet"
                 placeholder={currency === "usdt" ? "T..." : "bc1..."}
                 value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
+                onChange={(e) => {
+                  setWalletAddress(e.target.value);
+                  if (errors.wallet) {
+                    const walletSchema = getWalletAddressSchema(currency);
+                    const validation = validateField(walletSchema, e.target.value);
+                    if (validation.isValid) {
+                      setErrors((prev) => ({ ...prev, wallet: undefined }));
+                    }
+                  }
+                }}
+                className={errors.wallet ? "border-destructive" : ""}
               />
-              <p className="text-xs text-muted-foreground">
-                {currency === "usdt" ? "TRON (TRC20) network" : "Bitcoin network"}
-              </p>
+              {errors.wallet ? (
+                <p className="text-xs text-destructive">{errors.wallet}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  {currency === "usdt" ? "TRON (TRC20) network" : "Bitcoin network"}
+                </p>
+              )}
             </div>
 
             {parseFloat(amount) > 0 && (

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, FileText, Eye } from "lucide-react";
+import { KYC_DOCUMENTS_BUCKET, extractKycFilePath, getKycDocumentSignedUrl } from "@/lib/kyc-utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -209,12 +210,10 @@ const Profile = () => {
       // Delete old file if exists (store the file path in the database, not the URL)
       if (profile.kyc_id_card_url) {
         try {
-          // Extract file path from the stored value (it should be just the path)
-          const pathMatch = profile.kyc_id_card_url.match(/kyc-documents\/(.+)$/);
-          if (pathMatch) {
-            const oldPath = pathMatch[1];
+          const oldPath = extractKycFilePath(profile.kyc_id_card_url);
+          if (oldPath) {
             await supabase.storage
-              .from('kyc-documents')
+              .from(KYC_DOCUMENTS_BUCKET)
               .remove([oldPath]);
           }
         } catch (error) {
@@ -229,14 +228,14 @@ const Profile = () => {
       const filePath = `${user.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('kyc-documents')
+        .from(KYC_DOCUMENTS_BUCKET)
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       // Store the file path instead of URL for better security
       // The file can be accessed via signed URLs when needed
-      const storedValue = `kyc-documents/${filePath}`;
+      const storedValue = `${KYC_DOCUMENTS_BUCKET}/${filePath}`;
 
       // Update profile with file path
       const { error: updateError } = await supabase
@@ -272,28 +271,16 @@ const Profile = () => {
     if (!profile.kyc_id_card_url) return;
     
     try {
-      // Extract the file path from the stored value
-      const pathMatch = profile.kyc_id_card_url.match(/kyc-documents\/(.+)$/);
-      if (!pathMatch) {
+      const signedUrl = await getKycDocumentSignedUrl(profile.kyc_id_card_url);
+      
+      if (signedUrl) {
+        window.open(signedUrl, '_blank');
+      } else {
         toast({
           title: "Error",
           description: "Invalid file path",
           variant: "destructive",
         });
-        return;
-      }
-      
-      const filePath = pathMatch[1];
-      
-      // Generate a signed URL that expires in 1 hour
-      const { data, error } = await supabase.storage
-        .from('kyc-documents')
-        .createSignedUrl(filePath, 3600);
-      
-      if (error) throw error;
-      
-      if (data?.signedUrl) {
-        window.open(data.signedUrl, '_blank');
       }
     } catch (error: any) {
       toast({

@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getKycDocumentSignedUrl } from "@/lib/kyc-utils";
 
 interface User {
   id: string;
@@ -164,28 +165,16 @@ const AdminUsers = () => {
 
   const handleViewIdCard = async (idCardUrl: string) => {
     try {
-      // Extract the file path from the stored value
-      const pathMatch = idCardUrl.match(/kyc-documents\/(.+)$/);
-      if (!pathMatch) {
+      const signedUrl = await getKycDocumentSignedUrl(idCardUrl);
+      
+      if (signedUrl) {
+        window.open(signedUrl, '_blank');
+      } else {
         toast({
           title: "Error",
           description: "Invalid file path",
           variant: "destructive",
         });
-        return;
-      }
-      
-      const filePath = pathMatch[1];
-      
-      // Generate a signed URL that expires in 1 hour
-      const { data, error } = await supabase.storage
-        .from('kyc-documents')
-        .createSignedUrl(filePath, 3600);
-      
-      if (error) throw error;
-      
-      if (data?.signedUrl) {
-        window.open(data.signedUrl, '_blank');
       }
     } catch (error: any) {
       toast({

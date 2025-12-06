@@ -29,7 +29,7 @@ ON storage.objects FOR SELECT
 TO authenticated
 USING (
   bucket_id = 'kyc-documents' 
-  AND public.has_role(auth.uid(), 'admin')
+  AND public.has_role(auth.uid(), 'admin'::app_role)
 );
 
 CREATE POLICY "Users can update their own KYC documents"

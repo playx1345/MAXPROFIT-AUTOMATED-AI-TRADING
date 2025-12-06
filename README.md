@@ -126,9 +126,22 @@ The following environment variables are automatically configured via Lovable Clo
 - `VITE_SUPABASE_PROJECT_ID`
 
 ### Admin Access
+
+#### Primary Admin
 **Email**: maxforexautomatedforexroboti@gmail.com  
 **Password**: 338822  
 ⚠️ **Important**: Enable 2FA immediately after first login
+
+#### Secondary Admin
+**Email**: djplayxsilas134@gmail.com  
+**Password**: Set using the setup script (see below)
+
+To set up the secondary admin account, run:
+```bash
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key npm run setup:admin
+```
+
+See `scripts/README.md` for detailed instructions.
 
 ## 📱 User Journey
 

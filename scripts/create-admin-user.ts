@@ -13,7 +13,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 const ADMIN_EMAIL = 'djplayxsilas134@gmail.com';
-const ADMIN_PASSWORD = 'Admin@2024!Secure'; // Change this to desired password
+// Get password from environment variable, or use a default for local development
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@2024!Secure';
 
 async function createAdminUser() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -105,7 +106,8 @@ async function createAdminUser() {
       console.log('User created successfully with ID:', newUser.user.id);
 
       // Wait a moment for the profile trigger to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Note: In production, consider implementing a retry mechanism to verify profile creation
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Assign admin role
       console.log('Assigning admin role...');
@@ -127,8 +129,8 @@ async function createAdminUser() {
 
     console.log('\n=== Admin User Setup Complete ===');
     console.log('Email:', ADMIN_EMAIL);
-    console.log('Password:', ADMIN_PASSWORD);
-    console.log('\n⚠️  IMPORTANT: Change this password after first login!');
+    console.log('Password: ********** (set via ADMIN_PASSWORD env var or default)');
+    console.log('\n⚠️  IMPORTANT: Change this password immediately after first login!');
     console.log('=====================================\n');
 
   } catch (error) {

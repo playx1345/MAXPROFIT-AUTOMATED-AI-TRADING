@@ -74,7 +74,7 @@ const AdminDeposits = () => {
       if (!adminUser) throw new Error("Not authenticated as admin");
 
       // Use atomic function to approve deposit and credit balance
-      const { data, error } = await supabase.rpc("approve_deposit_atomic", {
+      const { data, error } = await supabase.rpc("approve_deposit_atomic" as any, {
         p_transaction_id: selectedDeposit.id,
         p_admin_id: adminUser.id,
         p_admin_email: adminUser.email || "",
@@ -112,7 +112,7 @@ const AdminDeposits = () => {
       if (!adminUser) throw new Error("Not authenticated as admin");
 
       // Use atomic function to reject deposit
-      const { data, error } = await supabase.rpc("reject_deposit_atomic", {
+      const { data, error } = await supabase.rpc("reject_deposit_atomic" as any, {
         p_transaction_id: selectedDeposit.id,
         p_admin_id: adminUser.id,
         p_admin_email: adminUser.email || "",

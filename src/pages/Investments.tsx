@@ -95,7 +95,7 @@ const Investments = () => {
       if (!user) throw new Error("Not authenticated");
 
       // Use atomic function to create investment and update balance
-      const { data, error } = await supabase.rpc("create_investment_atomic", {
+      const { data, error } = await supabase.rpc("create_investment_atomic" as any, {
         p_user_id: user.id,
         p_plan_id: selectedPlan.id,
         p_amount_usdt: parsedAmount,

@@ -19,7 +19,6 @@ const Profile = () => {
     wallet_btc: "",
     wallet_usdt: "",
     kyc_status: "pending",
-    kyc_fee_paid: false,
   });
 
   useEffect(() => {
@@ -47,7 +46,6 @@ const Profile = () => {
           wallet_btc: data.wallet_btc || "",
           wallet_usdt: data.wallet_usdt || "",
           kyc_status: data.kyc_status,
-          kyc_fee_paid: data.kyc_fee_paid || false,
         });
       }
     } catch (error: any) {
@@ -159,8 +157,7 @@ const Profile = () => {
           </div>
           <CardDescription>
             {profile.kyc_status === "pending" && "Complete your profile and submit for verification. A $400 verification fee will be deducted from your balance upon approval."}
-            {profile.kyc_status === "verified" && profile.kyc_fee_paid && "Your account is verified"}
-            {profile.kyc_status === "verified" && !profile.kyc_fee_paid && "Your account is verified (fee waived)"}
+            {profile.kyc_status === "verified" && "Your account is verified"}
             {profile.kyc_status === "rejected" && "Please contact support for more information"}
           </CardDescription>
         </CardHeader>

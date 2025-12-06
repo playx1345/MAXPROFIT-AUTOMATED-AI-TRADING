@@ -147,7 +147,7 @@ const Dashboard = () => {
               .remove([oldPath]);
           }
         } catch (error) {
-          console.error('Failed to delete old file:', error);
+          console.error('Failed to delete old KYC document:', error);
         }
       }
 

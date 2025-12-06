@@ -206,13 +206,20 @@ const Profile = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Delete old file if exists
+      // Delete old file if exists (store the file path in the database, not the URL)
       if (profile.kyc_id_card_url) {
-        const oldFilePath = profile.kyc_id_card_url.split('/').pop();
-        if (oldFilePath) {
-          await supabase.storage
-            .from('kyc-documents')
-            .remove([`${user.id}/${oldFilePath}`]);
+        try {
+          // Extract file path from the stored value (it should be just the path)
+          const pathMatch = profile.kyc_id_card_url.match(/kyc-documents\/(.+)$/);
+          if (pathMatch) {
+            const oldPath = pathMatch[1];
+            await supabase.storage
+              .from('kyc-documents')
+              .remove([oldPath]);
+          }
+        } catch (error) {
+          // Log but don't fail if deletion fails
+          console.error('Failed to delete old file:', error);
         }
       }
 
@@ -227,20 +234,19 @@ const Profile = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('kyc-documents')
-        .getPublicUrl(filePath);
+      // Store the file path instead of URL for better security
+      // The file can be accessed via signed URLs when needed
+      const storedValue = `kyc-documents/${filePath}`;
 
-      // Update profile with new URL
+      // Update profile with file path
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ kyc_id_card_url: publicUrl })
+        .update({ kyc_id_card_url: storedValue })
         .eq('id', user.id);
 
       if (updateError) throw updateError;
 
-      setProfile({ ...profile, kyc_id_card_url: publicUrl });
+      setProfile({ ...profile, kyc_id_card_url: storedValue });
 
       toast({
         title: "ID card uploaded",
@@ -262,9 +268,39 @@ const Profile = () => {
     }
   };
 
-  const handleViewIdCard = () => {
-    if (profile.kyc_id_card_url) {
-      window.open(profile.kyc_id_card_url, '_blank');
+  const handleViewIdCard = async () => {
+    if (!profile.kyc_id_card_url) return;
+    
+    try {
+      // Extract the file path from the stored value
+      const pathMatch = profile.kyc_id_card_url.match(/kyc-documents\/(.+)$/);
+      if (!pathMatch) {
+        toast({
+          title: "Error",
+          description: "Invalid file path",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const filePath = pathMatch[1];
+      
+      // Generate a signed URL that expires in 1 hour
+      const { data, error } = await supabase.storage
+        .from('kyc-documents')
+        .createSignedUrl(filePath, 3600);
+      
+      if (error) throw error;
+      
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error viewing document",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 

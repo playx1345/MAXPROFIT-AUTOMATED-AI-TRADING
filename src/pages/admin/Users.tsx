@@ -162,6 +162,40 @@ const AdminUsers = () => {
     }
   };
 
+  const handleViewIdCard = async (idCardUrl: string) => {
+    try {
+      // Extract the file path from the stored value
+      const pathMatch = idCardUrl.match(/kyc-documents\/(.+)$/);
+      if (!pathMatch) {
+        toast({
+          title: "Error",
+          description: "Invalid file path",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const filePath = pathMatch[1];
+      
+      // Generate a signed URL that expires in 1 hour
+      const { data, error } = await supabase.storage
+        .from('kyc-documents')
+        .createSignedUrl(filePath, 3600);
+      
+      if (error) throw error;
+      
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error viewing document",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handlePasswordReset = async (email: string) => {
     setResetLoading(true);
     try {
@@ -556,7 +590,7 @@ const AdminUsers = () => {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => window.open(selectedUser.kyc_id_card_url!, '_blank')}
+                    onClick={() => handleViewIdCard(selectedUser.kyc_id_card_url!)}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     View Uploaded ID Card
@@ -630,7 +664,7 @@ const AdminUsers = () => {
                         <Button
                           variant="outline"
                           className="w-full mt-2"
-                          onClick={() => window.open(selectedUser.kyc_id_card_url!, '_blank')}
+                          onClick={() => handleViewIdCard(selectedUser.kyc_id_card_url!)}
                         >
                           <Eye className="h-4 w-4 mr-2" />
                           View ID Card Document

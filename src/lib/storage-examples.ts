@@ -187,14 +187,15 @@ export const validateBeforeUpload = (file: File) => {
  */
 export const uploadPlatformDocument = async (file: File, documentName: string) => {
   try {
-    // Platform documents don't follow userId structure
+    // Platform documents use a flat structure without userId folders
     const fileExt = file.name.split('.').pop();
     const fileName = `${documentName}.${fileExt}`;
     
+    // For platform documents, we use a special 'platform' folder instead of userId
     const storedPath = await uploadFile(
       file,
       'PLATFORM_DOCUMENTS',
-      '', // No userId for platform docs
+      'platform', // Use 'platform' as the folder name
       fileName
     );
     

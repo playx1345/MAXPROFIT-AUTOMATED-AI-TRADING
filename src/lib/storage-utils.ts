@@ -111,7 +111,7 @@ export const uploadFile = async (
 
   // Generate file name
   const fileExt = file.name.split('.').pop();
-  const fileName = customFileName || `${Date.now()}.${fileExt}`;
+  const fileName = customFileName || `${Date.now()}.${fileExt || 'bin'}`;
   const filePath = `${userId}/${fileName}`;
 
   // Upload file

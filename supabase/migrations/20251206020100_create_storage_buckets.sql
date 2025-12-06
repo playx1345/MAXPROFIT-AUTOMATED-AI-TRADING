@@ -22,7 +22,9 @@ ON CONFLICT (id) DO UPDATE SET
   file_size_limit = 5242880,
   allowed_mime_types = ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
 
--- RLS Policies for KYC Documents (skip if already exists from previous migration)
+-- RLS Policies for KYC Documents
+-- Note: These policies are already created in migration 20251206012300_add_kyc_id_card.sql
+-- This section ensures the bucket configuration is updated with file size limits and MIME types
 
 -- -----------------------------------------------------
 -- 2. Profile Pictures Bucket

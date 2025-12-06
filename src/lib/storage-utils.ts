@@ -65,7 +65,7 @@ export const validateFile = (
 ): { isValid: boolean; error?: string } => {
   const bucket = STORAGE_BUCKETS[bucketName];
   const sizeLimit = BUCKET_SIZE_LIMITS[bucket];
-  const allowedTypes = BUCKET_MIME_TYPES[bucket];
+  const allowedTypes = BUCKET_MIME_TYPES[bucket] as readonly string[];
 
   // Check file type
   if (!allowedTypes.includes(file.type)) {
@@ -210,17 +210,7 @@ export const uploadProfilePicture = async (
   file: File,
   userId: string
 ): Promise<string> => {
-  // Delete old profile picture if it exists
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('profile_picture_url')
-    .eq('id', userId)
-    .single();
-
-  if (profile?.profile_picture_url) {
-    await deleteFile(profile.profile_picture_url);
-  }
-
+  // Upload the new profile picture (no profile_picture_url column exists in profiles table)
   return uploadFile(file, 'PROFILE_PICTURES', userId, 'avatar');
 };
 

@@ -44,7 +44,7 @@ const Landing = () => {
             }`}
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
-              Why Choose Win Trade Invest?
+              Why Choose Live Win Trade?
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Advanced technology meets professional trading expertise
@@ -231,7 +231,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <h3 className="font-bold text-2xl mb-4 bg-gradient-primary bg-clip-text text-transparent">
-                Win Trade Invest
+                Live Win Trade Investment
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Professional cryptocurrency investment platform with AI-powered automated trading strategies.
@@ -266,7 +266,7 @@ const Landing = () => {
           
           <div className="border-t border-border pt-8 text-center space-y-3">
             <p className="text-sm text-muted-foreground">
-              © 2025 Win Trade Invest Platform. All rights reserved.
+              © 2025 Live Win Trade Investment. All rights reserved.
             </p>
             <p className="text-xs text-muted-foreground max-w-3xl mx-auto">
               Trading cryptocurrencies involves substantial risk of loss and is not suitable for all investors. 

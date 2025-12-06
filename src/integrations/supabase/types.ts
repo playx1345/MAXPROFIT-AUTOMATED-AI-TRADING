@@ -185,7 +185,6 @@ export type Database = {
           id: string
           kyc_status: Database["public"]["Enums"]["kyc_status"]
           kyc_submitted_at: string | null
-          kyc_id_card_url: string | null
           phone: string | null
           wallet_btc: string | null
           wallet_usdt: string | null
@@ -198,7 +197,6 @@ export type Database = {
           id: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           kyc_submitted_at?: string | null
-          kyc_id_card_url?: string | null
           phone?: string | null
           wallet_btc?: string | null
           wallet_usdt?: string | null
@@ -211,7 +209,6 @@ export type Database = {
           id?: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           kyc_submitted_at?: string | null
-          kyc_id_card_url?: string | null
           phone?: string | null
           wallet_btc?: string | null
           wallet_usdt?: string | null

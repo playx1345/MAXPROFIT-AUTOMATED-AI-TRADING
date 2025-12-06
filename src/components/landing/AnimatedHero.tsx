@@ -25,9 +25,9 @@ export const AnimatedHero = () => {
             </div>
 
             {/* Main heading */}
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold mb-6 tracking-tight">
+            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight">
               <span className="text-gradient-premium">
-                Win Trade Invest
+                Live Win Trade Investment
               </span>
             </h1>
             

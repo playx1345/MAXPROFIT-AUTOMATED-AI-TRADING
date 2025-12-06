@@ -183,7 +183,6 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
-          kyc_fee_paid: boolean
           kyc_status: Database["public"]["Enums"]["kyc_status"]
           kyc_submitted_at: string | null
           phone: string | null
@@ -196,7 +195,6 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
-          kyc_fee_paid?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           kyc_submitted_at?: string | null
           phone?: string | null
@@ -209,7 +207,6 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
-          kyc_fee_paid?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           kyc_submitted_at?: string | null
           phone?: string | null

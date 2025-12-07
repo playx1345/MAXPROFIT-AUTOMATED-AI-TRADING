@@ -106,7 +106,7 @@ const Landing = () => {
                 "24/7 customer support",
                 "Monthly performance reports"
               ]}
-              glowColor="from-blue-400 to-cyan-600"
+              glowColor="from-amber-400 to-yellow-600"
             />
             <InvestmentPlanCard
               title="Growth Plan"
@@ -122,7 +122,7 @@ const Landing = () => {
                 "Weekly performance reports"
               ]}
               popular={true}
-              glowColor="from-yellow-400 to-orange-600"
+              glowColor="from-yellow-400 to-amber-500"
             />
             <InvestmentPlanCard
               title="Professional"
@@ -137,7 +137,7 @@ const Landing = () => {
                 "VIP support 24/7",
                 "Daily performance reports"
               ]}
-              glowColor="from-purple-400 to-pink-600"
+              glowColor="from-orange-400 to-amber-600"
             />
           </div>
 

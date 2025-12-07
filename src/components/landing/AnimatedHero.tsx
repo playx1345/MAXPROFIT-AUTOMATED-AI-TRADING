@@ -3,16 +3,16 @@ import { Link } from "react-router-dom";
 import { FloatingElements } from "./FloatingElements";
 import { ArrowRight, Sparkles } from "lucide-react";
 import logo from "@/assets/logo.jpg";
-
 export const AnimatedHero = () => {
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
+  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
       <FloatingElements />
       
       {/* Animated background gradient orbs */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-soft" />
-        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse-soft" style={{
+        animationDelay: '1s'
+      }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl" />
       </div>
       
@@ -27,7 +27,7 @@ export const AnimatedHero = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/25 mb-8 animate-fade-in">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold tracking-wide text-primary">AI-Powered Trading Platform</span>
+              <span className="text-sm font-semibold tracking-wide text-primary">LIVE </span>
             </div>
 
             {/* Main heading */}
@@ -84,6 +84,5 @@ export const AnimatedHero = () => {
 
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent" />
-    </section>
-  );
+    </section>;
 };

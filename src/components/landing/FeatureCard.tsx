@@ -16,15 +16,15 @@ export const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps
       
       {/* Bitcoin watermark */}
       <div className="absolute top-2 right-2 opacity-5 group-hover:opacity-10 transition-opacity">
-        <Icon className="w-24 h-24 text-primary" />
+        <Icon className="w-16 sm:w-24 h-16 sm:h-24 text-primary" />
       </div>
       
-      <CardHeader className="relative z-10">
-        <Icon className="h-12 w-12 mb-4 text-primary group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
-        <CardTitle className="text-2xl">{title}</CardTitle>
+      <CardHeader className="relative z-10 p-4 sm:p-6">
+        <Icon className="h-10 w-10 sm:h-12 sm:w-12 mb-3 sm:mb-4 text-primary group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
+        <CardTitle className="text-xl sm:text-2xl font-serif">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="relative z-10">
-        <CardDescription className="text-base">{description}</CardDescription>
+      <CardContent className="relative z-10 p-4 sm:p-6 pt-0">
+        <CardDescription className="text-sm sm:text-base font-serif">{description}</CardDescription>
       </CardContent>
     </Card>
   );

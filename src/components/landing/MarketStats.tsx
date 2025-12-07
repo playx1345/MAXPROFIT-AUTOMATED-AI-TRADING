@@ -53,10 +53,10 @@ export const MarketStats = () => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary-rgb),0.1),transparent_50%)]" />
       <div className="container mx-auto px-4 relative z-10">
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-foreground font-serif">
             Live Market Overview
           </h2>
-          <p className="text-muted-foreground">Real-time cryptocurrency market data</p>
+          <p className="text-foreground/70 font-serif">Real-time cryptocurrency market data</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">

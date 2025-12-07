@@ -98,17 +98,26 @@ const AdminDashboard = () => {
           amount,
           status,
           created_at,
-          profiles(email)
+          user_id
         `)
         .order("created_at", { ascending: false })
         .limit(10);
+
+      // Fetch user emails separately to avoid relationship ambiguity
+      const userIds = [...new Set(recentTransactions?.map(tx => tx.user_id) || [])];
+      const { data: userProfiles } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .in("id", userIds);
+
+      const emailMap = new Map(userProfiles?.map(p => [p.id, p.email]) || []);
 
       if (transactionsError) throw transactionsError;
 
       const formattedActivities = recentTransactions?.map((tx: any) => ({
         id: tx.id,
         type: tx.type,
-        description: `${tx.type === "deposit" ? "Deposit" : "Withdrawal"} of $${tx.amount} by ${tx.profiles?.email || "Unknown"} - ${tx.status}`,
+        description: `${tx.type === "deposit" ? "Deposit" : "Withdrawal"} of $${tx.amount} by ${emailMap.get(tx.user_id) || "Unknown"} - ${tx.status}`,
         timestamp: tx.created_at,
       })) || [];
 

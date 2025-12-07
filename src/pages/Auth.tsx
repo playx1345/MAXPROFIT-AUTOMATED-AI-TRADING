@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { emailSchema, passwordSchema, signInPasswordSchema, fullNameSchema, validateField } from "@/lib/validation";
 import { Shield, Zap, ArrowLeft } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/logo.jpg";
 
 const Auth = () => {
@@ -384,6 +385,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 sm:p-6 md:p-8 relative overflow-hidden">
+      {/* Theme Toggle - Fixed position */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,hsl(var(--primary)/0.15),transparent_50%)]" />

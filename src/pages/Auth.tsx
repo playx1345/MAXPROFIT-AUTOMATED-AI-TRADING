@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { emailSchema, passwordSchema, signInPasswordSchema, fullNameSchema, validateField } from "@/lib/validation";
 import { Shield, Zap, ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PasswordInput } from "@/components/ui/password-input";
 import logo from "@/assets/logo.jpg";
 
 const Auth = () => {
@@ -269,13 +270,13 @@ const Auth = () => {
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="new-password" className="text-foreground font-medium">New Password</Label>
-                  <Input
+                  <PasswordInput
                     id="new-password"
-                    type="password"
                     placeholder="••••••••"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
+                    showStrengthIndicator
                     className={`bg-background/50 border-border/50 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${errors.newPassword ? "border-destructive" : ""}`}
                   />
                   {errors.newPassword && (
@@ -287,9 +288,8 @@ const Auth = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password" className="text-foreground font-medium">Confirm Password</Label>
-                  <Input
+                  <PasswordInput
                     id="confirm-password"
-                    type="password"
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -456,9 +456,8 @@ const Auth = () => {
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
                     <Label htmlFor="signin-password" className="text-foreground font-serif font-medium text-sm sm:text-base">Password</Label>
-                    <Input
+                    <PasswordInput
                       id="signin-password"
-                      type="password"
                       placeholder="••••••••"
                       value={signInData.password}
                       onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
@@ -520,19 +519,18 @@ const Auth = () => {
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
                     <Label htmlFor="signup-password" className="text-foreground font-serif font-medium text-sm sm:text-base">Password</Label>
-                    <Input
+                    <PasswordInput
                       id="signup-password"
-                      type="password"
                       placeholder="••••••••"
                       value={signUpData.password}
                       onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
                       required
+                      showStrengthIndicator
                       className={`bg-background/60 border-border/40 focus:border-primary focus:ring-primary/20 transition-all duration-200 h-11 sm:h-12 text-sm sm:text-base rounded-xl ${errors.password ? "border-destructive" : ""}`}
                     />
                     {errors.password && (
                       <p className="text-xs text-destructive">{errors.password}</p>
                     )}
-                    <p className="text-xs text-muted-foreground font-serif">Min 8 chars with uppercase, lowercase, and number</p>
                   </div>
                   <Button 
                     type="submit" 

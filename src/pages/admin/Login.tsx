@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { z } from "zod";
+import { PasswordInput } from "@/components/ui/password-input";
 import logo from "@/assets/logo.jpg";
 
 const emailSchema = z.string().email("Invalid email address");
@@ -177,9 +178,8 @@ const AdminLogin = () => {
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

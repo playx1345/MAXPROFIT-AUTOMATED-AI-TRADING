@@ -26,6 +26,7 @@ const Auth = () => {
   const [signUpData, setSignUpData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     fullName: "",
   });
   const [signInData, setSignInData] = useState({
@@ -75,6 +76,9 @@ const Auth = () => {
       if (!emailValidation.isValid) newErrors.email = emailValidation.error;
       if (!passwordValidation.isValid) newErrors.password = passwordValidation.error;
       if (!nameValidation.isValid) newErrors.fullName = nameValidation.error;
+      if (signUpData.password !== signUpData.confirmPassword) {
+        newErrors.confirmPassword = "Passwords do not match";
+      }
 
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -99,7 +103,7 @@ const Auth = () => {
           title: "Account created successfully!",
           description: "You can now sign in to your account.",
         });
-        setSignUpData({ email: "", password: "", fullName: "" });
+        setSignUpData({ email: "", password: "", confirmPassword: "", fullName: "" });
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred during sign up";
@@ -532,8 +536,22 @@ const Auth = () => {
                       <p className="text-xs text-destructive">{errors.password}</p>
                     )}
                   </div>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label htmlFor="signup-confirm-password" className="text-foreground font-serif font-medium text-sm sm:text-base">Confirm Password</Label>
+                    <PasswordInput
+                      id="signup-confirm-password"
+                      placeholder="••••••••"
+                      value={signUpData.confirmPassword}
+                      onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
+                      required
+                      className={`bg-background/60 border-border/40 focus:border-primary focus:ring-primary/20 transition-all duration-200 h-11 sm:h-12 text-sm sm:text-base rounded-xl ${errors.confirmPassword ? "border-destructive" : ""}`}
+                    />
+                    {errors.confirmPassword && (
+                      <p className="text-xs text-destructive">{errors.confirmPassword}</p>
+                    )}
+                  </div>
                   <Button 
-                    type="submit" 
+                    type="submit"
                     className="w-full h-11 sm:h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-serif font-semibold shadow-lg shadow-primary/25 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] rounded-xl text-sm sm:text-base" 
                     disabled={loading}
                   >

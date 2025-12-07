@@ -13,11 +13,11 @@ import {
   User,
   LogOut,
   Menu,
-  X,
-  Sparkles
+  X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/logo.jpg";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -76,12 +76,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <div className="p-6 border-b border-primary/10 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent opacity-60" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
-            <h1 className="text-2xl font-bold relative flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary animate-pulse drop-shadow-glow" />
-              <span className="text-gradient-premium font-display">
-                CryptoInvest
+            <Link to="/" className="relative flex items-center gap-3 group">
+              <img src={logo} alt="Live Win Trade" className="h-10 w-10 rounded-lg object-cover shadow-md group-hover:shadow-glow transition-shadow duration-300" />
+              <span className="text-gradient-premium font-display text-xl font-bold">
+                Live Win Trade
               </span>
-            </h1>
+            </Link>
           </div>
 
           <ScrollArea className="flex-1 py-4">

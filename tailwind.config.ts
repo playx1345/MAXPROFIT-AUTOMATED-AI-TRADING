@@ -67,6 +67,9 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        teal: {
+          DEFAULT: "hsl(var(--logo-teal))",
+        },
       },
       fontFamily: {
         sans: ['Sora', 'system-ui', 'sans-serif'],

@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { z } from "zod";
+import logo from "@/assets/logo.jpg";
 
 const emailSchema = z.string().email("Invalid email address");
 
@@ -109,9 +110,7 @@ const AdminLogin = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="h-16 w-16 bg-primary rounded-full flex items-center justify-center">
-                <Shield className="h-8 w-8 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="Live Win Trade" className="h-16 w-16 rounded-full object-cover shadow-lg" />
             </div>
             <CardTitle className="text-2xl">Reset Admin Password</CardTitle>
             <CardDescription>
@@ -155,9 +154,7 @@ const AdminLogin = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 bg-primary rounded-full flex items-center justify-center">
-              <Shield className="h-8 w-8 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="Live Win Trade" className="h-16 w-16 rounded-full object-cover shadow-lg" />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>

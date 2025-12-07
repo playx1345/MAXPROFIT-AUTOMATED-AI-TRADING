@@ -66,15 +66,15 @@ export const AnimatedHero = () => {
             {/* Trust indicators */}
             <div className="mt-14 flex flex-wrap justify-center gap-10 text-sm">
               <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-teal animate-pulse shadow-[0_0_8px_hsl(var(--logo-teal)/0.6)]" />
                 <span className="text-muted-foreground font-medium">KYC Verified</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
                 <span className="text-muted-foreground font-medium">Bank-Level Security</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-teal animate-pulse shadow-[0_0_8px_hsl(var(--logo-teal)/0.6)]" />
                 <span className="text-muted-foreground font-medium">24/7 Support</span>
               </div>
             </div>

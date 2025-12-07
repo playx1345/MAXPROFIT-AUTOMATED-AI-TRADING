@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { emailSchema, passwordSchema, signInPasswordSchema, fullNameSchema, validateField } from "@/lib/validation";
-import { TrendingUp, Shield, Zap, ArrowLeft, CheckCircle } from "lucide-react";
+import { Shield, Zap, ArrowLeft } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -248,11 +249,9 @@ const Auth = () => {
 
         <div className="w-full max-w-md relative z-10">
           <div className="text-center mb-8 animate-fade-in">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-primary to-accent shadow-xl shadow-primary/25 mb-4">
-              <CheckCircle className="w-10 h-10 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="Live Win Trade" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-cover" />
             <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Win Trade Invest
+              Live Win Trade
             </h1>
           </div>
 
@@ -327,11 +326,9 @@ const Auth = () => {
 
         <div className="w-full max-w-md relative z-10">
           <div className="text-center mb-8 animate-fade-in">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-primary to-accent shadow-xl shadow-primary/25 mb-4">
-              <TrendingUp className="w-10 h-10 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="Live Win Trade" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-cover" />
             <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Win Trade Invest
+              Live Win Trade
             </h1>
           </div>
 
@@ -397,11 +394,9 @@ const Auth = () => {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-primary to-accent shadow-xl shadow-primary/25 mb-4">
-            <TrendingUp className="w-10 h-10 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="Live Win Trade" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-cover" />
           <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Win Trade Invest
+            Live Win Trade
           </h1>
           <p className="text-muted-foreground mt-2">AI-Powered Investment Platform</p>
         </div>
@@ -555,8 +550,8 @@ const Auth = () => {
                   <p className="text-xs text-muted-foreground">Fast</p>
                 </div>
                 <div className="space-y-1">
-                  <div className="w-8 h-8 mx-auto rounded-lg bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 mx-auto rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-primary" />
                   </div>
                   <p className="text-xs text-muted-foreground">Profitable</p>
                 </div>

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { FloatingElements } from "./FloatingElements";
 import { ArrowRight, Sparkles } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 export const AnimatedHero = () => {
   return (
@@ -18,6 +19,11 @@ export const AnimatedHero = () => {
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="max-w-5xl mx-auto text-center">
           <div className="glass-card-enhanced rounded-3xl p-8 md:p-14 animate-scale-in">
+            {/* Logo */}
+            <div className="mb-6 animate-fade-in">
+              <img src={logo} alt="Live Win Trade" className="w-28 h-28 md:w-32 md:h-32 rounded-2xl shadow-xl shadow-primary/25 mx-auto object-cover" />
+            </div>
+
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/25 mb-8 animate-fade-in">
               <Sparkles className="w-4 h-4 text-primary" />

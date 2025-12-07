@@ -126,8 +126,12 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-muted-foreground">Loading dashboard...</div>
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="relative">
+          <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+          <div className="h-10 w-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin relative z-10" />
+        </div>
+        <div className="animate-pulse text-muted-foreground font-medium">Loading dashboard...</div>
       </div>
     );
   }
@@ -135,68 +139,80 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold font-display bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
+          Admin Dashboard
+        </h1>
         <p className="text-muted-foreground">Overview of platform statistics and activity</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <Card>
+        <Card className="glass-card-enhanced border-primary/20 group hover:border-primary/40 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+            <div className="p-2 rounded-lg bg-primary/10 group-hover:scale-110 transition-transform duration-300">
+              <Users className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUsers}</div>
+            <div className="text-2xl font-bold font-display text-primary">{stats.totalUsers}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card-enhanced border-accent/20 group hover:border-accent/40 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Platform Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Platform Value</CardTitle>
+            <div className="p-2 rounded-lg bg-accent/10 group-hover:scale-110 transition-transform duration-300">
+              <DollarSign className="h-4 w-4 text-accent" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold font-display text-accent">
               ${stats.totalPlatformValue.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Total AUM</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card-enhanced border-warning/20 group hover:border-warning/40 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending Deposits</CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Deposits</CardTitle>
+            <div className="p-2 rounded-lg bg-warning/10 group-hover:scale-110 transition-transform duration-300">
+              <AlertCircle className="h-4 w-4 text-warning" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
+            <div className="text-2xl font-bold font-display text-warning">
               {stats.pendingDeposits}
             </div>
             <p className="text-xs text-muted-foreground">Awaiting approval</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card-enhanced border-destructive/20 group hover:border-destructive/40 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending Withdrawals</CardTitle>
-            <AlertCircle className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Withdrawals</CardTitle>
+            <div className="p-2 rounded-lg bg-destructive/10 group-hover:scale-110 transition-transform duration-300">
+              <AlertCircle className="h-4 w-4 text-destructive" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-2xl font-bold font-display text-destructive">
               {stats.pendingWithdrawals}
             </div>
             <p className="text-xs text-muted-foreground">Awaiting processing</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card-enhanced border-success/20 group hover:border-success/40 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Active Investments</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active Investments</CardTitle>
+            <div className="p-2 rounded-lg bg-success/10 group-hover:scale-110 transition-transform duration-300">
+              <TrendingUp className="h-4 w-4 text-success" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold font-display text-success">
               {stats.activeInvestments}
             </div>
             <p className="text-xs text-muted-foreground">Currently running</p>
@@ -205,9 +221,14 @@ const AdminDashboard = () => {
       </div>
 
       {/* Recent Activity */}
-      <Card>
+      <Card className="glass-card-enhanced border-border/50">
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle className="font-display flex items-center gap-2">
+            <span className="relative">
+              Recent Activity
+              <span className="absolute -right-3 -top-1 h-2 w-2 bg-primary rounded-full animate-pulse" />
+            </span>
+          </CardTitle>
           <CardDescription>Latest platform transactions and events</CardDescription>
         </CardHeader>
         <CardContent>
@@ -220,7 +241,7 @@ const AdminDashboard = () => {
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-start justify-between p-3 border rounded-lg"
+                  className="flex items-start justify-between p-3 border border-border/30 rounded-lg hover:bg-muted/20 hover:border-primary/20 transition-all duration-300 group"
                 >
                   <div className="flex-1">
                     <p className="text-sm">{activity.description}</p>
@@ -228,7 +249,10 @@ const AdminDashboard = () => {
                       {format(new Date(activity.timestamp), "MMM dd, yyyy HH:mm")}
                     </p>
                   </div>
-                  <Badge variant={activity.type === "deposit" ? "default" : "secondary"}>
+                  <Badge 
+                    variant={activity.type === "deposit" ? "default" : "secondary"}
+                    className={activity.type === "deposit" ? "bg-primary/20 text-primary border border-primary/30" : "bg-accent/20 text-accent border border-accent/30"}
+                  >
                     {activity.type}
                   </Badge>
                 </div>

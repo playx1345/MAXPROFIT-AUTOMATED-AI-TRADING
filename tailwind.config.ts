@@ -72,8 +72,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Sora', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'Sora', 'system-ui', 'sans-serif'],
+        sans: ['"Times New Roman"', 'Times', 'serif'],
+        display: ['"Times New Roman"', 'Times', 'serif'],
+        serif: ['"Times New Roman"', 'Times', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

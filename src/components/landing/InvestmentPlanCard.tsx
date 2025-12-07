@@ -47,9 +47,9 @@ export const InvestmentPlanCard = ({
           </div>
         )}
 
-        <CardHeader className="relative z-10">
-          <CardTitle className="text-3xl mb-2 font-display">{title}</CardTitle>
-        <CardDescription className="text-lg">
+        <CardHeader className="relative z-10 p-4 sm:p-6">
+          <CardTitle className="text-2xl sm:text-3xl mb-2 font-serif">{title}</CardTitle>
+          <CardDescription className="text-base sm:text-lg font-serif">
             <span className="font-semibold text-foreground">Risk Level:</span>{" "}
             <span className={`font-medium ${
               risk === "Low" || risk === "Low Risk" ? "text-success" : 
@@ -60,46 +60,46 @@ export const InvestmentPlanCard = ({
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="relative z-10 space-y-6">
+        <CardContent className="relative z-10 space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
           {/* Investment range */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50 border border-border/50">
-              <span className="text-muted-foreground text-sm">Min Investment</span>
-              <span className="text-xl font-bold text-primary">
+          <div className="space-y-2 sm:space-y-3">
+            <div className="flex justify-between items-center p-2.5 sm:p-3 rounded-lg bg-muted/50 border border-border/50">
+              <span className="text-muted-foreground text-xs sm:text-sm font-serif">Min Investment</span>
+              <span className="text-lg sm:text-xl font-bold text-primary font-serif">
                 {minInvestment}
               </span>
             </div>
-            <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50 border border-border/50">
-              <span className="text-muted-foreground text-sm">Max Investment</span>
-              <span className="text-xl font-bold text-primary">
+            <div className="flex justify-between items-center p-2.5 sm:p-3 rounded-lg bg-muted/50 border border-border/50">
+              <span className="text-muted-foreground text-xs sm:text-sm font-serif">Max Investment</span>
+              <span className="text-lg sm:text-xl font-bold text-primary font-serif">
                 {maxInvestment}
               </span>
             </div>
           </div>
 
           {/* Expected ROI */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 border border-primary/20">
-            <div className="text-sm text-muted-foreground mb-1">Expected ROI</div>
-            <div className="text-3xl font-bold font-display bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-transparent">
+          <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 border border-primary/20">
+            <div className="text-xs sm:text-sm text-muted-foreground mb-1 font-serif">Expected ROI</div>
+            <div className="text-2xl sm:text-3xl font-bold font-serif bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-transparent">
               {expectedROI}
             </div>
           </div>
 
           {/* Features */}
-          <ul className="space-y-3">
+          <ul className="space-y-2 sm:space-y-3">
             {features.map((feature, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="h-3 w-3 text-primary" />
+              <li key={index} className="flex items-start gap-2 sm:gap-3">
+                <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground">{feature}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground font-serif">{feature}</span>
               </li>
             ))}
           </ul>
 
           {/* CTA Button */}
           <Link to="/auth" className="block">
-            <Button className="w-full bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300">
+            <Button className="w-full font-serif bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 h-10 sm:h-11 text-sm sm:text-base">
               Start Investing
             </Button>
           </Link>

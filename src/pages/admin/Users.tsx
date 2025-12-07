@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck, DollarSign } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -27,6 +27,7 @@ interface User {
   is_suspended: boolean;
   wallet_btc: string | null;
   wallet_usdt: string | null;
+  upgrade_fee_paid: boolean;
 }
 
 interface UserFormData {
@@ -566,6 +567,12 @@ const AdminUsers = () => {
                   </Badge>
                 </div>
                 <div>
+                  <Label className="text-muted-foreground">Upgrade Fee</Label>
+                  <Badge className={selectedUser.upgrade_fee_paid ? "bg-green-500" : "bg-orange-500"}>
+                    {selectedUser.upgrade_fee_paid ? "Paid" : "Not Paid"}
+                  </Badge>
+                </div>
+                <div>
                   <Label className="text-muted-foreground">Joined</Label>
                   <p className="font-medium">
                     {format(new Date(selectedUser.created_at), "MMM dd, yyyy")}
@@ -670,52 +677,102 @@ const AdminUsers = () => {
               {/* Account Management Actions */}
               <div className="border-t pt-4">
                 <h3 className="font-semibold mb-3">Account Management</h3>
-                <div className="flex gap-2">
-                  {selectedUser.is_suspended === true ? (
+                <div className="flex flex-col gap-3">
+                  {/* Upgrade Fee Toggle */}
+                  {selectedUser.kyc_status === "verified" && (
                     <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, false)}
+                      variant={selectedUser.upgrade_fee_paid ? "outline" : "default"}
+                      className={`w-full ${!selectedUser.upgrade_fee_paid ? "bg-green-600 hover:bg-green-700" : ""}`}
+                      onClick={async () => {
+                        try {
+                          const { error } = await supabase
+                            .from("profiles")
+                            .update({ upgrade_fee_paid: !selectedUser.upgrade_fee_paid })
+                            .eq("id", selectedUser.id);
+
+                          if (error) throw error;
+
+                          // Log admin action
+                          const { data: { user: adminUser } } = await supabase.auth.getUser();
+                          if (adminUser) {
+                            await supabase.from("admin_activity_logs").insert({
+                              admin_id: adminUser.id,
+                              admin_email: adminUser.email || "",
+                              action: selectedUser.upgrade_fee_paid ? "upgrade_fee_revoked" : "upgrade_fee_marked_paid",
+                              target_type: "user",
+                              target_id: selectedUser.id,
+                              target_email: selectedUser.email,
+                              details: { upgrade_fee_paid: !selectedUser.upgrade_fee_paid },
+                            });
+                          }
+
+                          toast({
+                            title: "Upgrade fee status updated",
+                            description: `Upgrade fee marked as ${!selectedUser.upgrade_fee_paid ? "paid" : "not paid"} for ${selectedUser.email}`,
+                          });
+                          fetchUsers();
+                          setDetailsOpen(false);
+                        } catch (error: any) {
+                          toast({
+                            title: "Error updating upgrade fee status",
+                            description: error.message,
+                            variant: "destructive",
+                          });
+                        }
+                      }}
                     >
-                      <CheckCheck className="h-4 w-4 mr-2" />
-                      Activate Account
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, true)}
-                    >
-                      <Ban className="h-4 w-4 mr-2" />
-                      Suspend Account
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      {selectedUser.upgrade_fee_paid ? "Revoke Upgrade Fee" : "Mark Upgrade Fee as Paid"}
                     </Button>
                   )}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" className="flex-1">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete User
+
+                  <div className="flex gap-2">
+                    {selectedUser.is_suspended === true ? (
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, false)}
+                      >
+                        <CheckCheck className="h-4 w-4 mr-2" />
+                        Activate Account
                       </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the user account
-                          for <strong>{selectedUser.email}</strong> and remove all associated data.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          onClick={() => handleDeleteUser(selectedUser.id, selectedUser.email)}
-                        >
-                          Delete Permanently
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, true)}
+                      >
+                        <Ban className="h-4 w-4 mr-2" />
+                        Suspend Account
+                      </Button>
+                    )}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" className="flex-1">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete User
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the user account
+                            for <strong>{selectedUser.email}</strong> and remove all associated data.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={() => handleDeleteUser(selectedUser.id, selectedUser.email)}
+                          >
+                            Delete Permanently
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </div>
             </div>

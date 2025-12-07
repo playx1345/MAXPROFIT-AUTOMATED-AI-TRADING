@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
+import { UpgradeFeeNotification } from "@/components/UpgradeFeeNotification";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -54,6 +55,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div className="min-h-screen flex w-full bg-background">
+      {/* Upgrade Fee Notification */}
+      <UpgradeFeeNotification />
+      
       {/* Mobile Menu Button with Glass Effect */}
       <Button
         variant="ghost"

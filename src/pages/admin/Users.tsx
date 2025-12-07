@@ -24,7 +24,7 @@ interface User {
   kyc_status: string;
   kyc_submitted_at: string | null;
   created_at: string;
-  is_suspended?: boolean;
+  is_suspended: boolean;
   wallet_btc: string | null;
   wallet_usdt: string | null;
 }
@@ -793,7 +793,6 @@ const AdminUsers = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unverified">Unverified</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="verified">Verified</SelectItem>
                     <SelectItem value="rejected">Rejected</SelectItem>
@@ -867,7 +866,6 @@ const AdminUsers = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="unverified">Unverified</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="verified">Verified</SelectItem>
                       <SelectItem value="rejected">Rejected</SelectItem>

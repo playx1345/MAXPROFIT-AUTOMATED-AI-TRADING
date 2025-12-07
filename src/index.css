@@ -8,65 +8,68 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Binance-Inspired Premium Trading Brand */
-    /* Dark backgrounds with signature gold/yellow accents */
+    /* Live Win Trade Brand - Navy Blue Background from Logo */
+    /* Deep navy backgrounds with signature gold/yellow accents */
     
-    --background: 220 14% 4%;
-    --foreground: 220 10% 93%;
+    --background: 215 55% 8%;
+    --foreground: 210 20% 95%;
 
-    --card: 220 12% 8%;
-    --card-foreground: 220 10% 93%;
+    --card: 215 50% 11%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 220 12% 8%;
-    --popover-foreground: 220 10% 93%;
+    --popover: 215 50% 11%;
+    --popover-foreground: 210 20% 95%;
 
     /* Binance Yellow - Primary Brand Color */
     --primary: 45 93% 49%;
-    --primary-foreground: 220 14% 4%;
+    --primary-foreground: 215 55% 8%;
     --primary-glow: 45 95% 55%;
 
-    --secondary: 220 12% 12%;
-    --secondary-foreground: 220 10% 93%;
+    --secondary: 215 48% 12%;
+    --secondary-foreground: 210 20% 95%;
 
-    --muted: 220 12% 14%;
-    --muted-foreground: 220 8% 52%;
+    --muted: 215 45% 14%;
+    --muted-foreground: 210 15% 55%;
 
     /* Gold/Amber Accent */
     --accent: 38 92% 50%;
-    --accent-foreground: 220 14% 4%;
+    --accent-foreground: 215 55% 8%;
 
     /* Binance Red for Destructive */
     --destructive: 355 90% 62%;
-    --destructive-foreground: 220 10% 93%;
+    --destructive-foreground: 210 20% 95%;
 
-    --border: 220 12% 16%;
-    --input: 220 12% 16%;
+    --border: 215 40% 18%;
+    --input: 215 40% 18%;
     --ring: 45 93% 49%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 220 14% 6%;
-    --sidebar-foreground: 220 10% 94%;
+    --sidebar-background: 215 55% 7%;
+    --sidebar-foreground: 210 20% 95%;
     --sidebar-primary: 45 93% 49%;
-    --sidebar-primary-foreground: 220 14% 4%;
-    --sidebar-accent: 220 12% 12%;
-    --sidebar-accent-foreground: 220 10% 93%;
-    --sidebar-border: 220 12% 14%;
+    --sidebar-primary-foreground: 215 55% 8%;
+    --sidebar-accent: 215 48% 12%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 215 40% 14%;
     --sidebar-ring: 45 93% 49%;
 
-    /* Brand Gradients - Binance Gold */
+    /* Logo Teal - Secondary accent from chart lines */
+    --logo-teal: 185 100% 38%;
+
+    /* Brand Gradients - Navy Blue with Gold */
     --gradient-primary: linear-gradient(135deg, hsl(45 93% 49%) 0%, hsl(38 92% 55%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(32 95% 52%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(220 14% 4%) 0%, hsl(220 12% 8%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(220 12% 8%) 0%, hsl(220 12% 11%) 100%);
-    --gradient-premium: linear-gradient(135deg, hsl(220 14% 6%) 0%, hsl(220 12% 8%) 40%, hsl(45 30% 10%) 100%);
-    --gradient-hero: linear-gradient(145deg, hsl(220 14% 4%) 0%, hsl(220 14% 2%) 50%, hsl(220 12% 6%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(215 55% 8%) 0%, hsl(215 50% 11%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(215 50% 11%) 0%, hsl(215 48% 14%) 100%);
+    --gradient-premium: linear-gradient(135deg, hsl(215 55% 7%) 0%, hsl(215 50% 10%) 40%, hsl(45 30% 12%) 100%);
+    --gradient-hero: linear-gradient(145deg, hsl(215 55% 8%) 0%, hsl(215 58% 5%) 50%, hsl(215 50% 10%) 100%);
     --gradient-cyber: linear-gradient(135deg, hsl(45 93% 49% / 0.1) 0%, hsl(38 92% 50% / 0.1) 100%);
 
     /* Enhanced Shadows - Gold Glow */
-    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.4);
-    --shadow-md: 0 4px 20px hsl(0 0% 0% / 0.5);
-    --shadow-lg: 0 8px 40px hsl(0 0% 0% / 0.6);
+    --shadow-sm: 0 2px 8px hsl(215 60% 3% / 0.4);
+    --shadow-md: 0 4px 20px hsl(215 60% 3% / 0.5);
+    --shadow-lg: 0 8px 40px hsl(215 60% 3% / 0.6);
     --shadow-elegant: 0 12px 50px -15px hsl(45 93% 49% / 0.4);
     --shadow-glow: 0 0 60px hsl(45 93% 49% / 0.3);
     --shadow-accent: 0 8px 30px -10px hsl(38 92% 50% / 0.5);
@@ -77,67 +80,70 @@ All colors MUST be HSL.
     
     /* Binance Green for Success */
     --success: 160 85% 43%;
-    --success-foreground: 220 10% 93%;
+    --success-foreground: 210 20% 95%;
 
     /* Warning Color */
     --warning: 45 93% 49%;
-    --warning-foreground: 220 14% 4%;
+    --warning-foreground: 215 55% 8%;
     
     /* Perspective */
     --perspective: 1200px;
   }
 
   .dark {
-    --background: 220 16% 3%;
-    --foreground: 220 10% 93%;
+    --background: 215 58% 5%;
+    --foreground: 210 20% 95%;
 
-    --card: 220 14% 6%;
-    --card-foreground: 220 10% 93%;
+    --card: 215 52% 8%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 220 14% 6%;
-    --popover-foreground: 220 10% 93%;
+    --popover: 215 52% 8%;
+    --popover-foreground: 210 20% 95%;
 
     --primary: 45 95% 52%;
-    --primary-foreground: 220 16% 3%;
+    --primary-foreground: 215 58% 5%;
     --primary-glow: 45 97% 58%;
 
-    --secondary: 220 14% 10%;
-    --secondary-foreground: 220 10% 93%;
+    --secondary: 215 50% 10%;
+    --secondary-foreground: 210 20% 95%;
 
-    --muted: 220 14% 8%;
-    --muted-foreground: 220 8% 48%;
+    --muted: 215 48% 12%;
+    --muted-foreground: 210 12% 50%;
 
     --accent: 38 94% 52%;
-    --accent-foreground: 220 16% 3%;
+    --accent-foreground: 215 58% 5%;
 
     --destructive: 355 90% 62%;
-    --destructive-foreground: 220 10% 93%;
+    --destructive-foreground: 210 20% 95%;
 
-    --border: 220 14% 12%;
-    --input: 220 14% 12%;
+    --border: 215 42% 15%;
+    --input: 215 42% 15%;
     --ring: 45 95% 52%;
 
-    --sidebar-background: 220 16% 4%;
-    --sidebar-foreground: 220 10% 94%;
+    --sidebar-background: 215 58% 4%;
+    --sidebar-foreground: 210 20% 95%;
     --sidebar-primary: 45 95% 52%;
-    --sidebar-primary-foreground: 220 16% 3%;
-    --sidebar-accent: 220 14% 8%;
-    --sidebar-accent-foreground: 220 10% 93%;
-    --sidebar-border: 220 14% 10%;
+    --sidebar-primary-foreground: 215 58% 5%;
+    --sidebar-accent: 215 50% 10%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 215 42% 12%;
     --sidebar-ring: 45 95% 52%;
 
-    /* Dark mode gradients */
+    /* Logo Teal for dark mode */
+    --logo-teal: 185 100% 42%;
+
+    /* Dark mode gradients - Navy Blue */
     --gradient-primary: linear-gradient(135deg, hsl(45 95% 52%) 0%, hsl(38 94% 58%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(38 94% 52%) 0%, hsl(32 96% 54%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(220 16% 3%) 0%, hsl(220 14% 6%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(220 14% 6%) 0%, hsl(220 14% 9%) 100%);
-    --gradient-premium: linear-gradient(135deg, hsl(220 18% 4%) 0%, hsl(220 14% 6%) 40%, hsl(45 30% 8%) 100%);
-    --gradient-hero: linear-gradient(145deg, hsl(220 16% 3%) 0%, hsl(220 18% 2%) 50%, hsl(220 14% 5%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(215 58% 5%) 0%, hsl(215 52% 8%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(215 52% 8%) 0%, hsl(215 50% 11%) 100%);
+    --gradient-premium: linear-gradient(135deg, hsl(215 60% 4%) 0%, hsl(215 52% 7%) 40%, hsl(45 30% 10%) 100%);
+    --gradient-hero: linear-gradient(145deg, hsl(215 58% 5%) 0%, hsl(215 60% 3%) 50%, hsl(215 52% 7%) 100%);
 
     /* Dark mode shadows */
-    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.6);
-    --shadow-md: 0 4px 20px hsl(0 0% 0% / 0.7);
-    --shadow-lg: 0 8px 40px hsl(0 0% 0% / 0.8);
+    --shadow-sm: 0 2px 8px hsl(215 65% 2% / 0.6);
+    --shadow-md: 0 4px 20px hsl(215 65% 2% / 0.7);
+    --shadow-lg: 0 8px 40px hsl(215 65% 2% / 0.8);
     --shadow-elegant: 0 12px 50px -15px hsl(45 95% 52% / 0.45);
     --shadow-glow: 0 0 60px hsl(45 95% 52% / 0.35);
     --shadow-accent: 0 8px 30px -10px hsl(38 94% 52% / 0.5);

@@ -49,11 +49,11 @@ export const InvestmentPlanCard = ({
 
         <CardHeader className="relative z-10">
           <CardTitle className="text-3xl mb-2 font-display">{title}</CardTitle>
-          <CardDescription className="text-lg">
+        <CardDescription className="text-lg">
             <span className="font-semibold text-foreground">Risk Level:</span>{" "}
             <span className={`font-medium ${
-              risk === "Low" ? "text-success" : 
-              risk === "Medium" ? "text-accent" : "text-destructive"
+              risk === "Low" || risk === "Low Risk" ? "text-success" : 
+              risk === "Medium" || risk === "Medium Risk" ? "text-primary" : "text-destructive"
             }`}>
               {risk}
             </span>

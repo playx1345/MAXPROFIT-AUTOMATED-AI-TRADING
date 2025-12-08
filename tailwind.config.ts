@@ -195,6 +195,14 @@ export default {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        "text-reveal": {
+          "0%": { opacity: "0", transform: "translateY(30px)", filter: "blur(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
+        },
+        "text-reveal-delayed": {
+          "0%, 20%": { opacity: "0", transform: "translateY(20px)", filter: "blur(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -224,6 +232,8 @@ export default {
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
         "gradient-shift": "gradient-shift 3s ease infinite",
         "spin-slow": "spin-slow 3s linear infinite",
+        "text-reveal": "text-reveal 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
+        "text-reveal-delayed": "text-reveal-delayed 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
       },
     },
   },

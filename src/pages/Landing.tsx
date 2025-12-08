@@ -18,7 +18,7 @@ const Landing = () => {
   const faqRef = useScrollAnimation(0.1);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-background overflow-x-hidden">
       {/* Header */}
       <Header />
       
@@ -165,24 +165,24 @@ const Landing = () => {
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground font-serif">Get started in four simple steps</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto">
             {[
-              { num: "1", title: "Sign Up", desc: "Create your account and complete KYC verification for security" },
-              { num: "2", title: "Deposit Funds", desc: "Add USDT to your account securely via multiple payment methods" },
-              { num: "3", title: "Choose Plan", desc: "Select an investment strategy that fits your goals and risk profile" },
-              { num: "4", title: "Track & Earn", desc: "Monitor your portfolio performance and withdraw profits anytime" }
+              { num: "1", title: "Sign Up", desc: "Create account & complete KYC" },
+              { num: "2", title: "Deposit", desc: "Add USDT securely" },
+              { num: "3", title: "Choose Plan", desc: "Select your strategy" },
+              { num: "4", title: "Earn", desc: "Track & withdraw profits" }
             ].map((step, index) => (
               <div key={index} className="text-center group">
-                <div className="relative mb-4 sm:mb-6">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-primary flex items-center justify-center text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-primary-foreground mx-auto shadow-elegant hover-lift animate-optimized">
+                <div className="relative mb-3 sm:mb-4 md:mb-6">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-primary flex items-center justify-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif font-bold text-primary-foreground mx-auto shadow-elegant hover-lift animate-optimized">
                     {step.num}
                   </div>
                   {index < 3 && (
-                    <div className="hidden md:block absolute top-7 sm:top-8 lg:top-10 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
+                    <div className="hidden md:block absolute top-6 sm:top-7 md:top-8 lg:top-10 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
                   )}
                 </div>
-                <h3 className="text-base sm:text-lg lg:text-xl font-serif font-bold mb-1.5 sm:mb-3">{step.title}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground font-serif leading-relaxed">{step.desc}</p>
+                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-serif font-bold mb-1 sm:mb-2">{step.title}</h3>
+                <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground font-serif leading-relaxed px-1">{step.desc}</p>
               </div>
             ))}
           </div>

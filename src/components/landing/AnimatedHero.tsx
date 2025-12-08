@@ -38,22 +38,22 @@ export const AnimatedHero = () => {
             </div>
 
             {/* Main heading */}
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-tight leading-[1.1]">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-tight leading-[1.1]">
               <span className="text-gradient-premium drop-shadow-[0_0_35px_hsl(var(--primary)/0.4)]">
                 Live Win Trade
               </span>
               <br />
-              <span className="text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold">
+              <span className="text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold italic">
                 Investment
               </span>
             </h1>
             
-            <p className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold mb-4 sm:mb-5">
+            <p className="text-2xl sm:text-3xl md:text-4xl font-display font-semibold mb-4 sm:mb-5">
               <span className="text-gradient-accent">AI Trading Platform</span>
             </p>
 
             {/* Subtitle */}
-            <p className="text-lg sm:text-xl md:text-2xl text-foreground/70 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-2 font-serif font-light">
+            <p className="text-lg sm:text-xl md:text-2xl text-foreground/70 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-2 font-sans font-light">
               Harness the power of <span className="text-primary font-medium">AI-driven algorithms</span> to maximize your returns in the crypto and forex markets. 
               <span className="block mt-2 text-muted-foreground">Professional trading made accessible.</span>
             </p>

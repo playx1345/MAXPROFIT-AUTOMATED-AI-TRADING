@@ -72,9 +72,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Times New Roman"', 'Times', 'serif'],
-        display: ['"Times New Roman"', 'Times', 'serif'],
-        serif: ['"Times New Roman"', 'Times', 'serif'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

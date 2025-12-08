@@ -32,25 +32,30 @@ export const AnimatedHero = () => {
             </div>
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-primary/10 border border-primary/25 mb-6 sm:mb-8 animate-fade-in">
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-              <span className="text-xs sm:text-sm font-serif font-semibold tracking-wide text-primary">LIVE</span>
+            <div className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-primary/15 to-accent/10 border border-primary/30 mb-6 sm:mb-8 animate-fade-in shadow-lg shadow-primary/10 backdrop-blur-sm">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary animate-pulse" />
+              <span className="text-sm sm:text-base font-serif font-bold tracking-widest text-gradient uppercase">Live Trading</span>
             </div>
 
             {/* Main heading */}
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-4 sm:mb-6 tracking-tight leading-tight">
-              <span className="text-gradient-premium">
-                Live Win Trade Investment
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-tight leading-[1.1]">
+              <span className="text-gradient-premium drop-shadow-[0_0_35px_hsl(var(--primary)/0.4)]">
+                Live Win Trade
+              </span>
+              <br />
+              <span className="text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold">
+                Investment
               </span>
             </h1>
             
-            <p className="text-xl sm:text-2xl md:text-3xl font-serif font-medium text-foreground/90 mb-3 sm:mb-4">
-              AI Trading Platform
+            <p className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold mb-4 sm:mb-5">
+              <span className="text-gradient-accent">AI Trading Platform</span>
             </p>
 
             {/* Subtitle */}
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-2 font-serif">
-              Harness the power of AI-driven algorithms to maximize your returns in the crypto and forex markets. Professional trading made accessible.
+            <p className="text-lg sm:text-xl md:text-2xl text-foreground/70 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-2 font-serif font-light">
+              Harness the power of <span className="text-primary font-medium">AI-driven algorithms</span> to maximize your returns in the crypto and forex markets. 
+              <span className="block mt-2 text-muted-foreground">Professional trading made accessible.</span>
             </p>
 
             {/* CTA Buttons */}

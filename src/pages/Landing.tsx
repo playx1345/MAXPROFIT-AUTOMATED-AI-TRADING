@@ -43,7 +43,7 @@ const Landing = () => {
               featuresRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-3 sm:mb-4 bg-gradient-primary bg-clip-text text-transparent">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-3 sm:mb-4 text-gradient">
               Why Choose Live Win Trade?
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto font-serif px-4">

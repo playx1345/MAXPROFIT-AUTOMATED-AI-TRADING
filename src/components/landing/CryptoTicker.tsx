@@ -60,7 +60,7 @@ export const CryptoTicker = () => {
             key={`${crypto.id}-${index}`}
             className="flex items-center space-x-3 px-6 min-w-[250px] group"
           >
-            <span className="font-bold text-sm uppercase tracking-wider bg-gradient-primary bg-clip-text text-transparent">
+            <span className="font-bold text-sm uppercase tracking-wider text-gradient">
               {crypto.symbol}
             </span>
             <span className="font-semibold text-foreground">

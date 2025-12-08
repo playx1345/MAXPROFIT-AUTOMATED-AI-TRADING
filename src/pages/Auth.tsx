@@ -214,15 +214,28 @@ const Auth = () => {
         throw new Error("Passwords do not match");
       }
 
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
 
       if (error) throw error;
 
+      // Send confirmation email
+      if (user?.email) {
+        try {
+          await supabase.functions.invoke("send-password-reset-confirmation", {
+            body: { email: user.email, isAdmin: false },
+          });
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+        }
+      }
+
       toast({
         title: "Password updated successfully!",
-        description: "You can now sign in with your new password.",
+        description: "You can now sign in with your new password. A confirmation email has been sent.",
       });
       
       await supabase.auth.signOut();

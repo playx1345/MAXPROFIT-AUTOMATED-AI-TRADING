@@ -21,16 +21,16 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40">
-      <nav className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-b border-border/40 safe-area-top">
+      <nav className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-primary rounded-lg blur opacity-30 group-hover:opacity-50 transition-opacity" />
-              <img src={logo} alt="Live Win Trade" className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover" />
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group min-w-0">
+            <div className="relative flex-shrink-0">
+              <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-primary rounded-lg blur opacity-30 group-hover:opacity-50 transition-opacity" />
+              <img src={logo} alt="Live Win Trade" className="relative w-7 h-7 sm:w-9 sm:h-9 rounded-lg object-cover" />
             </div>
-            <span className="font-serif font-bold text-sm sm:text-base text-foreground hidden xs:inline">Live Win Trade</span>
+            <span className="font-serif font-bold text-xs sm:text-sm text-foreground truncate max-w-[100px] sm:max-w-none">Live Win Trade</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -65,14 +65,14 @@ export const Header = () => {
           </div>
 
           {/* Mobile: Theme Toggle & Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
             <ThemeToggle />
             <button 
-              className="p-2 text-muted-foreground hover:text-primary transition-colors" 
+              className="p-1.5 sm:p-2 text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted/50" 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>

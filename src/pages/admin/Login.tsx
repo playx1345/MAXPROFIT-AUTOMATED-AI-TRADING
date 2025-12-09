@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Clock } from "lucide-react";
 import { z } from "zod";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useRateLimit } from "@/hooks/useRateLimit";
 import logo from "@/assets/logo.jpg";
 
 const emailSchema = z.string().email("Invalid email address");
@@ -26,6 +27,19 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  
+  // Rate limiting: 3 attempts per 15 minutes
+  const {
+    isBlocked,
+    remainingTime,
+    checkRateLimit,
+    recordAttempt,
+    formatRemainingTime,
+  } = useRateLimit({
+    maxAttempts: 3,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    storageKey: "admin_password_reset_rate_limit",
+  });
 
   useEffect(() => {
     const accessToken = searchParams.get("access_token");
@@ -96,10 +110,25 @@ const AdminLogin = () => {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check rate limit before proceeding
+    const { allowed, waitTime } = checkRateLimit();
+    if (!allowed) {
+      toast({
+        title: "Too many attempts",
+        description: `Please wait ${formatRemainingTime(waitTime)} before requesting another reset.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
       emailSchema.parse(resetEmail);
+
+      // Record the attempt before making the request
+      recordAttempt();
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: `${window.location.origin}/admin/login?type=recovery`,
@@ -253,7 +282,13 @@ const AdminLogin = () => {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              {isBlocked && (
+                <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
+                  <Clock className="w-4 h-4 flex-shrink-0" />
+                  <span>Too many attempts. Please wait {formatRemainingTime(remainingTime)} before trying again.</span>
+                </div>
+              )}
+              <Button type="submit" className="w-full" disabled={loading || isBlocked}>
                 {loading ? "Sending..." : "Send Reset Link"}
               </Button>
               <Button

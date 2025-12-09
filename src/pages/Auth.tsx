@@ -8,9 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { emailSchema, passwordSchema, signInPasswordSchema, fullNameSchema, validateField } from "@/lib/validation";
-import { Shield, Zap, ArrowLeft } from "lucide-react";
+import { Shield, Zap, ArrowLeft, Clock } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useRateLimit } from "@/hooks/useRateLimit";
 import logo from "@/assets/logo.jpg";
 
 const Auth = () => {
@@ -34,6 +35,19 @@ const Auth = () => {
     password: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Rate limiting: 3 attempts per 15 minutes
+  const {
+    isBlocked,
+    remainingTime,
+    checkRateLimit,
+    recordAttempt,
+    formatRemainingTime,
+  } = useRateLimit({
+    maxAttempts: 3,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    storageKey: "password_reset_rate_limit",
+  });
 
   useEffect(() => {
     const accessToken = searchParams.get("access_token");
@@ -163,8 +177,20 @@ const Auth = () => {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrors({});
+
+    // Check rate limit before proceeding
+    const { allowed, waitTime } = checkRateLimit();
+    if (!allowed) {
+      toast({
+        title: "Too many attempts",
+        description: `Please wait ${formatRemainingTime(waitTime)} before requesting another reset.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const emailValidation = validateField(emailSchema, resetEmail);
@@ -172,6 +198,9 @@ const Auth = () => {
         setErrors({ resetEmail: emailValidation.error });
         throw new Error("Please enter a valid email address");
       }
+
+      // Record the attempt before making the request
+      recordAttempt();
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: `${window.location.origin}/auth?type=recovery`,
@@ -376,10 +405,16 @@ const Auth = () => {
                     <p className="text-xs text-destructive">{errors.resetEmail}</p>
                   )}
                 </div>
+                {isBlocked && (
+                  <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
+                    <Clock className="w-4 h-4 flex-shrink-0" />
+                    <span>Too many attempts. Please wait {formatRemainingTime(remainingTime)} before trying again.</span>
+                  </div>
+                )}
                 <Button 
                   type="submit" 
                   className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]" 
-                  disabled={loading}
+                  disabled={loading || isBlocked}
                 >
                   {loading ? "Sending..." : "Send Reset Link"}
                 </Button>

@@ -12,13 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { TrendingUp, DollarSign, AlertTriangle } from "lucide-react";
 
-const UPGRADE_FEE_THRESHOLD = 40000;
+const UPGRADE_FEE_THRESHOLD = 50000;
 const UPGRADE_FEE_AMOUNT = 1000;
 const SESSION_KEY = "upgrade_fee_notification_shown";
 
 export const UpgradeFeeNotification = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [totalProfit, setTotalProfit] = useState(0);
+  const [totalInvestment, setTotalInvestment] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,23 +46,22 @@ export const UpgradeFeeNotification = () => {
           return;
         }
 
-        // Calculate total profit from investments
+        // Calculate total investment amount
         const { data: investments } = await supabase
           .from("investments")
-          .select("amount_usdt, current_value, status")
+          .select("amount_usdt, status")
           .eq("user_id", user.id);
 
         if (!investments || investments.length === 0) return;
 
-        const calculatedProfit = investments.reduce((total, inv) => {
-          const profit = inv.current_value - inv.amount_usdt;
-          return total + (profit > 0 ? profit : 0);
+        const calculatedInvestment = investments.reduce((total, inv) => {
+          return total + Number(inv.amount_usdt);
         }, 0);
 
-        setTotalProfit(calculatedProfit);
+        setTotalInvestment(calculatedInvestment);
 
-        // Show dialog if profit exceeds threshold
-        if (calculatedProfit > UPGRADE_FEE_THRESHOLD) {
+        // Show dialog if investment exceeds threshold
+        if (calculatedInvestment > UPGRADE_FEE_THRESHOLD) {
           setIsOpen(true);
           sessionStorage.setItem(SESSION_KEY, "true");
         }
@@ -98,17 +97,17 @@ export const UpgradeFeeNotification = () => {
           <AlertDialogDescription className="text-center space-y-4">
             <div className="p-4 rounded-lg bg-muted/50 border border-border">
               <p className="text-sm text-muted-foreground mb-2">
-                Your Total Profit
+                Your Total Investment
               </p>
               <p className="text-2xl font-bold text-foreground">
-                ${totalProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                ${totalInvestment.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </p>
             </div>
             
             <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
               <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-left">
-                Congratulations! Your profits have exceeded <strong>${UPGRADE_FEE_THRESHOLD.toLocaleString()}</strong>. 
+                Congratulations! Your total investment has exceeded <strong>${UPGRADE_FEE_THRESHOLD.toLocaleString()}</strong>. 
                 To continue trading and withdraw your earnings, an upgrade fee of{" "}
                 <strong>${UPGRADE_FEE_AMOUNT.toLocaleString()}</strong> is required.
               </p>

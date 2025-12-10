@@ -17,6 +17,7 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - **Live Chat Support**: Real-time communication with platform administrators
 - **Multi-Factor Authentication**: Enhanced security with 2FA support
 - **Referral System**: Earn bonuses when referred users make their first deposit
+- **Upgrade Fee System**: Automated upgrade fee notifications for high-volume investors (investments exceeding $50,000)
 
 ### Admin Features
 - **Centralized Dashboard**: Complete oversight of user accounts, transactions, and KYC verification
@@ -42,6 +43,30 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - Net profits credited to client accounts
 - Transparent fee disclosure (blockchain charges + VAT)
 
+## 🚀 Upgrade Fee System
+
+For high-volume investors, the platform implements an automated upgrade fee notification system to ensure account tier optimization:
+
+### How It Works
+- **Trigger Threshold**: Automatically activated when total investments exceed $50,000
+- **Upgrade Fee**: One-time payment of $1,000 required
+- **Time Window**: 3-hour countdown timer from notification
+- **Notification Method**: Real-time popup alert with countdown timer displayed on login
+- **Consequences**: Account suspension if fee is not paid within the deadline
+
+### Features
+- **Live Countdown Timer**: Shows hours, minutes, and seconds remaining
+- **Investment Summary**: Displays current total investment amount
+- **Direct Payment Link**: One-click navigation to deposit page
+- **Urgent Visual Design**: High-visibility warning design to ensure user awareness
+
+### Requirements
+- User must have verified KYC status
+- Total investment balance must exceed $50,000
+- Fee is only required once per account tier upgrade
+
+This system ensures that high-volume traders are appropriately tiered and can continue to access enhanced platform features and higher transaction limits.
+
 ## 🏗️ Technical Architecture
 
 ### Technology Stack
@@ -54,13 +79,15 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - **Routing**: React Router v6
 
 ### Database Schema
-- **profiles**: User information, KYC status, wallet addresses, balances
+- **profiles**: User information, KYC status, wallet addresses, balances, upgrade fee status
 - **user_roles**: Role-based access control (admin/user)
 - **investment_plans**: Configurable investment tiers
 - **investments**: Active and historical user investments
 - **transactions**: Deposit, withdrawal, and profit records
 - **trading_bot_performance**: AI trading activity logs
 - **referrals**: Referral tracking and bonus management
+- **admin_activity_logs**: Comprehensive audit trails for administrative actions
+- **contact_messages**: User support messages and inquiries
 
 ### Storage Buckets
 - **kyc-documents**: KYC verification documents (private, 5MB limit)
@@ -177,6 +204,7 @@ For more details, see `scripts/README.md`.
 5. **Track Performance**: Monitor investments and profits in real-time
 6. **Request Withdrawal**: Submit withdrawal request (processed within 24 hours)
 7. **Refer Friends**: Share referral link and earn bonuses
+8. **Upgrade Fee** (High-Volume): Pay upgrade fee if investments exceed $50,000 threshold
 
 ### For Administrators
 1. **Login**: Access admin dashboard with secure credentials
@@ -229,6 +257,7 @@ For more details, see `scripts/README.md`.
 - Withdrawal status updates
 - KYC verification results
 - Profit distribution alerts
+- **Upgrade fee requirements** with countdown timer
 - Promotional announcements
 
 ### Admin Notifications
@@ -238,6 +267,7 @@ For more details, see `scripts/README.md`.
 - Failed login attempts
 - System health alerts
 - Suspicious activity flags
+- Upgrade fee payment confirmations
 
 ## 🛠️ Development
 
@@ -247,13 +277,16 @@ src/
 ├── components/          # Reusable UI components
 │   ├── ui/             # shadcn/ui components
 │   ├── DashboardLayout.tsx
-│   └── ProtectedRoute.tsx
+│   ├── ProtectedRoute.tsx
+│   ├── UpgradeFeeNotification.tsx  # Automated upgrade fee alert system
+│   └── landing/        # Landing page components
 ├── pages/              # Route pages
 │   ├── Landing.tsx     # Public landing page
 │   ├── Auth.tsx        # Login/signup
 │   ├── Dashboard.tsx   # Client dashboard
 │   ├── Investments.tsx # Investment management
 │   ├── Profile.tsx     # User profile & KYC
+│   ├── admin/          # Admin panel pages
 │   └── NotFound.tsx    # 404 page
 ├── integrations/       # External service integrations
 │   └── supabase/       # Supabase client & types

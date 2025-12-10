@@ -316,6 +316,18 @@ const AdminWithdrawals = () => {
                   </p>
                 </div>
                 <div>
+                  <Label className="text-muted-foreground">Blockchain Confirmation Fee (10%)</Label>
+                  <p className="font-semibold text-lg text-yellow-600">
+                    ${(selectedWithdrawal.amount * 0.10).toFixed(2)}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Net Amount to Send</Label>
+                  <p className="font-bold text-xl text-green-600">
+                    ${(selectedWithdrawal.amount * 0.90).toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
+                  </p>
+                </div>
+                <div>
                   <Label className="text-muted-foreground">Destination Wallet</Label>
                   <p className="font-mono text-xs break-all">
                     {selectedWithdrawal.wallet_address}

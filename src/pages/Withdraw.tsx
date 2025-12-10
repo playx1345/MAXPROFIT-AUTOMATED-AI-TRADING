@@ -86,7 +86,7 @@ const Withdraw = () => {
     }
   };
 
-  const estimatedFees = parseFloat(amount) * 0.02;
+  const estimatedFees = parseFloat(amount) * 0.10;
   const netAmount = parseFloat(amount || "0") - estimatedFees;
 
   const validateForm = (): boolean => {
@@ -273,7 +273,7 @@ const Withdraw = () => {
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Estimated fees:</span>
+                  <span>Blockchain confirmation fee (10%):</span>
                   <span>-${estimatedFees.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">

@@ -274,7 +274,7 @@ const Withdraw = () => {
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Blockchain confirmation fee (10%):</span>
+                  <span>Blockchain confirmation fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
                   <span>-${estimatedFees.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">

@@ -317,7 +317,7 @@ const AdminWithdrawals = () => {
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Blockchain Confirmation Fee (10%)</Label>
+                  <Label className="text-muted-foreground">Blockchain Confirmation Fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%)</Label>
                   <p className="font-semibold text-lg text-yellow-600">
                     ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
                   </p>

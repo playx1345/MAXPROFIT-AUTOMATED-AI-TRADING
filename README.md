@@ -45,27 +45,34 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 
 ## 🚀 Upgrade Fee System
 
-For high-volume investors, the platform implements an automated upgrade fee notification system to ensure account tier optimization:
+For high-volume investors, the platform implements an automated account upgrade notification system:
 
 ### How It Works
 - **Trigger Threshold**: Automatically activated when total investments exceed $50,000
-- **Upgrade Fee**: One-time payment of $1,000 required
-- **Time Window**: 3-hour countdown timer from notification
-- **Notification Method**: Real-time popup alert with countdown timer displayed on login
-- **Consequences**: Account suspension if fee is not paid within the deadline
+- **Account Upgrade Fee**: One-time payment of $1,000 required for continued platform access
+- **Notification Window**: 3-hour countdown timer displayed on login
+- **Notification Method**: Real-time popup alert with live countdown
+- **Enforcement**: Account suspension enforced if fee is not paid within the time limit
 
 ### Features
 - **Live Countdown Timer**: Shows hours, minutes, and seconds remaining
 - **Investment Summary**: Displays current total investment amount
-- **Direct Payment Link**: One-click navigation to deposit page
-- **Urgent Visual Design**: High-visibility warning design to ensure user awareness
+- **Direct Payment Link**: One-click navigation to deposit page for fee payment
+- **Urgent Notification Design**: High-visibility alert to ensure user awareness
 
 ### Requirements
 - User must have verified KYC status
 - Total investment balance must exceed $50,000
-- Fee is only required once per account tier upgrade
+- Fee is required once when crossing the high-volume threshold
+- Payment processes through standard platform deposit methods
 
-This system ensures that high-volume traders are appropriately tiered and can continue to access enhanced platform features and higher transaction limits.
+### Important Information
+- This fee structure is part of the platform's tiered account system
+- Users crossing the $50,000 investment threshold are automatically notified
+- The notification includes clear information about the fee requirement and timeline
+- All platform fees and policies should be reviewed in the Terms of Service
+
+**⚠️ Note**: Users should carefully review all fee structures and account policies before investing. High-volume thresholds and associated fees are part of the platform's account tier system.
 
 ## 🏗️ Technical Architecture
 

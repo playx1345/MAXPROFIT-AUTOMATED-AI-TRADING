@@ -7,10 +7,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle, XCircle, ExternalLink } from "lucide-react";
+import { CheckCircle, XCircle, ExternalLink, Shield, AlertTriangle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
+import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Deposit {
   id: string;
@@ -35,10 +38,23 @@ const AdminDeposits = () => {
   const [processing, setProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { verifying, result, verifyTransaction, clearResult } = useBlockchainVerification();
 
   useEffect(() => {
     fetchDeposits();
   }, []);
+
+  // Verify transaction when dialog opens with a transaction hash
+  useEffect(() => {
+    if (detailsOpen && selectedDeposit?.transaction_hash) {
+      verifyTransaction(
+        selectedDeposit.transaction_hash,
+        selectedDeposit.currency as "usdt" | "btc"
+      );
+    } else {
+      clearResult();
+    }
+  }, [detailsOpen, selectedDeposit]);
 
   const fetchDeposits = async () => {
     try {
@@ -69,11 +85,9 @@ const AdminDeposits = () => {
     setProcessing(true);
 
     try {
-      // Get admin user info
       const { data: { user: adminUser } } = await supabase.auth.getUser();
       if (!adminUser) throw new Error("Not authenticated as admin");
 
-      // Use atomic function to approve deposit and credit balance
       const { data, error } = await supabase.rpc("approve_deposit_atomic" as any, {
         p_transaction_id: selectedDeposit.id,
         p_admin_id: adminUser.id,
@@ -107,11 +121,9 @@ const AdminDeposits = () => {
     setProcessing(true);
 
     try {
-      // Get admin user info
       const { data: { user: adminUser } } = await supabase.auth.getUser();
       if (!adminUser) throw new Error("Not authenticated as admin");
 
-      // Use atomic function to reject deposit
       const { data, error } = await supabase.rpc("reject_deposit_atomic" as any, {
         p_transaction_id: selectedDeposit.id,
         p_admin_id: adminUser.id,
@@ -140,8 +152,25 @@ const AdminDeposits = () => {
     }
   };
 
+  const handleVerifyBlockchain = () => {
+    if (selectedDeposit?.transaction_hash) {
+      verifyTransaction(
+        selectedDeposit.transaction_hash,
+        selectedDeposit.currency as "usdt" | "btc"
+      );
+    }
+  };
+
+  const getBlockchainExplorerUrl = (deposit: Deposit) => {
+    if (!deposit.transaction_hash) return null;
+    if (deposit.currency === "usdt") {
+      return `https://tronscan.org/#/transaction/${deposit.transaction_hash}`;
+    }
+    return `https://blockchair.com/bitcoin/transaction/${deposit.transaction_hash}`;
+  };
+
   const pendingDeposits = deposits.filter((d) => d.status === "pending");
-  const completedDeposits = deposits.filter((d) => d.status === "completed");
+  const completedDeposits = deposits.filter((d) => d.status === "approved");
   const rejectedDeposits = deposits.filter((d) => d.status === "rejected");
 
   const DepositTable = ({ data }: { data: Deposit[] }) => (
@@ -182,7 +211,7 @@ const AdminDeposits = () => {
               <TableCell>
                 <Badge
                   className={
-                    deposit.status === "completed"
+                    deposit.status === "approved"
                       ? "bg-green-500"
                       : deposit.status === "pending"
                       ? "bg-yellow-500"
@@ -243,7 +272,7 @@ const AdminDeposits = () => {
                 Pending ({pendingDeposits.length})
               </TabsTrigger>
               <TabsTrigger value="completed">
-                Completed ({completedDeposits.length})
+                Approved ({completedDeposits.length})
               </TabsTrigger>
               <TabsTrigger value="rejected">
                 Rejected ({rejectedDeposits.length})
@@ -267,7 +296,7 @@ const AdminDeposits = () => {
 
       {/* Deposit Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Deposit Details</DialogTitle>
             <DialogDescription>Review and process deposit request</DialogDescription>
@@ -298,14 +327,19 @@ const AdminDeposits = () => {
                 <div>
                   <Label className="text-muted-foreground">Transaction Hash</Label>
                   {selectedDeposit.transaction_hash ? (
-                    <a
-                      href={`https://tronscan.org/#/transaction/${selectedDeposit.transaction_hash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline text-xs flex items-center gap-1"
-                    >
-                      View on blockchain <ExternalLink className="h-3 w-3" />
-                    </a>
+                    <div className="space-y-1">
+                      <p className="font-mono text-xs break-all">
+                        {selectedDeposit.transaction_hash}
+                      </p>
+                      <a
+                        href={getBlockchainExplorerUrl(selectedDeposit) || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline text-xs flex items-center gap-1"
+                      >
+                        View on blockchain <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
                   ) : (
                     <p className="text-sm text-muted-foreground">Not provided</p>
                   )}
@@ -320,7 +354,7 @@ const AdminDeposits = () => {
                   <Label className="text-muted-foreground">Status</Label>
                   <Badge
                     className={
-                      selectedDeposit.status === "completed"
+                      selectedDeposit.status === "approved"
                         ? "bg-green-500"
                         : selectedDeposit.status === "pending"
                         ? "bg-yellow-500"
@@ -331,6 +365,86 @@ const AdminDeposits = () => {
                   </Badge>
                 </div>
               </div>
+
+              {/* Blockchain Verification Section */}
+              {selectedDeposit.transaction_hash && (
+                <div className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-primary" />
+                      <Label className="font-semibold">Blockchain Verification</Label>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleVerifyBlockchain}
+                      disabled={verifying}
+                    >
+                      {verifying ? "Verifying..." : "Refresh"}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <BlockchainVerificationBadge verifying={verifying} result={result} showDetails />
+                  </div>
+
+                  {result && result.verified && (
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Blockchain Amount</Label>
+                        <p className="font-medium">
+                          {result.amount !== null ? result.amount.toLocaleString() : "N/A"} {selectedDeposit.currency.toUpperCase()}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Confirmations</Label>
+                        <p className="font-medium">{result.confirmations}</p>
+                      </div>
+                      {result.from_address && (
+                        <div className="col-span-2">
+                          <Label className="text-xs text-muted-foreground">From Address</Label>
+                          <p className="font-mono text-xs break-all">{result.from_address}</p>
+                        </div>
+                      )}
+                      {result.timestamp && (
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Transaction Time</Label>
+                          <p className="font-medium">
+                            {format(new Date(result.timestamp), "MMM dd, yyyy HH:mm")}
+                          </p>
+                        </div>
+                      )}
+                      {result.block_number && (
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Block Number</Label>
+                          <p className="font-medium">{result.block_number.toLocaleString()}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Amount mismatch warning */}
+                  {result && result.verified && result.amount !== null && 
+                   Math.abs(result.amount - selectedDeposit.amount) > 0.01 && (
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription>
+                        <strong>Amount Mismatch!</strong> User claimed ${selectedDeposit.amount.toLocaleString()} 
+                        but blockchain shows {result.amount.toLocaleString()} {selectedDeposit.currency.toUpperCase()}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
+
+              {!selectedDeposit.transaction_hash && selectedDeposit.status === "pending" && (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    No transaction hash provided. Consider requesting this from the user before approval.
+                  </AlertDescription>
+                </Alert>
+              )}
 
               {selectedDeposit.status === "pending" && (
                 <div className="border-t pt-4 space-y-3">

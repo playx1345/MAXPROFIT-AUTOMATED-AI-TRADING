@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, Shield } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { depositAmountSchema, transactionHashSchema, validateField } from "@/lib/validation";
+import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
+import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 
 const PLATFORM_WALLETS = {
   usdt_trc20: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
@@ -22,6 +24,7 @@ interface RecentDeposit {
   currency: string;
   status: string;
   created_at: string;
+  transaction_hash: string | null;
 }
 
 const Deposit = () => {
@@ -32,10 +35,27 @@ const Deposit = () => {
   const [recentDeposits, setRecentDeposits] = useState<RecentDeposit[]>([]);
   const [errors, setErrors] = useState<{ amount?: string; txHash?: string }>({});
   const { toast } = useToast();
+  const { verifying, result, verifyTransaction, clearResult } = useBlockchainVerification();
 
   useEffect(() => {
     fetchRecentDeposits();
   }, []);
+
+  // Auto-verify when transaction hash changes (debounced)
+  useEffect(() => {
+    if (!transactionHash.trim()) {
+      clearResult();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (transactionHash.trim().length >= 10) {
+        verifyTransaction(transactionHash, currency);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [transactionHash, currency]);
 
   const fetchRecentDeposits = async () => {
     try {
@@ -44,7 +64,7 @@ const Deposit = () => {
 
       const { data, error } = await supabase
         .from("transactions")
-        .select("id, amount, currency, status, created_at")
+        .select("id, amount, currency, status, created_at, transaction_hash")
         .eq("user_id", user.id)
         .eq("type", "deposit")
         .order("created_at", { ascending: false })
@@ -119,6 +139,7 @@ const Deposit = () => {
       setAmount("");
       setTransactionHash("");
       setErrors({});
+      clearResult();
       fetchRecentDeposits();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
@@ -129,6 +150,12 @@ const Deposit = () => {
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleVerifyClick = () => {
+    if (transactionHash.trim()) {
+      verifyTransaction(transactionHash, currency);
     }
   };
 
@@ -160,14 +187,20 @@ const Deposit = () => {
               <div className="flex gap-2 mt-2">
                 <Button
                   variant={currency === "usdt" ? "default" : "outline"}
-                  onClick={() => setCurrency("usdt")}
+                  onClick={() => {
+                    setCurrency("usdt");
+                    clearResult();
+                  }}
                   className="flex-1"
                 >
                   USDT (TRC20)
                 </Button>
                 <Button
                   variant={currency === "btc" ? "default" : "outline"}
-                  onClick={() => setCurrency("btc")}
+                  onClick={() => {
+                    setCurrency("btc");
+                    clearResult();
+                  }}
                   className="flex-1"
                 >
                   BTC
@@ -246,10 +279,25 @@ const Deposit = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="txHash">Transaction Hash (Optional)</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="txHash">Transaction Hash</Label>
+                {transactionHash.trim() && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleVerifyClick}
+                    disabled={verifying}
+                    className="h-6 text-xs"
+                  >
+                    <Shield className="h-3 w-3 mr-1" />
+                    Verify
+                  </Button>
+                )}
+              </div>
               <Input
                 id="txHash"
-                placeholder="Enter transaction hash"
+                placeholder="Enter transaction hash for verification"
                 value={transactionHash}
                 onChange={(e) => {
                   setTransactionHash(e.target.value);
@@ -265,9 +313,31 @@ const Deposit = () => {
               {errors.txHash ? (
                 <p className="text-xs text-destructive">{errors.txHash}</p>
               ) : (
-                <p className="text-xs text-muted-foreground">
-                  You can submit this later if you don't have it yet
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    Optional but helps speed up approval
+                  </p>
+                  <BlockchainVerificationBadge verifying={verifying} result={result} />
+                </div>
+              )}
+              
+              {result && result.verified && result.amount !== null && (
+                <div className="p-3 rounded-lg bg-muted/50 space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Blockchain Amount:</span>
+                    <span className="font-medium">{result.amount.toLocaleString()} {currency.toUpperCase()}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Confirmations:</span>
+                    <span className="font-medium">{result.confirmations}</span>
+                  </div>
+                  {result.timestamp && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Time:</span>
+                      <span className="font-medium">{format(new Date(result.timestamp), "MMM dd, HH:mm")}</span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -302,10 +372,15 @@ const Deposit = () => {
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(deposit.created_at), "MMM dd, yyyy HH:mm")}
                     </p>
+                    {deposit.transaction_hash && (
+                      <p className="text-xs text-muted-foreground font-mono truncate max-w-[200px]">
+                        TX: {deposit.transaction_hash.slice(0, 16)}...
+                      </p>
+                    )}
                   </div>
                   <Badge
                     className={
-                      deposit.status === "completed"
+                      deposit.status === "approved"
                         ? "bg-green-500"
                         : deposit.status === "pending"
                         ? "bg-yellow-500"

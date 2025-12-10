@@ -12,6 +12,7 @@ import { CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WITHDRAWAL_FEE_PERCENTAGE } from "@/lib/constants";
 
 interface Withdrawal {
   id: string;
@@ -318,13 +319,13 @@ const AdminWithdrawals = () => {
                 <div>
                   <Label className="text-muted-foreground">Blockchain Confirmation Fee (10%)</Label>
                   <p className="font-semibold text-lg text-yellow-600">
-                    ${(selectedWithdrawal.amount * 0.10).toFixed(2)}
+                    ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
                   </p>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Net Amount to Send</Label>
                   <p className="font-bold text-xl text-green-600">
-                    ${(selectedWithdrawal.amount * 0.90).toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
+                    ${(selectedWithdrawal.amount * (1 - WITHDRAWAL_FEE_PERCENTAGE)).toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
                   </p>
                 </div>
                 <div>

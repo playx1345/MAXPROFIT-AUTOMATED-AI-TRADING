@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
+import { WITHDRAWAL_FEE_PERCENTAGE } from "@/lib/constants";
 
 interface RecentWithdrawal {
   id: string;
@@ -86,7 +87,7 @@ const Withdraw = () => {
     }
   };
 
-  const estimatedFees = parseFloat(amount) * 0.10;
+  const estimatedFees = parseFloat(amount) * WITHDRAWAL_FEE_PERCENTAGE;
   const netAmount = parseFloat(amount || "0") - estimatedFees;
 
   const validateForm = (): boolean => {

@@ -17,7 +17,7 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - **Live Chat Support**: Real-time communication with platform administrators
 - **Multi-Factor Authentication**: Enhanced security with 2FA support
 - **Referral System**: Earn bonuses when referred users make their first deposit
-- **Upgrade Fee System**: Automated upgrade fee notifications for high-volume investors (investments exceeding $50,000)
+- **High-Volume Account Fees**: Automated fee notifications for accounts exceeding $50,000 in total investments
 
 ### Admin Features
 - **Centralized Dashboard**: Complete oversight of user accounts, transactions, and KYC verification
@@ -43,36 +43,44 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - Net profits credited to client accounts
 - Transparent fee disclosure (blockchain charges + VAT)
 
-## 🚀 Upgrade Fee System
+## 🚀 High-Volume Account Fee System
 
-For high-volume investors, the platform implements an automated account upgrade notification system:
+⚠️ **Important**: A mandatory $1,000 platform access fee is required when total investments exceed $50,000. Please review this policy carefully before reaching this threshold.
+
+For accounts that reach high investment volumes, the platform implements an automated fee notification system:
 
 ### How It Works
 - **Trigger Threshold**: Automatically activated when total investments exceed $50,000
-- **Account Upgrade Fee**: One-time payment of $1,000 required for continued platform access
-- **Notification Window**: 3-hour countdown timer displayed on login
+- **Platform Access Fee**: One-time payment of $1,000 required for continued platform access
+- **Notification Window**: 3-hour countdown timer displayed on login after threshold is reached
 - **Notification Method**: Real-time popup alert with live countdown
-- **Enforcement**: Account suspension enforced if fee is not paid within the time limit
+- **Enforcement**: Account access is restricted if fee is not paid within the time limit
+
+### What Happens During Restriction
+- Users cannot make new investments or withdrawals during restriction period
+- Existing investments remain in the account
+- Account can be reactivated by completing the $1,000 fee payment
+- Access to view account information remains available
 
 ### Features
 - **Live Countdown Timer**: Shows hours, minutes, and seconds remaining
 - **Investment Summary**: Displays current total investment amount
 - **Direct Payment Link**: One-click navigation to deposit page for fee payment
-- **Urgent Notification Design**: High-visibility alert to ensure user awareness
+- **Clear Notification**: High-visibility alert ensures user awareness of requirement
 
-### Requirements
+### Technical Requirements
 - User must have verified KYC status
 - Total investment balance must exceed $50,000
 - Fee is required once when crossing the high-volume threshold
 - Payment processes through standard platform deposit methods
 
 ### Important Information
-- This fee structure is part of the platform's tiered account system
-- Users crossing the $50,000 investment threshold are automatically notified
-- The notification includes clear information about the fee requirement and timeline
-- All platform fees and policies should be reviewed in the Terms of Service
+- **Fee Structure**: This is a mandatory platform access fee, not an optional upgrade
+- **Timing**: Users are notified immediately upon crossing the $50,000 threshold
+- **Transparency**: The notification includes clear information about the fee requirement and timeline
+- **Terms**: All platform fees and policies are detailed in the Terms of Service
 
-**⚠️ Note**: Users should carefully review all fee structures and account policies before investing. High-volume thresholds and associated fees are part of the platform's account tier system.
+**⚠️ Investment Advisory**: Users should carefully review all fee structures and account policies before investing, especially if planning to invest amounts approaching or exceeding the $50,000 threshold. The $1,000 fee represents 2% of the threshold amount and is a significant consideration for investment planning.
 
 ## 🏗️ Technical Architecture
 
@@ -86,7 +94,7 @@ For high-volume investors, the platform implements an automated account upgrade 
 - **Routing**: React Router v6
 
 ### Database Schema
-- **profiles**: User information, KYC status, wallet addresses, balances, upgrade fee status
+- **profiles**: User information, KYC status, wallet addresses, balances, upgrade_fee_paid (boolean) for high-volume account fee tracking
 - **user_roles**: Role-based access control (admin/user)
 - **investment_plans**: Configurable investment tiers
 - **investments**: Active and historical user investments
@@ -211,7 +219,7 @@ For more details, see `scripts/README.md`.
 5. **Track Performance**: Monitor investments and profits in real-time
 6. **Request Withdrawal**: Submit withdrawal request (processed within 24 hours)
 7. **Refer Friends**: Share referral link and earn bonuses
-8. **Upgrade Fee** (High-Volume): Pay upgrade fee if investments exceed $50,000 threshold
+8. **High-Volume Fee** (if applicable): Pay mandatory $1,000 fee if investments exceed $50,000 threshold
 
 ### For Administrators
 1. **Login**: Access admin dashboard with secure credentials
@@ -264,7 +272,7 @@ For more details, see `scripts/README.md`.
 - Withdrawal status updates
 - KYC verification results
 - Profit distribution alerts
-- **Upgrade fee requirements** with countdown timer
+- **High-volume account fee requirements** with countdown timer
 - Promotional announcements
 
 ### Admin Notifications
@@ -274,7 +282,7 @@ For more details, see `scripts/README.md`.
 - Failed login attempts
 - System health alerts
 - Suspicious activity flags
-- Upgrade fee payment confirmations
+- High-volume account fee payment confirmations
 
 ## 🛠️ Development
 

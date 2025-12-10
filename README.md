@@ -17,6 +17,7 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - **Live Chat Support**: Real-time communication with platform administrators
 - **Multi-Factor Authentication**: Enhanced security with 2FA support
 - **Referral System**: Earn bonuses when referred users make their first deposit
+- **High-Volume Account Fees**: Automated fee notifications for accounts exceeding $50,000 in total investments
 
 ### Admin Features
 - **Centralized Dashboard**: Complete oversight of user accounts, transactions, and KYC verification
@@ -42,6 +43,45 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - Net profits credited to client accounts
 - Transparent fee disclosure (blockchain charges + VAT)
 
+## 🚀 High-Volume Account Fee System
+
+⚠️ **Important**: A mandatory $1,000 platform access fee is required when total investments exceed $50,000. Please review this policy carefully before reaching this threshold.
+
+For accounts that reach high investment volumes, the platform implements an automated fee notification system:
+
+### How It Works
+- **Trigger Threshold**: Automatically activated when total investments exceed $50,000
+- **Platform Access Fee**: One-time payment of $1,000 required for continued platform access
+- **Notification Window**: 3-hour countdown timer displayed on login after threshold is reached
+- **Notification Method**: Real-time popup alert with live countdown
+- **Enforcement**: Account access is restricted if fee is not paid within the time limit
+
+### What Happens During Restriction
+- Users cannot make new investments or withdrawals during restriction period
+- Existing investments remain in the account
+- Account can be reactivated by completing the $1,000 fee payment
+- Access to view account information remains available
+
+### Features
+- **Live Countdown Timer**: Shows hours, minutes, and seconds remaining
+- **Investment Summary**: Displays current total investment amount
+- **Direct Payment Link**: One-click navigation to deposit page for fee payment
+- **Clear Notification**: High-visibility alert ensures user awareness of requirement
+
+### Technical Requirements
+- User must have verified KYC status
+- Total investment balance must exceed $50,000
+- Fee is required once when crossing the high-volume threshold
+- Payment processes through standard platform deposit methods
+
+### Important Information
+- **Fee Structure**: This is a mandatory platform access fee, not an optional upgrade
+- **Timing**: Users are notified immediately upon crossing the $50,000 threshold
+- **Transparency**: The notification includes clear information about the fee requirement and timeline
+- **Terms**: All platform fees and policies are detailed in the Terms of Service
+
+**⚠️ Investment Advisory**: Users should carefully review all fee structures and account policies before investing, especially if planning to invest amounts approaching or exceeding the $50,000 threshold. The $1,000 fee represents 2% of the threshold amount and is a significant consideration for investment planning.
+
 ## 🏗️ Technical Architecture
 
 ### Technology Stack
@@ -54,13 +94,15 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - **Routing**: React Router v6
 
 ### Database Schema
-- **profiles**: User information, KYC status, wallet addresses, balances
+- **profiles**: User information, KYC status, wallet addresses, balances, upgrade_fee_paid (boolean) for high-volume account fee tracking
 - **user_roles**: Role-based access control (admin/user)
 - **investment_plans**: Configurable investment tiers
 - **investments**: Active and historical user investments
 - **transactions**: Deposit, withdrawal, and profit records
 - **trading_bot_performance**: AI trading activity logs
 - **referrals**: Referral tracking and bonus management
+- **admin_activity_logs**: Comprehensive audit trails for administrative actions
+- **contact_messages**: User support messages and inquiries
 
 ### Storage Buckets
 - **kyc-documents**: KYC verification documents (private, 5MB limit)
@@ -177,6 +219,7 @@ For more details, see `scripts/README.md`.
 5. **Track Performance**: Monitor investments and profits in real-time
 6. **Request Withdrawal**: Submit withdrawal request (processed within 24 hours)
 7. **Refer Friends**: Share referral link and earn bonuses
+8. **High-Volume Fee** (if applicable): Pay mandatory $1,000 fee if investments exceed $50,000 threshold
 
 ### For Administrators
 1. **Login**: Access admin dashboard with secure credentials
@@ -229,6 +272,7 @@ For more details, see `scripts/README.md`.
 - Withdrawal status updates
 - KYC verification results
 - Profit distribution alerts
+- **High-volume account fee requirements** with countdown timer
 - Promotional announcements
 
 ### Admin Notifications
@@ -238,6 +282,7 @@ For more details, see `scripts/README.md`.
 - Failed login attempts
 - System health alerts
 - Suspicious activity flags
+- High-volume account fee payment confirmations
 
 ## 🛠️ Development
 
@@ -247,13 +292,16 @@ src/
 ├── components/          # Reusable UI components
 │   ├── ui/             # shadcn/ui components
 │   ├── DashboardLayout.tsx
-│   └── ProtectedRoute.tsx
+│   ├── ProtectedRoute.tsx
+│   ├── UpgradeFeeNotification.tsx  # Automated upgrade fee alert system
+│   └── landing/        # Landing page components
 ├── pages/              # Route pages
 │   ├── Landing.tsx     # Public landing page
 │   ├── Auth.tsx        # Login/signup
 │   ├── Dashboard.tsx   # Client dashboard
 │   ├── Investments.tsx # Investment management
 │   ├── Profile.tsx     # User profile & KYC
+│   ├── admin/          # Admin panel pages
 │   └── NotFound.tsx    # 404 page
 ├── integrations/       # External service integrations
 │   └── supabase/       # Supabase client & types

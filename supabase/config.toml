@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.send-password-reset-confirmation]
 verify_jwt = false
+
+[functions.verify-blockchain-transaction]
+verify_jwt = true

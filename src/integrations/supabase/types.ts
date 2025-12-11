@@ -409,6 +409,10 @@ export type Database = {
         }
         Returns: Json
       }
+      auto_approve_withdrawal: {
+        Args: { p_transaction_id: string }
+        Returns: Json
+      }
       create_investment_atomic: {
         Args: { p_amount_usdt: number; p_plan_id: string; p_user_id: string }
         Returns: Json

@@ -8,9 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE } from "@/lib/constants";
+
 
 interface RecentWithdrawal {
   id: string;
@@ -19,6 +19,7 @@ interface RecentWithdrawal {
   status: string;
   created_at: string;
   wallet_address: string | null;
+  transaction_hash: string | null;
 }
 
 const Withdraw = () => {
@@ -74,7 +75,7 @@ const Withdraw = () => {
 
       const { data, error } = await supabase
         .from("transactions")
-        .select("id, amount, currency, status, created_at, wallet_address")
+        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash")
         .eq("user_id", user.id)
         .eq("type", "withdrawal")
         .order("created_at", { ascending: false })
@@ -138,7 +139,7 @@ const Withdraw = () => {
 
       toast({
         title: "Withdrawal submitted!",
-        description: "Your withdrawal request is pending admin approval. Processing typically takes up to 24 hours.",
+        description: "Your withdrawal will be automatically processed within 24 hours if not manually reviewed earlier.",
       });
 
       setAmount("");
@@ -165,9 +166,9 @@ const Withdraw = () => {
       </div>
 
       <Alert>
-        <AlertTriangle className="h-4 w-4" />
+        <Clock className="h-4 w-4" />
         <AlertDescription>
-          <strong>Important:</strong> Withdrawals are processed within 24 hours. Make sure your wallet address is correct - transactions cannot be reversed.
+          <strong>Auto-Processing:</strong> Withdrawals are automatically processed after 24 hours. Admins may approve earlier. Make sure your wallet address is correct - transactions cannot be reversed.
         </AlertDescription>
       </Alert>
 
@@ -299,42 +300,133 @@ const Withdraw = () => {
         <Card>
           <CardHeader>
             <CardTitle>Recent Withdrawals</CardTitle>
-            <CardDescription>Your latest withdrawal requests</CardDescription>
+            <CardDescription>Your latest withdrawal requests with blockchain tracking</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {recentWithdrawals.map((withdrawal) => (
-                <div
-                  key={withdrawal.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium">
-                      ${withdrawal.amount.toLocaleString()} {withdrawal.currency.toUpperCase()}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate max-w-[300px]">
-                      To: {withdrawal.wallet_address || "N/A"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
-                    </p>
-                  </div>
-                  <Badge
-                    className={
-                      withdrawal.status === "completed"
-                        ? "bg-green-500"
-                        : withdrawal.status === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }
-                  >
-                    {withdrawal.status}
-                  </Badge>
-                </div>
+                <WithdrawalCard key={withdrawal.id} withdrawal={withdrawal} />
               ))}
             </div>
           </CardContent>
         </Card>
+      )}
+    </div>
+  );
+};
+
+// Component for individual withdrawal with blockchain tracking
+const WithdrawalCard = ({ withdrawal }: { withdrawal: RecentWithdrawal }) => {
+  const { verifying, result, verifyTransaction } = useBlockchainVerification();
+  const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
+  const [verified, setVerified] = useState(false);
+
+  const handleVerify = async () => {
+    if (withdrawal.transaction_hash) {
+      await verifyTransaction(withdrawal.transaction_hash, withdrawal.currency as "usdt" | "btc");
+      setVerified(true);
+    }
+  };
+
+  const getExplorerUrl = () => {
+    if (!withdrawal.transaction_hash) return null;
+    if (withdrawal.currency === "usdt") {
+      return `https://tronscan.org/#/transaction/${withdrawal.transaction_hash}`;
+    }
+    return `https://blockchair.com/bitcoin/transaction/${withdrawal.transaction_hash}`;
+  };
+
+  return (
+    <div className="p-4 border rounded-lg space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="font-medium">
+            ${withdrawal.amount.toLocaleString()} {withdrawal.currency.toUpperCase()}
+          </p>
+          <p className="text-xs text-muted-foreground truncate max-w-[300px]">
+            To: {withdrawal.wallet_address || "N/A"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <Badge
+            className={
+              withdrawal.status === "approved" || withdrawal.status === "completed"
+                ? "bg-green-500"
+                : withdrawal.status === "pending"
+                ? "bg-yellow-500"
+                : "bg-red-500"
+            }
+          >
+            {withdrawal.status}
+          </Badge>
+          {/* Auto-process countdown for pending withdrawals */}
+          {withdrawal.status === "pending" && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>{isEligible ? "Processing soon..." : `Auto in ${timeRemaining}`}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Transaction Hash & Blockchain Tracking */}
+      {withdrawal.transaction_hash && (
+        <div className="pt-2 border-t space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">Transaction Hash:</p>
+            <a
+              href={getExplorerUrl() || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-primary hover:underline flex items-center gap-1"
+            >
+              {withdrawal.transaction_hash.slice(0, 16)}...
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+
+          {!verified && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleVerify}
+              disabled={verifying}
+              className="w-full"
+            >
+              {verifying ? "Verifying..." : "Verify on Blockchain"}
+            </Button>
+          )}
+
+          {verified && result && (
+            <div className="space-y-2">
+              <BlockchainVerificationBadge verifying={false} result={result} showDetails />
+              {result.confirmed && (
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>Confirmations: {result.confirmations}</p>
+                  {result.amount && <p>Amount: {result.amount}</p>}
+                  {result.timestamp && (
+                    <p>Block time: {new Date(result.timestamp).toLocaleString()}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Pending status info with auto-process note */}
+      {withdrawal.status === "pending" && !withdrawal.transaction_hash && (
+        <div className="pt-2 border-t">
+          <p className="text-xs text-muted-foreground">
+            {isEligible 
+              ? "🔄 Eligible for auto-processing. Will be processed in the next scheduled run."
+              : `⏳ Will auto-process in ${timeRemaining} if not manually reviewed.`
+            }
+          </p>
+        </div>
       )}
     </div>
   );

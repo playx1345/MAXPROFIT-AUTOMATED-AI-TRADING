@@ -2,11 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import logo from "@/assets/logo.jpg";
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
   
   const scrollToSection = (sectionId: string) => {
     if (!sectionId) return;
@@ -36,36 +39,38 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6 lg:gap-8">
             <button onClick={() => scrollToSection("features")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              Features
+              {t('nav.features')}
             </button>
             <button onClick={() => scrollToSection("plans")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              Plans
+              {t('nav.plans')}
             </button>
             <button onClick={() => scrollToSection("how-it-works")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              How It Works
+              {t('nav.howItWorks')}
             </button>
             <button onClick={() => scrollToSection("faq")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              FAQ
+              {t('nav.faq')}
             </button>
           </div>
 
-          {/* Desktop CTA Buttons & Theme Toggle */}
+          {/* Desktop CTA Buttons & Theme Toggle & Language */}
           <div className="hidden md:flex items-center gap-2 lg:gap-3">
+            <LanguageSelector />
             <ThemeToggle />
             <Link to="/auth">
               <Button variant="ghost" size="sm" className="font-serif font-medium">
-                Sign In
+                {t('nav.signIn')}
               </Button>
             </Link>
             <Link to="/auth">
               <Button size="sm" className="bg-gradient-primary font-serif font-medium shadow-elegant hover:shadow-glow transition-all">
-                Get Started
+                {t('nav.getStarted')}
               </Button>
             </Link>
           </div>
 
-          {/* Mobile: Theme Toggle & Menu Button */}
+          {/* Mobile: Language, Theme Toggle & Menu Button */}
           <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+            <LanguageSelector />
             <ThemeToggle />
             <button 
               className="p-1.5 sm:p-2 text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted/50" 
@@ -82,26 +87,26 @@ export const Header = () => {
           <div className="md:hidden mt-3 sm:mt-4 pb-4 border-t border-border/40 pt-4 animate-fade-in">
             <div className="flex flex-col gap-3 sm:gap-4">
               <button onClick={() => scrollToSection("features")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                Features
+                {t('nav.features')}
               </button>
               <button onClick={() => scrollToSection("plans")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                Plans
+                {t('nav.plans')}
               </button>
               <button onClick={() => scrollToSection("how-it-works")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                How It Works
+                {t('nav.howItWorks')}
               </button>
               <button onClick={() => scrollToSection("faq")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                FAQ
+                {t('nav.faq')}
               </button>
               <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-border/30">
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="outline" size="sm" className="w-full font-serif font-medium h-10 sm:h-11">
-                    Sign In
+                    {t('nav.signIn')}
                   </Button>
                 </Link>
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                   <Button size="sm" className="w-full bg-gradient-primary font-serif font-medium h-10 sm:h-11">
-                    Get Started
+                    {t('nav.getStarted')}
                   </Button>
                 </Link>
               </div>

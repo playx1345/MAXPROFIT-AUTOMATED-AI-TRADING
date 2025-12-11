@@ -1,0 +1,161 @@
+{
+  "nav": {
+    "features": "Features",
+    "plans": "Plans",
+    "howItWorks": "How It Works",
+    "faq": "FAQ",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "title": "Professional Crypto Trading",
+    "subtitle": "Powered by AI",
+    "description": "Experience the future of cryptocurrency investment with our advanced AI-powered trading platform. Maximize your returns with intelligent automation.",
+    "startInvesting": "Start Investing",
+    "learnMore": "Learn More"
+  },
+  "features": {
+    "title": "Why Choose Live Win Trade",
+    "aiBot": {
+      "title": "AI Trading Bot",
+      "description": "Advanced algorithms analyze market trends 24/7 to maximize your investment returns."
+    },
+    "secure": {
+      "title": "Secure Platform",
+      "description": "Bank-grade security with blockchain verification for all transactions."
+    },
+    "performance": {
+      "title": "Performance Tracking",
+      "description": "Real-time analytics and detailed reports on your investment performance."
+    },
+    "referral": {
+      "title": "Referral Program",
+      "description": "Earn bonus rewards by inviting friends to join the platform."
+    }
+  },
+  "plans": {
+    "title": "Investment Plans",
+    "subtitle": "Choose the plan that fits your investment goals",
+    "starter": {
+      "name": "Starter",
+      "description": "Perfect for beginners"
+    },
+    "growth": {
+      "name": "Growth",
+      "description": "For serious investors"
+    },
+    "professional": {
+      "name": "Professional",
+      "description": "Maximum returns"
+    },
+    "roi": "Expected ROI",
+    "duration": "Duration",
+    "days": "days",
+    "minInvestment": "Min Investment",
+    "selectPlan": "Select Plan"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "step1": {
+      "title": "Sign Up",
+      "description": "Create your account in minutes with a simple registration process."
+    },
+    "step2": {
+      "title": "Deposit",
+      "description": "Fund your account using cryptocurrency or other payment methods."
+    },
+    "step3": {
+      "title": "Choose Plan",
+      "description": "Select an investment plan that matches your goals and risk tolerance."
+    },
+    "step4": {
+      "title": "Earn",
+      "description": "Watch your investment grow with our AI-powered trading strategies."
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": "How does the AI trading bot work?",
+    "a1": "Our AI trading bot uses advanced machine learning algorithms to analyze market trends, news, and historical data to make informed trading decisions 24/7.",
+    "q2": "Is my investment secure?",
+    "a2": "Yes, we use bank-grade security measures including encryption, two-factor authentication, and blockchain verification for all transactions.",
+    "q3": "What is the minimum investment?",
+    "a3": "The minimum investment varies by plan, starting from $100 for our Starter plan.",
+    "q4": "How do I withdraw my earnings?",
+    "a4": "You can withdraw your earnings at any time through your dashboard. Withdrawals are processed within 24 hours.",
+    "q5": "What cryptocurrencies do you support?",
+    "a5": "We currently support USDT (Tether) and Bitcoin for deposits and withdrawals."
+  },
+  "footer": {
+    "description": "Professional cryptocurrency trading platform powered by advanced AI algorithms.",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "riskDisclosure": "Risk Disclosure",
+    "riskWarning": "Trading cryptocurrencies involves significant risk and may not be suitable for all investors. Past performance is not indicative of future results.",
+    "rights": "All rights reserved."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "totalBalance": "Total Balance",
+    "activeInvestments": "Active Investments",
+    "totalProfit": "Total Profit",
+    "menu": {
+      "dashboard": "Dashboard",
+      "investments": "Investments",
+      "transactions": "Transactions",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "referrals": "Referrals",
+      "profile": "Profile & KYC"
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "createAccount": "Create Account",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account..."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "active": "Active",
+    "signOut": "Sign Out"
+  },
+  "language": {
+    "select": "Select Language",
+    "en": "English",
+    "ru": "Russian",
+    "uk": "Ukrainian",
+    "ar": "Arabic",
+    "ko": "Korean",
+    "ro": "Romanian"
+  }
+}

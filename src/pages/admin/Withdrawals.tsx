@@ -8,12 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
+import { useAutoProcessCountdown, getAutoProcessTime } from "@/hooks/useAutoProcessCountdown";
 
 interface Withdrawal {
   id: string;
@@ -162,6 +163,64 @@ const AdminWithdrawals = () => {
   const completedWithdrawals = withdrawals.filter((w) => w.status === "completed");
   const rejectedWithdrawals = withdrawals.filter((w) => w.status === "rejected");
 
+  const WithdrawalTableRow = ({ withdrawal }: { withdrawal: Withdrawal }) => {
+    const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
+    
+    return (
+      <TableRow>
+        <TableCell>
+          <div>
+            <p className="font-medium">{withdrawal.profiles?.full_name || "N/A"}</p>
+            <p className="text-xs text-muted-foreground">{withdrawal.profiles?.email}</p>
+          </div>
+        </TableCell>
+        <TableCell className="font-semibold">
+          ${withdrawal.amount.toLocaleString()}
+        </TableCell>
+        <TableCell className="uppercase">{withdrawal.currency}</TableCell>
+        <TableCell className="font-mono text-xs max-w-[150px] truncate">
+          {withdrawal.wallet_address}
+        </TableCell>
+        <TableCell>
+          {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
+        </TableCell>
+        <TableCell>
+          <div className="flex flex-col gap-1">
+            <Badge
+              className={
+                withdrawal.status === "completed" || withdrawal.status === "approved"
+                  ? "bg-green-500"
+                  : withdrawal.status === "pending"
+                  ? "bg-yellow-500"
+                  : "bg-red-500"
+              }
+            >
+              {withdrawal.status}
+            </Badge>
+            {withdrawal.status === "pending" && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                <span>{isEligible ? "Auto soon" : timeRemaining}</span>
+              </div>
+            )}
+          </div>
+        </TableCell>
+        <TableCell>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setSelectedWithdrawal(withdrawal);
+              setDetailsOpen(true);
+            }}
+          >
+            View Details
+          </Button>
+        </TableCell>
+      </TableRow>
+    );
+  };
+
   const WithdrawalTable = ({ data }: { data: Withdrawal[] }) => (
     <Table>
       <TableHeader>
@@ -184,49 +243,7 @@ const AdminWithdrawals = () => {
           </TableRow>
         ) : (
           data.map((withdrawal) => (
-            <TableRow key={withdrawal.id}>
-              <TableCell>
-                <div>
-                  <p className="font-medium">{withdrawal.profiles?.full_name || "N/A"}</p>
-                  <p className="text-xs text-muted-foreground">{withdrawal.profiles?.email}</p>
-                </div>
-              </TableCell>
-              <TableCell className="font-semibold">
-                ${withdrawal.amount.toLocaleString()}
-              </TableCell>
-              <TableCell className="uppercase">{withdrawal.currency}</TableCell>
-              <TableCell className="font-mono text-xs max-w-[150px] truncate">
-                {withdrawal.wallet_address}
-              </TableCell>
-              <TableCell>
-                {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
-              </TableCell>
-              <TableCell>
-                <Badge
-                  className={
-                    withdrawal.status === "completed"
-                      ? "bg-green-500"
-                      : withdrawal.status === "pending"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }
-                >
-                  {withdrawal.status}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    setSelectedWithdrawal(withdrawal);
-                    setDetailsOpen(true);
-                  }}
-                >
-                  View Details
-                </Button>
-              </TableCell>
-            </TableRow>
+            <WithdrawalTableRow key={withdrawal.id} withdrawal={withdrawal} />
           ))
         )}
       </TableBody>
@@ -352,6 +369,11 @@ const AdminWithdrawals = () => {
                     Warning: User has insufficient balance for this withdrawal!
                   </p>
                 </div>
+              )}
+
+              {/* Auto-process countdown for pending withdrawals */}
+              {selectedWithdrawal.status === "pending" && (
+                <AutoProcessInfo createdAt={selectedWithdrawal.created_at} />
               )}
 
               {/* Blockchain Verification Section for completed withdrawals */}
@@ -495,6 +517,29 @@ const BlockchainVerificationSection = ({ withdrawal }: { withdrawal: Withdrawal 
           )}
         </div>
       )}
+    </div>
+  );
+};
+
+// Auto-process info component for admin dialog
+const AutoProcessInfo = ({ createdAt }: { createdAt: string }) => {
+  const { timeRemaining, isEligible } = useAutoProcessCountdown(createdAt);
+  const autoProcessTime = getAutoProcessTime(createdAt);
+
+  return (
+    <div className={`flex items-center gap-2 p-3 rounded-lg ${isEligible ? 'bg-primary/10 border border-primary' : 'bg-muted'}`}>
+      <Clock className={`h-5 w-5 ${isEligible ? 'text-primary' : 'text-muted-foreground'}`} />
+      <div>
+        <p className={`text-sm font-medium ${isEligible ? 'text-primary' : ''}`}>
+          {isEligible 
+            ? "⚡ Eligible for auto-processing" 
+            : `Auto-processes in ${timeRemaining}`
+          }
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Scheduled: {format(autoProcessTime, "MMM dd, yyyy HH:mm")}
+        </p>
+      </div>
     </div>
   );
 };

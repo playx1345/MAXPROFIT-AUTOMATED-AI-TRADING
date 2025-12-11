@@ -12,10 +12,6 @@ import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock } from
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
-import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
-import { useAutoProcessCountdown, getAutoProcessTime } from "@/hooks/useAutoProcessCountdown";
-
 interface Withdrawal {
   id: string;
   user_id: string;
@@ -332,6 +328,18 @@ const AdminWithdrawals = () => {
                   <Label className="text-muted-foreground">Withdrawal Amount</Label>
                   <p className="font-bold text-2xl">
                     ${selectedWithdrawal.amount.toLocaleString()} {selectedWithdrawal.currency.toUpperCase()}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Blockchain Confirmation Fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%)</Label>
+                  <p className="font-semibold text-lg text-yellow-600">
+                    ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Net Amount to Send</Label>
+                  <p className="font-bold text-xl text-green-600">
+                    ${(selectedWithdrawal.amount * (1 - WITHDRAWAL_FEE_PERCENTAGE)).toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
                   </p>
                 </div>
                 <div>

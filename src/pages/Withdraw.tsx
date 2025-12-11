@@ -10,9 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
-import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
-import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
+
 
 interface RecentWithdrawal {
   id: string;
@@ -90,7 +88,7 @@ const Withdraw = () => {
     }
   };
 
-  const estimatedFees = parseFloat(amount) * 0.02;
+  const estimatedFees = parseFloat(amount) * WITHDRAWAL_FEE_PERCENTAGE;
   const netAmount = parseFloat(amount || "0") - estimatedFees;
 
   const validateForm = (): boolean => {
@@ -277,7 +275,7 @@ const Withdraw = () => {
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Estimated fees:</span>
+                  <span>Blockchain confirmation fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
                   <span>-${estimatedFees.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">

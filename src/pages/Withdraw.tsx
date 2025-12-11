@@ -8,10 +8,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { AlertTriangle, ExternalLink } from "lucide-react";
+import { AlertTriangle, ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
+import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 
 interface RecentWithdrawal {
   id: string;
@@ -140,7 +141,7 @@ const Withdraw = () => {
 
       toast({
         title: "Withdrawal submitted!",
-        description: "Your withdrawal request is pending admin approval. Processing typically takes up to 24 hours.",
+        description: "Your withdrawal will be automatically processed within 24 hours if not manually reviewed earlier.",
       });
 
       setAmount("");
@@ -167,9 +168,9 @@ const Withdraw = () => {
       </div>
 
       <Alert>
-        <AlertTriangle className="h-4 w-4" />
+        <Clock className="h-4 w-4" />
         <AlertDescription>
-          <strong>Important:</strong> Withdrawals are processed within 24 hours. Make sure your wallet address is correct - transactions cannot be reversed.
+          <strong>Auto-Processing:</strong> Withdrawals are automatically processed after 24 hours. Admins may approve earlier. Make sure your wallet address is correct - transactions cannot be reversed.
         </AlertDescription>
       </Alert>
 
@@ -319,6 +320,7 @@ const Withdraw = () => {
 // Component for individual withdrawal with blockchain tracking
 const WithdrawalCard = ({ withdrawal }: { withdrawal: RecentWithdrawal }) => {
   const { verifying, result, verifyTransaction } = useBlockchainVerification();
+  const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
   const [verified, setVerified] = useState(false);
 
   const handleVerify = async () => {
@@ -350,17 +352,26 @@ const WithdrawalCard = ({ withdrawal }: { withdrawal: RecentWithdrawal }) => {
             {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
           </p>
         </div>
-        <Badge
-          className={
-            withdrawal.status === "approved" || withdrawal.status === "completed"
-              ? "bg-green-500"
-              : withdrawal.status === "pending"
-              ? "bg-yellow-500"
-              : "bg-red-500"
-          }
-        >
-          {withdrawal.status}
-        </Badge>
+        <div className="flex flex-col items-end gap-1">
+          <Badge
+            className={
+              withdrawal.status === "approved" || withdrawal.status === "completed"
+                ? "bg-green-500"
+                : withdrawal.status === "pending"
+                ? "bg-yellow-500"
+                : "bg-red-500"
+            }
+          >
+            {withdrawal.status}
+          </Badge>
+          {/* Auto-process countdown for pending withdrawals */}
+          {withdrawal.status === "pending" && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>{isEligible ? "Processing soon..." : `Auto in ${timeRemaining}`}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Transaction Hash & Blockchain Tracking */}
@@ -408,11 +419,16 @@ const WithdrawalCard = ({ withdrawal }: { withdrawal: RecentWithdrawal }) => {
         </div>
       )}
 
-      {/* Pending status info */}
+      {/* Pending status info with auto-process note */}
       {withdrawal.status === "pending" && !withdrawal.transaction_hash && (
-        <p className="text-xs text-muted-foreground italic">
-          Awaiting admin processing...
-        </p>
+        <div className="pt-2 border-t">
+          <p className="text-xs text-muted-foreground">
+            {isEligible 
+              ? "🔄 Eligible for auto-processing. Will be processed in the next scheduled run."
+              : `⏳ Will auto-process in ${timeRemaining} if not manually reviewed.`
+            }
+          </p>
+        </div>
       )}
     </div>
   );

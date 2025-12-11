@@ -1,0 +1,161 @@
+{
+  "nav": {
+    "features": "Funcții",
+    "plans": "Planuri",
+    "howItWorks": "Cum funcționează",
+    "faq": "Întrebări",
+    "signIn": "Autentificare",
+    "getStarted": "Începe"
+  },
+  "hero": {
+    "title": "Tranzacționare Crypto Profesională",
+    "subtitle": "Powered by AI",
+    "description": "Experimentează viitorul investițiilor în criptomonede cu platforma noastră avansată de tranzacționare bazată pe AI. Maximizează-ți randamentele cu automatizare inteligentă.",
+    "startInvesting": "Începe să investești",
+    "learnMore": "Află mai multe"
+  },
+  "features": {
+    "title": "De ce să alegi Live Win Trade",
+    "aiBot": {
+      "title": "Bot de Trading AI",
+      "description": "Algoritmi avansați analizează tendințele pieței 24/7 pentru a maximiza randamentele investițiilor tale."
+    },
+    "secure": {
+      "title": "Platformă Sigură",
+      "description": "Securitate de nivel bancar cu verificare blockchain pentru toate tranzacțiile."
+    },
+    "performance": {
+      "title": "Urmărirea Performanței",
+      "description": "Analize în timp real și rapoarte detaliate despre performanța investițiilor tale."
+    },
+    "referral": {
+      "title": "Program de Recomandare",
+      "description": "Câștigă recompense bonus invitând prieteni să se alăture platformei."
+    }
+  },
+  "plans": {
+    "title": "Planuri de Investiții",
+    "subtitle": "Alege planul care se potrivește obiectivelor tale",
+    "starter": {
+      "name": "Starter",
+      "description": "Perfect pentru începători"
+    },
+    "growth": {
+      "name": "Creștere",
+      "description": "Pentru investitori serioși"
+    },
+    "professional": {
+      "name": "Profesional",
+      "description": "Randamente maxime"
+    },
+    "roi": "ROI Așteptat",
+    "duration": "Durată",
+    "days": "zile",
+    "minInvestment": "Investiție Min.",
+    "selectPlan": "Selectează Plan"
+  },
+  "howItWorks": {
+    "title": "Cum Funcționează",
+    "step1": {
+      "title": "Înregistrare",
+      "description": "Creează-ți contul în câteva minute cu un proces simplu de înregistrare."
+    },
+    "step2": {
+      "title": "Depunere",
+      "description": "Alimentează-ți contul folosind criptomonede sau alte metode de plată."
+    },
+    "step3": {
+      "title": "Alege Planul",
+      "description": "Selectează un plan de investiții care se potrivește obiectivelor și toleranței la risc."
+    },
+    "step4": {
+      "title": "Câștigă",
+      "description": "Urmărește cum investiția ta crește cu strategiile noastre de trading AI."
+    }
+  },
+  "faq": {
+    "title": "Întrebări Frecvente",
+    "q1": "Cum funcționează botul de trading AI?",
+    "a1": "Botul nostru de trading AI folosește algoritmi avansați de machine learning pentru a analiza tendințele pieței, știrile și datele istorice pentru a lua decizii de tranzacționare informate 24/7.",
+    "q2": "Este investiția mea sigură?",
+    "a2": "Da, folosim măsuri de securitate de nivel bancar, inclusiv criptare, autentificare cu doi factori și verificare blockchain pentru toate tranzacțiile.",
+    "q3": "Care este investiția minimă?",
+    "a3": "Investiția minimă variază în funcție de plan, începând de la 100$ pentru planul Starter.",
+    "q4": "Cum îmi retrag câștigurile?",
+    "a4": "Poți retrage câștigurile oricând prin dashboard. Retragerile sunt procesate în 24 de ore.",
+    "q5": "Ce criptomonede sunt suportate?",
+    "a5": "Suportăm în prezent USDT (Tether) și Bitcoin pentru depuneri și retrageri."
+  },
+  "footer": {
+    "description": "Platformă profesională de tranzacționare criptomonede alimentată de algoritmi AI avansați.",
+    "quickLinks": "Linkuri Rapide",
+    "legal": "Legal",
+    "termsOfService": "Termeni și Condiții",
+    "privacyPolicy": "Politica de Confidențialitate",
+    "riskDisclosure": "Dezvăluirea Riscurilor",
+    "riskWarning": "Tranzacționarea criptomonedelor implică riscuri semnificative și poate să nu fie potrivită pentru toți investitorii. Performanța trecută nu indică rezultate viitoare.",
+    "rights": "Toate drepturile rezervate."
+  },
+  "dashboard": {
+    "title": "Panou de Control",
+    "welcome": "Bine ai revenit",
+    "totalBalance": "Sold Total",
+    "activeInvestments": "Investiții Active",
+    "totalProfit": "Profit Total",
+    "menu": {
+      "dashboard": "Panou",
+      "investments": "Investiții",
+      "transactions": "Tranzacții",
+      "deposit": "Depunere",
+      "withdraw": "Retragere",
+      "referrals": "Recomandări",
+      "profile": "Profil & KYC"
+    }
+  },
+  "auth": {
+    "signIn": "Autentificare",
+    "signUp": "Înregistrare",
+    "email": "Email",
+    "password": "Parolă",
+    "fullName": "Nume Complet",
+    "confirmPassword": "Confirmă Parola",
+    "forgotPassword": "Ai uitat parola?",
+    "noAccount": "Nu ai cont?",
+    "haveAccount": "Ai deja cont?",
+    "createAccount": "Creează Cont",
+    "signingIn": "Se autentifică...",
+    "creatingAccount": "Se creează contul..."
+  },
+  "common": {
+    "loading": "Se încarcă...",
+    "error": "Eroare",
+    "success": "Succes",
+    "submit": "Trimite",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "delete": "Șterge",
+    "edit": "Editează",
+    "view": "Vezi",
+    "back": "Înapoi",
+    "next": "Următorul",
+    "previous": "Anterior",
+    "search": "Caută",
+    "filter": "Filtrează",
+    "all": "Toate",
+    "pending": "În așteptare",
+    "approved": "Aprobat",
+    "rejected": "Respins",
+    "completed": "Finalizat",
+    "active": "Activ",
+    "signOut": "Deconectare"
+  },
+  "language": {
+    "select": "Selectează Limba",
+    "en": "Engleză",
+    "ru": "Rusă",
+    "uk": "Ucraineană",
+    "ar": "Arabă",
+    "ko": "Coreeană",
+    "ro": "Română"
+  }
+}

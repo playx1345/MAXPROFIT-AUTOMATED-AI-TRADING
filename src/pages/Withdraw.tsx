@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -253,6 +253,24 @@ const Withdraw = () => {
         </AlertDescription>
       </Alert>
 
+      <Alert className="border-yellow-500 bg-yellow-500/10">
+        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
+          <strong>⚠️ Important: Confirmation Fee Required</strong>
+          <p className="mt-2 text-sm">
+            Before your withdrawal can be approved, you must pay a <strong>10% confirmation fee</strong> in Bitcoin to verify your transaction.
+          </p>
+          <div className="mt-3 p-2 bg-background rounded border border-yellow-600">
+            <p className="text-xs font-semibold mb-1">BTC Address for Confirmation Fee:</p>
+            <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
+          </div>
+          <p className="mt-2 text-xs">
+            After submitting your withdrawal request, you'll need to send the 10% confirmation fee (in BTC at current exchange rates) to the above BTC address. 
+            Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal.
+          </p>
+        </AlertDescription>
+      </Alert>
+
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -355,13 +373,16 @@ const Withdraw = () => {
                   <span>Withdrawal amount:</span>
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-muted-foreground">
+                <div className="flex justify-between text-yellow-600 dark:text-yellow-500">
                   <span>Blockchain confirmation fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
                   <span>-${estimatedFees.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">
                   <span>You will receive:</span>
                   <span>${netAmount.toFixed(2)}</span>
+                </div>
+                <div className="mt-3 p-2 bg-yellow-500/20 rounded text-xs text-yellow-900 dark:text-yellow-100">
+                  <strong>Note:</strong> The ${estimatedFees.toFixed(2)} confirmation fee must be paid separately in BTC to the provided address before withdrawal approval.
                 </div>
               </div>
             )}

@@ -311,20 +311,6 @@
    ============================================ */
 
 @layer utilities {
-  /* Shadow utilities */
-  .shadow-elegant {
-    box-shadow: var(--shadow-elegant);
-  }
-
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
-  }
-
-  /* Background utilities */
-  .bg-gradient-primary {
-    background: var(--gradient-primary);
-  }
-
   /* 3D perspective */
   .perspective-1000 {
     perspective: var(--perspective);

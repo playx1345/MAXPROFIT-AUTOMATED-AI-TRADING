@@ -101,8 +101,16 @@ const Withdraw = () => {
     }
   };
 
-  const estimatedFees = parseFloat(amount) * WITHDRAWAL_FEE_PERCENTAGE;
-  const netAmount = parseFloat(amount || "0") - estimatedFees;
+  const calculateFee = (withdrawalAmount: number): number => {
+    return withdrawalAmount * WITHDRAWAL_FEE_PERCENTAGE;
+  };
+
+  const calculateNetAmount = (withdrawalAmount: number): number => {
+    return withdrawalAmount - calculateFee(withdrawalAmount);
+  };
+
+  const estimatedFees = calculateFee(parseFloat(amount || "0"));
+  const netAmount = calculateNetAmount(parseFloat(amount || "0"));
 
   const validateForm = (): boolean => {
     const newErrors: { amount?: string; wallet?: string } = {};
@@ -140,7 +148,7 @@ const Withdraw = () => {
       if (!user) throw new Error("Not authenticated");
 
       const withdrawalAmount = parseFloat(amount);
-      const feeAmount = withdrawalAmount * WITHDRAWAL_FEE_PERCENTAGE;
+      const feeAmount = calculateFee(withdrawalAmount);
       
       const { data: newTransaction, error } = await supabase.from("transactions").insert({
         user_id: user.id,
@@ -409,7 +417,7 @@ const Withdraw = () => {
             <div className="space-y-2">
               <Label>Fee Amount</Label>
               <div className="text-2xl font-bold text-primary">
-                ${(pendingWithdrawalAmount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
+                ${calculateFee(pendingWithdrawalAmount).toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">
                 {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% of ${pendingWithdrawalAmount.toLocaleString()}

@@ -12,6 +12,10 @@ import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock } from
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WITHDRAWAL_FEE_PERCENTAGE } from "@/lib/constants";
+import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
+import { useAutoProcessCountdown, getAutoProcessTime } from "@/hooks/useAutoProcessCountdown";
+import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 interface Withdrawal {
   id: string;
   user_id: string;

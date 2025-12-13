@@ -10,6 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
+import { WITHDRAWAL_FEE_PERCENTAGE } from "@/lib/constants";
+import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
+import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
+import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 
 
 interface RecentWithdrawal {

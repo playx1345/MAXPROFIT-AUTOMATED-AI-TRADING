@@ -2,49 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* ============================================
+   DESIGN SYSTEM CONFIGURATION
+   All colors MUST be in HSL format for consistency
+   ============================================ */
 
 @layer base {
   :root {
-    /* Live Win Trade Brand - Navy Blue Background from Logo */
-    /* Deep navy backgrounds with signature gold/yellow accents */
-    
+    /* ========== Background Colors - Navy Blue Theme ========== */
+    /* Deep navy backgrounds inspired by the logo */
     --background: 215 55% 8%;
     --foreground: 210 20% 95%;
 
+    /* ========== Component Colors ========== */
     --card: 215 50% 11%;
     --card-foreground: 210 20% 95%;
 
     --popover: 215 50% 11%;
     --popover-foreground: 210 20% 95%;
 
+    /* ========== Brand Colors ========== */
     /* Binance Yellow - Primary Brand Color */
     --primary: 45 93% 49%;
     --primary-foreground: 215 55% 8%;
     --primary-glow: 45 95% 55%;
 
+    /* Gold/Amber Accent */
+    --accent: 38 92% 50%;
+    --accent-foreground: 215 55% 8%;
+
+    /* Logo Teal - Secondary accent from chart lines */
+    --logo-teal: 185 100% 38%;
+
+    /* ========== Semantic Colors ========== */
     --secondary: 215 48% 12%;
     --secondary-foreground: 210 20% 95%;
 
     --muted: 215 45% 14%;
     --muted-foreground: 210 15% 55%;
 
-    /* Gold/Amber Accent */
-    --accent: 38 92% 50%;
-    --accent-foreground: 215 55% 8%;
-
-    /* Binance Red for Destructive */
+    /* Binance Red for Destructive Actions */
     --destructive: 355 90% 62%;
     --destructive-foreground: 210 20% 95%;
 
+    /* Binance Green for Success States */
+    --success: 160 85% 43%;
+    --success-foreground: 210 20% 95%;
+
+    /* Warning Color */
+    --warning: 45 93% 49%;
+    --warning-foreground: 215 55% 8%;
+
+    /* ========== Border & Input ========== */
     --border: 215 40% 18%;
     --input: 215 40% 18%;
     --ring: 45 93% 49%;
-
     --radius: 0.75rem;
 
+    /* ========== Sidebar Colors ========== */
     --sidebar-background: 215 55% 7%;
     --sidebar-foreground: 210 20% 95%;
     --sidebar-primary: 45 93% 49%;
@@ -54,10 +69,8 @@ All colors MUST be HSL.
     --sidebar-border: 215 40% 14%;
     --sidebar-ring: 45 93% 49%;
 
-    /* Logo Teal - Secondary accent from chart lines */
-    --logo-teal: 185 100% 38%;
-
-    /* Brand Gradients - Navy Blue with Gold */
+    /* ========== Gradients ========== */
+    /* Navy Blue with Gold accents */
     --gradient-primary: linear-gradient(135deg, hsl(45 93% 49%) 0%, hsl(38 92% 55%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(32 95% 52%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(215 55% 8%) 0%, hsl(215 50% 11%) 100%);
@@ -66,7 +79,7 @@ All colors MUST be HSL.
     --gradient-hero: linear-gradient(145deg, hsl(215 55% 8%) 0%, hsl(215 58% 5%) 50%, hsl(215 50% 10%) 100%);
     --gradient-cyber: linear-gradient(135deg, hsl(45 93% 49% / 0.1) 0%, hsl(38 92% 50% / 0.1) 100%);
 
-    /* Enhanced Shadows - Gold Glow */
+    /* ========== Shadows - Gold Glow Effects ========== */
     --shadow-sm: 0 2px 8px hsl(215 60% 3% / 0.4);
     --shadow-md: 0 4px 20px hsl(215 60% 3% / 0.5);
     --shadow-lg: 0 8px 40px hsl(215 60% 3% / 0.6);
@@ -74,22 +87,16 @@ All colors MUST be HSL.
     --shadow-glow: 0 0 60px hsl(45 93% 49% / 0.3);
     --shadow-accent: 0 8px 30px -10px hsl(38 92% 50% / 0.5);
     --shadow-neon: 0 0 20px hsl(45 93% 49% / 0.4), 0 0 40px hsl(45 93% 49% / 0.2);
-    
+
+    /* ========== Legacy Support ========== */
     /* Bitcoin/Crypto Brand Color - Now matches Binance Yellow */
     --bitcoin-orange: 45 93% 49%;
-    
-    /* Binance Green for Success */
-    --success: 160 85% 43%;
-    --success-foreground: 210 20% 95%;
 
-    /* Warning Color */
-    --warning: 45 93% 49%;
-    --warning-foreground: 215 55% 8%;
-    
-    /* Perspective */
+    /* ========== 3D Perspective ========== */
     --perspective: 1200px;
   }
 
+  /* ========== Dark Mode Overrides ========== */
   .dark {
     --background: 215 58% 5%;
     --foreground: 210 20% 95%;
@@ -129,10 +136,9 @@ All colors MUST be HSL.
     --sidebar-border: 215 42% 12%;
     --sidebar-ring: 45 95% 52%;
 
-    /* Logo Teal for dark mode */
     --logo-teal: 185 100% 42%;
 
-    /* Dark mode gradients - Navy Blue */
+    /* Dark mode gradients */
     --gradient-primary: linear-gradient(135deg, hsl(45 95% 52%) 0%, hsl(38 94% 58%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(38 94% 52%) 0%, hsl(32 96% 54%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(215 58% 5%) 0%, hsl(215 52% 8%) 100%);
@@ -140,7 +146,7 @@ All colors MUST be HSL.
     --gradient-premium: linear-gradient(135deg, hsl(215 60% 4%) 0%, hsl(215 52% 7%) 40%, hsl(45 30% 10%) 100%);
     --gradient-hero: linear-gradient(145deg, hsl(215 58% 5%) 0%, hsl(215 60% 3%) 50%, hsl(215 52% 7%) 100%);
 
-    /* Dark mode shadows */
+    /* Dark mode shadows - enhanced for better depth */
     --shadow-sm: 0 2px 8px hsl(215 65% 2% / 0.6);
     --shadow-md: 0 4px 20px hsl(215 65% 2% / 0.7);
     --shadow-lg: 0 8px 40px hsl(215 65% 2% / 0.8);
@@ -150,167 +156,181 @@ All colors MUST be HSL.
   }
 }
 
+/* ============================================
+   BASE STYLES & DEFAULTS
+   ============================================ */
+
 @layer base {
   * {
     @apply border-border;
   }
 
   body {
-  @apply bg-background text-foreground;
-}
+    @apply bg-background text-foreground;
+  }
 
-/* Gradient utilities */
-.bg-gradient-primary {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-}
+  /* ========== Gradient Text Utilities ========== */
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-.bg-gradient-accent {
-  background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
-}
+  .text-gradient-premium {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 40%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-.bg-gradient-hero {
-  background: var(--gradient-hero);
-}
+  .text-gradient-accent {
+    background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--primary-glow)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-.text-gradient {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  /* ========== Background Gradient Utilities ========== */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  }
 
-.text-gradient-premium {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 40%, hsl(var(--accent)) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
+  }
 
-.text-gradient-accent {
-  background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--primary-glow)) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
 
-/* Glass effect */
-.glass-card {
-  @apply backdrop-blur-lg bg-card/40 border border-primary/15;
-}
+  /* ========== Glass Morphism Effects ========== */
+  .glass-card {
+    @apply backdrop-blur-lg bg-card/40 border border-primary/15;
+  }
 
-/* Performance utilities */
-.animate-optimized {
-  will-change: transform, opacity;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
+  .glass-card-enhanced {
+    backdrop-filter: blur(20px);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card) / 0.7) 0%,
+      hsl(var(--card) / 0.5) 100%
+    );
+    border: 1px solid hsl(var(--primary) / 0.15);
+    box-shadow: 0 8px 32px hsl(0 0% 0% / 0.4),
+      inset 0 1px 0 hsl(var(--primary) / 0.08),
+      inset 0 0 0 1px hsl(var(--primary) / 0.05);
+  }
 
-/* Enhanced glass effect */
-.glass-card-enhanced {
-  backdrop-filter: blur(20px);
-  background: linear-gradient(135deg, 
-    hsl(var(--card) / 0.7) 0%, 
-    hsl(var(--card) / 0.5) 100%);
-  border: 1px solid hsl(var(--primary) / 0.15);
-  box-shadow: 0 8px 32px hsl(0 0% 0% / 0.4),
-              inset 0 1px 0 hsl(var(--primary) / 0.08),
-              inset 0 0 0 1px hsl(var(--primary) / 0.05);
-}
+  /* ========== Premium Card Styles ========== */
+  .card-premium {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-/* Premium card with accent glow */
-.card-premium {
-  background: var(--gradient-card);
-  border: 1px solid hsl(var(--border));
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .card-premium:hover {
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: var(--shadow-elegant);
+  }
 
-.card-premium:hover {
-  border-color: hsl(var(--primary) / 0.3);
-  box-shadow: var(--shadow-elegant);
-}
+  /* ========== Interactive Hover Effects ========== */
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
 
-/* Smooth hover transitions */
-.hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elegant);
+  }
 
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-elegant);
-}
+  /* ========== Micro-Interactions ========== */
+  .micro-interact {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-/* Micro-interactions */
-.micro-interact {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .micro-interact:hover {
+    transform: scale(1.02) translateY(-2px) rotate(0.5deg);
+  }
 
-.micro-interact:hover {
-  transform: scale(1.02) translateY(-2px) rotate(0.5deg);
-}
+  .micro-interact:active {
+    transform: scale(0.98) translateY(0) rotate(0deg);
+    transition-duration: 0.1s;
+  }
 
-.micro-interact:active {
-  transform: scale(0.98) translateY(0) rotate(0deg);
-  transition-duration: 0.1s;
-}
+  .micro-interact-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-.micro-interact-button {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .micro-interact-button:hover {
+    transform: scale(1.05) translateY(-1px);
+    filter: brightness(1.1);
+  }
 
-.micro-interact-button:hover {
-  transform: scale(1.05) translateY(-1px);
-  filter: brightness(1.1);
-}
+  .micro-interact-button:active {
+    transform: scale(0.95);
+    filter: brightness(0.9);
+    transition-duration: 0.1s;
+  }
 
-.micro-interact-button:active {
-  transform: scale(0.95);
-  filter: brightness(0.9);
-  transition-duration: 0.1s;
-}
-
-/* Shadow utilities */
-.shadow-elegant {
-  box-shadow: var(--shadow-elegant);
-}
-
-.shadow-glow {
-  box-shadow: var(--shadow-glow);
-}
-
-.shadow-accent {
-  box-shadow: var(--shadow-accent);
-}
-
-/* Brand-specific utilities */
-.border-glow {
-  border: 1px solid hsl(var(--primary) / 0.3);
-  box-shadow: 0 0 20px hsl(var(--primary) / 0.15);
-}
-
-.border-accent-glow {
-  border: 1px solid hsl(var(--accent) / 0.3);
-  box-shadow: 0 0 20px hsl(var(--accent) / 0.15);
-}
-}
-
-@layer utilities {
+  /* ========== Shadow Utilities ========== */
   .shadow-elegant {
     box-shadow: var(--shadow-elegant);
   }
-  
+
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
-  
+
+  .shadow-accent {
+    box-shadow: var(--shadow-accent);
+  }
+
+  /* ========== Border Glow Effects ========== */
+  .border-glow {
+    border: 1px solid hsl(var(--primary) / 0.3);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.15);
+  }
+
+  .border-accent-glow {
+    border: 1px solid hsl(var(--accent) / 0.3);
+    box-shadow: 0 0 20px hsl(var(--accent) / 0.15);
+  }
+
+  /* ========== Performance Optimizations ========== */
+  .animate-optimized {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+@layer utilities {
+  /* Shadow utilities */
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Background utilities */
   .bg-gradient-primary {
     background: var(--gradient-primary);
   }
-  
+
+  /* 3D perspective */
   .perspective-1000 {
     perspective: var(--perspective);
   }
 
+  /* Filter utilities */
   .drop-shadow-glow {
     filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.5));
   }
@@ -325,7 +345,10 @@ All colors MUST be HSL.
   }
 }
 
-/* RTL Support for Arabic */
+/* ============================================
+   RTL (RIGHT-TO-LEFT) SUPPORT FOR ARABIC
+   ============================================ */
+
 [dir="rtl"] {
   text-align: right;
 }
@@ -334,6 +357,7 @@ All colors MUST be HSL.
   flex-direction: row-reverse;
 }
 
+/* RTL spacing utilities */
 [dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
@@ -346,6 +370,7 @@ All colors MUST be HSL.
   --tw-space-x-reverse: 1;
 }
 
+/* RTL margin utilities */
 [dir="rtl"] .ml-auto {
   margin-left: 0;
   margin-right: auto;
@@ -356,6 +381,7 @@ All colors MUST be HSL.
   margin-left: auto;
 }
 
+/* RTL text alignment */
 [dir="rtl"] .text-left {
   text-align: right;
 }

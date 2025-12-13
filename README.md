@@ -13,7 +13,7 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - **User Dashboard**: Real-time portfolio tracking, investment management, and transaction history
 - **Multi-Tier Investment Plans**: Three investment tiers ($250, $500, $1000 USDT) with transparent profit-sharing
 - **Crypto Deposits**: Support for USDT (TRC20) and Bitcoin (BTC) with QR code integration
-- **Fast Withdrawals**: 24-hour processing time with transparent fee structure
+- **Fast Withdrawals**: 24-hour processing time with transparent fee structure (10% BTC confirmation fee required)
 - **Live Chat Support**: Real-time communication with platform administrators
 - **Multi-Factor Authentication**: Enhanced security with 2FA support
 - **Referral System**: Earn bonuses when referred users make their first deposit
@@ -21,7 +21,7 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 
 ### Admin Features
 - **Centralized Dashboard**: Complete oversight of user accounts, transactions, and KYC verification
-- **Deposit/Withdrawal Management**: Real-time approval workflow for all financial transactions
+- **Deposit/Withdrawal Management**: Real-time approval workflow for all financial transactions with blockchain-verified BTC confirmation fees
 - **User Management**: Create, edit, and manage client accounts with full audit trails
 - **Notification Center**: Instant alerts for registrations, deposits, and withdrawal requests
 - **Live Chat Management**: Respond to client inquiries with full conversation history
@@ -42,6 +42,41 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - Platform retains 20% of trading profits
 - Net profits credited to client accounts
 - Transparent fee disclosure (blockchain charges + VAT)
+
+## 💸 Withdrawal Confirmation Fee
+
+To ensure security and prevent fraudulent withdrawals, the platform requires a 10% confirmation fee paid in Bitcoin (BTC) before any withdrawal can be approved.
+
+### How It Works
+- **Fee Amount**: 10% of the withdrawal amount
+- **Payment Method**: Must be paid in BTC to the platform's confirmation wallet
+- **Wallet Address**: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+- **Verification**: Blockchain verification ensures payment is received before approval
+- **Processing**: Once verified, withdrawal is processed within 24 hours
+
+### Withdrawal Process
+1. **Request Withdrawal**: Submit withdrawal request through your dashboard
+2. **Calculate Fee**: System calculates 10% fee in USD, convert to BTC at current rate
+3. **Pay Fee**: Send exact BTC amount to confirmation wallet address
+4. **Submit Transaction Hash**: Provide Bitcoin transaction hash to admin
+5. **Verification**: Admin verifies payment on Bitcoin blockchain using edge function
+6. **Approval**: Once verified, withdrawal is approved and processed
+
+### Security Features
+- **Blockchain Verification**: All payments verified on Bitcoin blockchain
+- **Correct Address Check**: System ensures payment went to correct BTC address
+- **Amount Verification**: Validates correct fee amount was paid (±1% tolerance)
+- **Confirmation Requirement**: Requires at least 1 blockchain confirmation
+- **Audit Trail**: All verifications logged for transparency and security
+
+### Important Notes
+⚠️ **This fee is mandatory** - Withdrawals cannot be approved without verified BTC confirmation fee  
+⚠️ **Non-refundable** - Confirmation fees are non-refundable once paid  
+⚠️ **Price Fluctuation** - BTC price may change between calculation and payment; ±1% tolerance allowed  
+⚠️ **Correct Address** - Always send to: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+
+For detailed technical documentation, see [Confirmation Fee Verification Guide](./docs/CONFIRMATION_FEE_VERIFICATION.md).
+
 
 ## 🚀 High-Volume Account Fee System
 
@@ -218,16 +253,18 @@ For more details, see `scripts/README.md`.
 4. **Deposit Funds**: Transfer USDT or BTC to provided wallet address
 5. **Track Performance**: Monitor investments and profits in real-time
 6. **Request Withdrawal**: Submit withdrawal request (processed within 24 hours)
-7. **Refer Friends**: Share referral link and earn bonuses
-8. **High-Volume Fee** (if applicable): Pay mandatory $1,000 fee if investments exceed $50,000 threshold
+7. **Pay Confirmation Fee**: Send 10% BTC confirmation fee to platform wallet for withdrawal verification
+8. **Refer Friends**: Share referral link and earn bonuses
+9. **High-Volume Fee** (if applicable): Pay mandatory $1,000 fee if investments exceed $50,000 threshold
 
 ### For Administrators
 1. **Login**: Access admin dashboard with secure credentials
 2. **Review KYC**: Approve or reject identity verification submissions
 3. **Process Deposits**: Verify and approve incoming crypto deposits
-4. **Manage Withdrawals**: Review and process withdrawal requests
-5. **Monitor Platform**: Track user activity, investments, and system health
-6. **Respond to Support**: Handle client inquiries via live chat
+4. **Verify Confirmation Fees**: Verify users have paid 10% BTC confirmation fee for withdrawals
+5. **Manage Withdrawals**: Review and process withdrawal requests (after fee verification)
+6. **Monitor Platform**: Track user activity, investments, and system health
+7. **Respond to Support**: Handle client inquiries via live chat
 
 ## 💬 Customer Support
 

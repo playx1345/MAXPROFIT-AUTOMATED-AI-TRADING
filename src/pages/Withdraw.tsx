@@ -188,7 +188,7 @@ const Withdraw = () => {
             <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
           </div>
           <p className="mt-2 text-xs">
-            After submitting your withdrawal request, you'll need to send the confirmation fee to the above BTC address. 
+            After submitting your withdrawal request, you'll need to send the 10% confirmation fee (in BTC at current exchange rates) to the above BTC address. 
             Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal.
           </p>
         </AlertDescription>

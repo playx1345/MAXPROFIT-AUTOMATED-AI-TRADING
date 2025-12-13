@@ -102,7 +102,7 @@ async function verifyBTCTransaction(txHash: string): Promise<BlockchainVerificat
       confirmations: Math.max(0, confirmations),
       amount: amountBTC,
       to_address: feeOutput.recipient,
-      from_address: txData.inputs?.[0]?.recipient || null,
+      from_address: txData.inputs?.[0]?.sender || txData.inputs?.[0]?.recipient || null,
       block_number: tx.block_id || null,
       timestamp: tx.time ? new Date(tx.time).toISOString() : null,
     };
@@ -202,14 +202,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Verify the amount is correct (10% of withdrawal amount)
-    // Note: We need to convert USDT to BTC equivalent at the time of withdrawal
-    // For now, we just check that some BTC was sent to the correct address
-    if (!verificationResult.amount || verificationResult.amount <= 0) {
+    // Verify the amount is a reasonable confirmation fee
+    // Since we can't easily verify exact USD/BTC conversion without external price API,
+    // we verify that a meaningful amount of BTC was sent (not dust)
+    // Minimum 0.0001 BTC (~$4-10 USD typically) as a basic sanity check
+    const MIN_BTC_AMOUNT = 0.0001;
+    
+    if (!verificationResult.amount || verificationResult.amount < MIN_BTC_AMOUNT) {
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: 'Invalid confirmation fee amount',
+          error: `Insufficient confirmation fee. Minimum ${MIN_BTC_AMOUNT} BTC required. Received: ${verificationResult.amount || 0} BTC`,
           verification_details: verificationResult
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

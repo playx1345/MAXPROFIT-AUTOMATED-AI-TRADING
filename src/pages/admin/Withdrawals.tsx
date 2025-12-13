@@ -463,7 +463,8 @@ const AdminWithdrawals = () => {
                       {CONFIRMATION_FEE_WALLET_BTC}
                     </p>
                     <p className="text-xs text-muted-foreground mt-2">
-                      User must send 10% confirmation fee ({(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)} USDT equivalent in BTC) to this address
+                      User must send 10% confirmation fee ({(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)} USDT equivalent in BTC) to this address.
+                      Note: The actual BTC amount varies based on current BTC/USD exchange rate.
                     </p>
                   </div>
 

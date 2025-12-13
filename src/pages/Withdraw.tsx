@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -38,6 +38,8 @@ const Withdraw = () => {
   const [errors, setErrors] = useState<{ amount?: string; wallet?: string }>({});
   const [feePaymentDialogOpen, setFeePaymentDialogOpen] = useState(false);
   const [pendingWithdrawalId, setPendingWithdrawalId] = useState<string | null>(null);
+  const [pendingWithdrawalCurrency, setPendingWithdrawalCurrency] = useState<"usdt" | "btc">("usdt");
+  const [pendingWithdrawalAmount, setPendingWithdrawalAmount] = useState(0);
   const [feePaymentHash, setFeePaymentHash] = useState("");
   const [submittingFeeHash, setSubmittingFeeHash] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
@@ -137,10 +139,11 @@ const Withdraw = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      const withdrawalAmount = parseFloat(amount);
       const { data, error } = await supabase.from("transactions").insert({
         user_id: user.id,
         type: "withdrawal",
-        amount: parseFloat(amount),
+        amount: withdrawalAmount,
         currency: currency,
         status: "pending",
         wallet_address: walletAddress.trim(),
@@ -150,6 +153,8 @@ const Withdraw = () => {
 
       // Open fee payment dialog
       setPendingWithdrawalId(data.id);
+      setPendingWithdrawalCurrency(currency);
+      setPendingWithdrawalAmount(withdrawalAmount);
       setFeePaymentDialogOpen(true);
 
       toast({
@@ -398,31 +403,31 @@ const Withdraw = () => {
             <div className="space-y-2">
               <Label>Fee Amount</Label>
               <div className="text-2xl font-bold text-primary">
-                ${estimatedFees.toFixed(2)}
+                ${(pendingWithdrawalAmount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">
-                {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% of ${parseFloat(amount || "0").toLocaleString()}
+                {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% of ${pendingWithdrawalAmount.toLocaleString()}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label>Payment Address (BTC)</Label>
+              <Label>Payment Address ({pendingWithdrawalCurrency.toUpperCase()})</Label>
               <div className="flex items-center gap-2">
                 <Input
-                  value={CONFIRMATION_FEE_WALLET_BTC}
+                  value={pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : CONFIRMATION_FEE_WALLET_USDT}
                   readOnly
                   className="font-mono text-xs"
                 />
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => copyToClipboard(CONFIRMATION_FEE_WALLET_BTC)}
+                  onClick={() => copyToClipboard(pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : CONFIRMATION_FEE_WALLET_USDT)}
                 >
                   {copiedAddress ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Send the fee amount to this Bitcoin address
+                Send the fee amount to this {pendingWithdrawalCurrency === "btc" ? "Bitcoin" : "USDT (TRC20)"} address
               </p>
             </div>
 

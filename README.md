@@ -13,7 +13,8 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - **User Dashboard**: Real-time portfolio tracking, investment management, and transaction history
 - **Multi-Tier Investment Plans**: Three investment tiers ($250, $500, $1000 USDT) with transparent profit-sharing
 - **Crypto Deposits**: Support for USDT (TRC20) and Bitcoin (BTC) with QR code integration
-- **Fast Withdrawals**: 24-hour processing time with transparent fee structure (10% BTC confirmation fee required)
+- **Fast Withdrawals**: 24-hour processing time with blockchain confirmation fee verification
+- **Withdrawal Confirmation Fee**: 10% confirmation fee in BTC required before withdrawal approval for transaction security
 - **Live Chat Support**: Real-time communication with platform administrators
 - **Multi-Factor Authentication**: Enhanced security with 2FA support
 - **Referral System**: Earn bonuses when referred users make their first deposit
@@ -21,7 +22,8 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 
 ### Admin Features
 - **Centralized Dashboard**: Complete oversight of user accounts, transactions, and KYC verification
-- **Deposit/Withdrawal Management**: Real-time approval workflow for all financial transactions with blockchain-verified BTC confirmation fees
+- **Deposit/Withdrawal Management**: Real-time approval workflow for all financial transactions with blockchain verification
+- **Confirmation Fee Verification**: Automated verification of 10% BTC confirmation fees on blockchain before approving withdrawals
 - **User Management**: Create, edit, and manage client accounts with full audit trails
 - **Notification Center**: Instant alerts for registrations, deposits, and withdrawal requests
 - **Live Chat Management**: Respond to client inquiries with full conversation history
@@ -133,10 +135,10 @@ For accounts that reach high investment volumes, the platform implements an auto
 - **user_roles**: Role-based access control (admin/user)
 - **investment_plans**: Configurable investment tiers
 - **investments**: Active and historical user investments
-- **transactions**: Deposit, withdrawal, and profit records
+- **transactions**: Deposit, withdrawal, and profit records with blockchain confirmation fee tracking (confirmation_fee_transaction_hash, confirmation_fee_verified, confirmation_fee_amount)
 - **trading_bot_performance**: AI trading activity logs
 - **referrals**: Referral tracking and bonus management
-- **admin_activity_logs**: Comprehensive audit trails for administrative actions
+- **admin_activity_logs**: Comprehensive audit trails for all administrative actions
 - **contact_messages**: User support messages and inquiries
 
 ### Storage Buckets
@@ -252,19 +254,21 @@ For more details, see `scripts/README.md`.
 3. **Choose Investment Plan**: Select Silver, Gold, or Platinum tier
 4. **Deposit Funds**: Transfer USDT or BTC to provided wallet address
 5. **Track Performance**: Monitor investments and profits in real-time
-6. **Request Withdrawal**: Submit withdrawal request (processed within 24 hours)
-7. **Pay Confirmation Fee**: Send 10% BTC confirmation fee to platform wallet for withdrawal verification
-8. **Refer Friends**: Share referral link and earn bonuses
-9. **High-Volume Fee** (if applicable): Pay mandatory $1,000 fee if investments exceed $50,000 threshold
+6. **Request Withdrawal**: Submit withdrawal request
+7. **Pay Confirmation Fee**: Send 10% confirmation fee in BTC to designated address
+8. **Await Approval**: Admin verifies fee on blockchain and approves withdrawal (processed within 24 hours)
+9. **Refer Friends**: Share referral link and earn bonuses
+10. **High-Volume Fee** (if applicable): Pay mandatory $1,000 fee if investments exceed $50,000 threshold
 
 ### For Administrators
 1. **Login**: Access admin dashboard with secure credentials
 2. **Review KYC**: Approve or reject identity verification submissions
 3. **Process Deposits**: Verify and approve incoming crypto deposits
-4. **Verify Confirmation Fees**: Verify users have paid 10% BTC confirmation fee for withdrawals
-5. **Manage Withdrawals**: Review and process withdrawal requests (after fee verification)
-6. **Monitor Platform**: Track user activity, investments, and system health
-7. **Respond to Support**: Handle client inquiries via live chat
+4. **Manage Withdrawals**: Review withdrawal requests
+5. **Verify Confirmation Fees**: Check blockchain to confirm 10% BTC fee payment
+6. **Approve Withdrawals**: Process approved withdrawals after fee verification
+7. **Monitor Platform**: Track user activity, investments, and system health
+8. **Respond to Support**: Handle client inquiries via live chat
 
 ## 💬 Customer Support
 
@@ -416,7 +420,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions for each platform
 ## 📞 Contact
 
 **Platform**: Win Trade Invest  
-**Admin Email**: maxforexautomatedforexroboti@gmail.com  
+**Admin Email**: livewintrade105@gmail.com  
 **Support**: Available via live chat in client dashboard
 
 ---

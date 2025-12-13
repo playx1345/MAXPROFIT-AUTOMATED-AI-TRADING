@@ -8,6 +8,8 @@ const corsHeaders = {
 
 const CONFIRMATION_FEE_WALLET_BTC = "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny";
 const WITHDRAWAL_FEE_PERCENTAGE = 0.10;
+const AMOUNT_TOLERANCE_PERCENTAGE = 0.01; // ±1% tolerance for BTC price fluctuations
+const MINIMUM_CONFIRMATIONS = 1; // Minimum blockchain confirmations required
 
 interface VerificationResult {
   verified: boolean;
@@ -91,18 +93,26 @@ async function verifyBTCTransaction(txHash: string, expectedFeeBTC: number): Pro
     // Convert satoshis to BTC
     const actualAmountBTC = feeOutput.value / 1e8;
     
-    // Calculate confirmations
-    const confirmations = tx.block_id ? data.context?.state - tx.block_id + 1 : 0;
+    // Calculate confirmations - ensure we have valid data
+    const currentBlock = data.context?.state || 0;
+    const transactionBlock = tx.block_id || 0;
+    const confirmations = (currentBlock > 0 && transactionBlock > 0) 
+      ? Math.max(0, currentBlock - transactionBlock + 1)
+      : 0;
     
-    // Check if the amount matches (with a small tolerance for transaction fees)
-    // Allow up to 1% difference to account for price fluctuations and rounding
-    const tolerance = expectedFeeBTC * 0.01;
+    // Check if the amount matches (with tolerance for transaction fees and price fluctuations)
+    const tolerance = expectedFeeBTC * AMOUNT_TOLERANCE_PERCENTAGE;
     const amountMatches = Math.abs(actualAmountBTC - expectedFeeBTC) <= tolerance;
     
-    // Bitcoin requires at least 1 confirmation for security
-    const hasConfirmations = confirmations >= 1;
+    // Bitcoin requires at least the minimum confirmations for security
+    const hasConfirmations = confirmations >= MINIMUM_CONFIRMATIONS;
     
     const feePaid = amountMatches && hasConfirmations;
+
+    // Note: Bitcoin inputs don't directly expose sender address in a simple way
+    // The actual sender would need to be traced through input UTXOs
+    // For verification purposes, we focus on the recipient (our wallet)
+    const fromAddress = txData.inputs?.[0]?.recipient || 'Unknown (multiple inputs)';
 
     return {
       verified: true,
@@ -110,13 +120,13 @@ async function verifyBTCTransaction(txHash: string, expectedFeeBTC: number): Pro
       expected_fee_btc: expectedFeeBTC,
       actual_amount_btc: actualAmountBTC,
       to_address: feeOutput.recipient,
-      from_address: txData.inputs?.[0]?.recipient || null,
+      from_address: fromAddress,
       confirmations: Math.max(0, confirmations),
       transaction_hash: txHash,
       error: !feePaid ? (
         !amountMatches 
           ? `Amount mismatch. Expected: ${expectedFeeBTC} BTC, Got: ${actualAmountBTC} BTC`
-          : `Insufficient confirmations. Got: ${confirmations}, Need at least 1`
+          : `Insufficient confirmations. Got: ${confirmations}, Need at least ${MINIMUM_CONFIRMATIONS}`
       ) : undefined,
     };
   } catch (error) {
@@ -159,8 +169,18 @@ serve(async (req) => {
       );
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    // Validate required environment variables
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing required environment variables');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get the withdrawal transaction details

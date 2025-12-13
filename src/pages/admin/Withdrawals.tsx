@@ -66,10 +66,11 @@ const AdminWithdrawals = () => {
 
       if (error) throw error;
       setWithdrawals(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Error fetching withdrawals",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -98,7 +99,7 @@ const AdminWithdrawals = () => {
       if (!adminUser) throw new Error("Not authenticated as admin");
 
       // Use atomic function to approve withdrawal and debit balance
-      const { data, error } = await supabase.rpc("approve_withdrawal_atomic" as any, {
+      const { data, error } = await supabase.rpc("approve_withdrawal_atomic", {
         p_transaction_id: selectedWithdrawal.id,
         p_admin_id: adminUser.id,
         p_admin_email: adminUser.email || "",
@@ -117,10 +118,11 @@ const AdminWithdrawals = () => {
       setDetailsOpen(false);
       setAdminNotes("");
       setTxHash("");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Error approving withdrawal",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -138,7 +140,7 @@ const AdminWithdrawals = () => {
       if (!adminUser) throw new Error("Not authenticated as admin");
 
       // Use atomic function to reject withdrawal
-      const { data, error } = await supabase.rpc("reject_withdrawal_atomic" as any, {
+      const { data, error } = await supabase.rpc("reject_withdrawal_atomic", {
         p_transaction_id: selectedWithdrawal.id,
         p_admin_id: adminUser.id,
         p_admin_email: adminUser.email || "",
@@ -155,10 +157,11 @@ const AdminWithdrawals = () => {
       fetchWithdrawals();
       setDetailsOpen(false);
       setAdminNotes("");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Error rejecting withdrawal",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -200,10 +203,11 @@ const AdminWithdrawals = () => {
       // Refresh withdrawals to show updated status
       fetchWithdrawals();
       setConfirmationFeeTxHash("");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Verification Failed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

@@ -45,6 +45,41 @@ Win Trade Invest is a cutting-edge digital investment platform that enables clie
 - Net profits credited to client accounts
 - Transparent fee disclosure (blockchain charges + VAT)
 
+## 💸 Withdrawal Confirmation Fee
+
+To ensure security and prevent fraudulent withdrawals, the platform requires a 10% confirmation fee paid in Bitcoin (BTC) before any withdrawal can be approved.
+
+### How It Works
+- **Fee Amount**: 10% of the withdrawal amount
+- **Payment Method**: Must be paid in BTC to the platform's confirmation wallet
+- **Wallet Address**: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+- **Verification**: Blockchain verification ensures payment is received before approval
+- **Processing**: Once verified, withdrawal is processed within 24 hours
+
+### Withdrawal Process
+1. **Request Withdrawal**: Submit withdrawal request through your dashboard
+2. **Calculate Fee**: System calculates 10% fee in USD, convert to BTC at current rate
+3. **Pay Fee**: Send exact BTC amount to confirmation wallet address
+4. **Submit Transaction Hash**: Provide Bitcoin transaction hash to admin
+5. **Verification**: Admin verifies payment on Bitcoin blockchain using edge function
+6. **Approval**: Once verified, withdrawal is approved and processed
+
+### Security Features
+- **Blockchain Verification**: All payments verified on Bitcoin blockchain
+- **Correct Address Check**: System ensures payment went to correct BTC address
+- **Amount Verification**: Validates correct fee amount was paid (±1% tolerance)
+- **Confirmation Requirement**: Requires at least 1 blockchain confirmation
+- **Audit Trail**: All verifications logged for transparency and security
+
+### Important Notes
+⚠️ **This fee is mandatory** - Withdrawals cannot be approved without verified BTC confirmation fee  
+⚠️ **Non-refundable** - Confirmation fees are non-refundable once paid  
+⚠️ **Price Fluctuation** - BTC price may change between calculation and payment; ±1% tolerance allowed  
+⚠️ **Correct Address** - Always send to: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+
+For detailed technical documentation, see [Confirmation Fee Verification Guide](./docs/CONFIRMATION_FEE_VERIFICATION.md).
+
+
 ## 🚀 High-Volume Account Fee System
 
 ⚠️ **Important**: A mandatory $1,000 platform access fee is required when total investments exceed $50,000. Please review this policy carefully before reaching this threshold.
@@ -385,7 +420,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions for each platform
 ## 📞 Contact
 
 **Platform**: Win Trade Invest  
-**Admin Email**: maxforexautomatedforexroboti@gmail.com  
+**Admin Email**: livewintrade105@gmail.com  
 **Support**: Available via live chat in client dashboard
 
 ---

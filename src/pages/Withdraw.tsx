@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT, MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -118,8 +118,13 @@ const Withdraw = () => {
     const amountValidation = validateField(amountSchema, amount);
     if (!amountValidation.isValid) {
       newErrors.amount = amountValidation.error;
-    } else if (parseFloat(amount) > balance) {
-      newErrors.amount = "Insufficient balance for this withdrawal";
+    } else {
+      const withdrawalAmount = parseFloat(amount);
+      if (withdrawalAmount > balance) {
+        newErrors.amount = `Insufficient balance. You have $${balance.toLocaleString()} available.`;
+      } else if (withdrawalAmount < MINIMUM_WITHDRAWAL_AMOUNT) {
+        newErrors.amount = `Minimum withdrawal amount is $${MINIMUM_WITHDRAWAL_AMOUNT}.`;
+      }
     }
 
     const walletSchema = getWalletAddressSchema(currency);
@@ -258,15 +263,24 @@ const Withdraw = () => {
         <AlertDescription className="text-yellow-900 dark:text-yellow-100">
           <strong>⚠️ Important: Confirmation Fee Required</strong>
           <p className="mt-2 text-sm">
-            Before your withdrawal can be approved, you must pay a <strong>10% confirmation fee</strong> in Bitcoin to verify your transaction.
+            Before your withdrawal can be approved, you must pay a <strong>10% confirmation fee</strong> to verify your transaction. The fee must be paid in the same currency as your withdrawal.
           </p>
           <div className="mt-3 p-2 bg-background rounded border border-yellow-600">
-            <p className="text-xs font-semibold mb-1">BTC Address for Confirmation Fee:</p>
-            <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
+            <p className="text-xs font-semibold mb-1">Fee Payment Addresses:</p>
+            <div className="space-y-1">
+              <div>
+                <p className="text-xs font-medium">BTC:</p>
+                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium">USDT (TRC20):</p>
+                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_USDT}</p>
+              </div>
+            </div>
           </div>
           <p className="mt-2 text-xs">
-            After submitting your withdrawal request, you'll need to send the 10% confirmation fee (in BTC at current exchange rates) to the above BTC address. 
-            Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal.
+            After submitting your withdrawal request, send the 10% confirmation fee to the appropriate address above. 
+            Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal within 24 hours.
           </p>
         </AlertDescription>
       </Alert>
@@ -374,15 +388,15 @@ const Withdraw = () => {
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-yellow-600 dark:text-yellow-500">
-                  <span>Blockchain confirmation fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
+                  <span>Network fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
                   <span>-${estimatedFees.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">
                   <span>You will receive:</span>
-                  <span>${netAmount.toFixed(2)}</span>
+                  <span className="text-green-600 dark:text-green-500">${netAmount.toFixed(2)}</span>
                 </div>
                 <div className="mt-3 p-2 bg-yellow-500/20 rounded text-xs text-yellow-900 dark:text-yellow-100">
-                  <strong>Note:</strong> The ${estimatedFees.toFixed(2)} confirmation fee must be paid separately in BTC to the provided address before withdrawal approval.
+                  <strong>Important:</strong> You must pay a ${estimatedFees.toFixed(2)} confirmation fee separately to the {currency.toUpperCase()} address shown above before your withdrawal can be approved. This fee verifies your transaction on the blockchain.
                 </div>
               </div>
             )}
@@ -424,29 +438,29 @@ const Withdraw = () => {
           <DialogHeader>
             <DialogTitle>Submit Confirmation Fee Payment</DialogTitle>
             <DialogDescription>
-              To process your withdrawal, you must pay a {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% confirmation fee.
+              Complete your withdrawal by paying the {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% confirmation fee
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Important:</strong> You must pay the confirmation fee before your withdrawal can be processed.
+                <strong>Required:</strong> Pay the confirmation fee to the address below using {pendingWithdrawalCurrency.toUpperCase()} before your withdrawal can be processed.
               </AlertDescription>
             </Alert>
 
             <div className="space-y-2">
-              <Label>Fee Amount</Label>
+              <Label>Fee Amount (in USD equivalent)</Label>
               <div className="text-2xl font-bold text-primary">
                 ${calculateFee(pendingWithdrawalAmount).toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">
-                {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% of ${pendingWithdrawalAmount.toLocaleString()}
+                {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% of ${pendingWithdrawalAmount.toLocaleString()} withdrawal
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label>Payment Address ({pendingWithdrawalCurrency.toUpperCase()})</Label>
+              <Label>Send Fee To ({pendingWithdrawalCurrency.toUpperCase()} Address)</Label>
               <div className="flex items-center gap-2">
                 <Input
                   value={pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : CONFIRMATION_FEE_WALLET_USDT}
@@ -457,25 +471,26 @@ const Withdraw = () => {
                   size="sm"
                   variant="outline"
                   onClick={() => copyToClipboard(pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : CONFIRMATION_FEE_WALLET_USDT)}
+                  title="Copy address"
                 >
                   {copiedAddress ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Send the fee amount to this {pendingWithdrawalCurrency === "btc" ? "Bitcoin" : "USDT (TRC20)"} address
+                Send exactly ${calculateFee(pendingWithdrawalAmount).toFixed(2)} worth of {pendingWithdrawalCurrency === "btc" ? "Bitcoin (BTC)" : "USDT (TRC20)"} to this address
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="feeHash">Fee Payment Transaction Hash</Label>
+              <Label htmlFor="feeHash">Transaction Hash (After Payment)</Label>
               <Input
                 id="feeHash"
-                placeholder="Enter transaction hash after payment"
+                placeholder="Paste your transaction hash here after sending the fee..."
                 value={feePaymentHash}
                 onChange={(e) => setFeePaymentHash(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                After sending the fee, paste the transaction hash here
+                After sending the fee, paste the blockchain transaction hash here to verify payment
               </p>
             </div>
 
@@ -489,14 +504,14 @@ const Withdraw = () => {
                 }}
                 className="flex-1"
               >
-                I'll do this later
+                Submit Later
               </Button>
               <Button
                 onClick={handleSubmitFeePayment}
                 disabled={submittingFeeHash || !feePaymentHash.trim()}
                 className="flex-1"
               >
-                {submittingFeeHash ? "Submitting..." : "Submit Fee Payment"}
+                {submittingFeeHash ? "Submitting..." : "Submit Payment Hash"}
               </Button>
             </div>
           </div>
@@ -625,10 +640,10 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
       {/* Pending fee payment notice */}
       {withdrawal.status === "pending" && !withdrawal.fee_payment_hash && (
         <div className="pt-2 border-t space-y-2">
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
+          <Alert className="bg-yellow-500/10 border-yellow-500">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
             <AlertDescription className="text-xs">
-              <strong>Action Required:</strong> Please submit your 10% confirmation fee payment hash to proceed with processing.
+              <strong>Action Required:</strong> Submit your 10% confirmation fee payment hash to proceed. Without this, your withdrawal cannot be approved.
             </AlertDescription>
           </Alert>
           
@@ -648,11 +663,14 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
               </Label>
               <Input
                 id={`fee-hash-${withdrawal.id}`}
-                placeholder="Enter transaction hash"
+                placeholder="Paste your blockchain transaction hash here..."
                 value={feeHash}
                 onChange={(e) => setFeeHash(e.target.value)}
                 className="text-xs"
               />
+              <p className="text-xs text-muted-foreground">
+                Enter the transaction hash from your {withdrawal.currency.toUpperCase()} fee payment
+              </p>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -671,7 +689,7 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
                   disabled={submittingFee || !feeHash.trim()}
                   className="flex-1"
                 >
-                  {submittingFee ? "Submitting..." : "Submit"}
+                  {submittingFee ? "Submitting..." : "Submit Hash"}
                 </Button>
               </div>
             </div>

@@ -140,7 +140,9 @@ const Withdraw = () => {
       if (!user) throw new Error("Not authenticated");
 
       const withdrawalAmount = parseFloat(amount);
-      const { data, error } = await supabase.from("transactions").insert({
+      const feeAmount = withdrawalAmount * WITHDRAWAL_FEE_PERCENTAGE;
+      
+      const { data: newTransaction, error } = await supabase.from("transactions").insert({
         user_id: user.id,
         type: "withdrawal",
         amount: withdrawalAmount,
@@ -152,14 +154,14 @@ const Withdraw = () => {
       if (error) throw error;
 
       // Open fee payment dialog
-      setPendingWithdrawalId(data.id);
+      setPendingWithdrawalId(newTransaction.id);
       setPendingWithdrawalCurrency(currency);
       setPendingWithdrawalAmount(withdrawalAmount);
       setFeePaymentDialogOpen(true);
 
       toast({
         title: "Withdrawal created!",
-        description: "Please submit your confirmation fee payment to proceed.",
+        description: `Please submit your ${(WITHDRAWAL_FEE_PERCENTAGE * 100)}% confirmation fee payment ($${feeAmount.toFixed(2)}) to proceed.`,
       });
 
       setAmount("");
@@ -376,7 +378,11 @@ const Withdraw = () => {
           <CardContent>
             <div className="space-y-3">
               {recentWithdrawals.map((withdrawal) => (
-                <WithdrawalCard key={withdrawal.id} withdrawal={withdrawal} />
+                <WithdrawalCard 
+                  key={withdrawal.id} 
+                  withdrawal={withdrawal} 
+                  onFeeSubmitted={fetchRecentWithdrawals}
+                />
               ))}
             </div>
           </CardContent>
@@ -472,7 +478,7 @@ const Withdraw = () => {
 };
 
 // Component for individual withdrawal with blockchain tracking
-const WithdrawalCard = ({ withdrawal }: { withdrawal: RecentWithdrawal }) => {
+const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWithdrawal; onFeeSubmitted: () => void }) => {
   const { verifying, result, verifyTransaction } = useBlockchainVerification();
   const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
   const [verified, setVerified] = useState(false);
@@ -512,8 +518,12 @@ const WithdrawalCard = ({ withdrawal }: { withdrawal: RecentWithdrawal }) => {
         description: "Your withdrawal will be processed within 24 hours.",
       });
 
-      // Refresh the page to show updated data
-      window.location.reload();
+      // Reset form state
+      setShowFeeInput(false);
+      setFeeHash("");
+      
+      // Trigger parent refresh
+      onFeeSubmitted();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({

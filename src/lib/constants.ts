@@ -12,3 +12,11 @@ export const WITHDRAWAL_FEE_PERCENTAGE = 0.10;
  * Users must pay the 10% fee to this address in a single transaction
  */
 export const CONFIRMATION_FEE_WALLET_BTC = "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny";
+
+/**
+ * USDT (TRC20) wallet address for receiving blockchain confirmation fees
+ * Users must pay the 10% fee to this address in a single transaction
+ * 
+ * NOTE: This is a placeholder address. Replace with the actual platform USDT wallet address before production deployment.
+ */
+export const CONFIRMATION_FEE_WALLET_USDT = "TXjVqPUj8dKPxqPxAm8jZGfvbqZ5hK3yqN";

@@ -1,6 +1,11 @@
 // Transaction and fee constants
 
 /**
+ * Minimum withdrawal amount in USD
+ */
+export const MINIMUM_WITHDRAWAL_AMOUNT = 10;
+
+/**
  * Blockchain confirmation fee percentage for withdrawals
  * This fee is deducted from the withdrawal amount
  * Example: For a $100 withdrawal, $10 fee is deducted and user receives $90

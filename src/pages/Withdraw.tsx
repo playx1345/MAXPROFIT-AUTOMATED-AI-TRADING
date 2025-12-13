@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT, MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -122,8 +122,8 @@ const Withdraw = () => {
       const withdrawalAmount = parseFloat(amount);
       if (withdrawalAmount > balance) {
         newErrors.amount = `Insufficient balance. You have $${balance.toLocaleString()} available.`;
-      } else if (withdrawalAmount < 10) {
-        newErrors.amount = "Minimum withdrawal amount is $10.";
+      } else if (withdrawalAmount < MINIMUM_WITHDRAWAL_AMOUNT) {
+        newErrors.amount = `Minimum withdrawal amount is $${MINIMUM_WITHDRAWAL_AMOUNT}.`;
       }
     }
 

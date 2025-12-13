@@ -123,17 +123,29 @@ supabase functions deploy admin-reset-password
 
 # Deploy admin-suspend-user
 supabase functions deploy admin-suspend-user
+
+# Deploy auto-process-withdrawals
+supabase functions deploy auto-process-withdrawals
+
+# Deploy verify-blockchain-transaction
+supabase functions deploy verify-blockchain-transaction
+
+# Deploy verify-withdrawal-confirmation-fee
+supabase functions deploy verify-withdrawal-confirmation-fee
+
+# Deploy send-password-reset-confirmation
+supabase functions deploy send-password-reset-confirmation
 ```
 
 **Or deploy all at once:**
 
 ```bash
-supabase functions deploy admin-create-user admin-delete-user admin-reset-password admin-suspend-user
+supabase functions deploy admin-create-user admin-delete-user admin-reset-password admin-suspend-user auto-process-withdrawals verify-blockchain-transaction verify-withdrawal-confirmation-fee send-password-reset-confirmation
 ```
 
 ### 3.2 Verify Edge Functions
 
-Go to **Supabase Dashboard > Edge Functions** and confirm all 4 functions are deployed and showing as "Active".
+Go to **Supabase Dashboard > Edge Functions** and confirm all functions are deployed and showing as "Active".
 
 ### 3.3 Test Edge Functions (Optional)
 

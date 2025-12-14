@@ -24,12 +24,8 @@ interface Withdrawal {
   status: string;
   wallet_address: string | null;
   transaction_hash: string | null;
-  fee_payment_hash: string | null;
+  admin_notes: string | null;
   created_at: string;
-  confirmation_fee_transaction_hash: string | null;
-  confirmation_fee_verified: boolean;
-  confirmation_fee_verified_at: string | null;
-  confirmation_fee_amount: number | null;
   profiles: {
     email: string;
     full_name: string | null;
@@ -254,15 +250,10 @@ const AdminWithdrawals = () => {
               {withdrawal.status}
             </Badge>
             {withdrawal.status === "pending" && (
-              <>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  <span>{isEligible ? "Auto soon" : timeRemaining}</span>
-                </div>
-                <Badge variant={withdrawal.confirmation_fee_verified ? "default" : "outline"} className="text-xs">
-                  Fee: {withdrawal.confirmation_fee_verified ? "✓" : "✗"}
-                </Badge>
-              </>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                <span>{isEligible ? "Auto soon" : timeRemaining}</span>
+              </div>
             )}
           </div>
         </TableCell>
@@ -414,16 +405,13 @@ const AdminWithdrawals = () => {
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Fee Payment Hash</Label>
-                  {selectedWithdrawal.fee_payment_hash ? (
-                    <p className="font-mono text-xs break-all text-green-600">
-                      {selectedWithdrawal.fee_payment_hash}
+                  <Label className="text-muted-foreground">Admin Notes</Label>
+                  {selectedWithdrawal.admin_notes ? (
+                    <p className="font-mono text-xs break-all text-muted-foreground">
+                      {selectedWithdrawal.admin_notes}
                     </p>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                      <p className="text-xs text-yellow-600">Not submitted yet</p>
-                    </div>
+                    <p className="text-xs text-muted-foreground">No notes</p>
                   )}
                 </div>
                 <div>
@@ -457,22 +445,14 @@ const AdminWithdrawals = () => {
                 </div>
               )}
 
-              {/* Confirmation Fee Verification Section */}
+              {/* Confirmation Fee Info Section */}
               {selectedWithdrawal.status === "pending" && (
                 <div className="border rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label className="text-lg font-semibold">10% Confirmation Fee Verification</Label>
-                    {selectedWithdrawal.confirmation_fee_verified ? (
-                      <Badge className="bg-green-500">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Verified
-                      </Badge>
-                    ) : (
-                      <Badge variant="destructive">
-                        <XCircle className="h-3 w-3 mr-1" />
-                        Not Verified
-                      </Badge>
-                    )}
+                    <Label className="text-lg font-semibold">10% Confirmation Fee Required</Label>
+                    <Badge variant="outline">
+                      ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
+                    </Badge>
                   </div>
 
                   <div className="p-3 bg-yellow-500/10 border border-yellow-500 rounded-lg">
@@ -481,59 +461,26 @@ const AdminWithdrawals = () => {
                       {CONFIRMATION_FEE_WALLET_BTC}
                     </p>
                     <p className="text-xs text-muted-foreground mt-2">
-                      User must send 10% confirmation fee ({(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)} USDT equivalent in BTC) to this address.
-                      Note: The actual BTC amount varies based on current BTC/USD exchange rate.
+                      User must send 10% confirmation fee to this address before withdrawal can be approved.
                     </p>
                   </div>
 
-                  {selectedWithdrawal.confirmation_fee_verified ? (
-                    <div className="p-3 bg-green-500/10 border border-green-500 rounded-lg space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Transaction Hash:</span>
-                        <span className="font-mono text-xs">{selectedWithdrawal.confirmation_fee_transaction_hash?.slice(0, 16)}...</span>
-                      </div>
-                      {selectedWithdrawal.confirmation_fee_amount && (
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Amount Paid:</span>
-                          <span className="font-medium">{selectedWithdrawal.confirmation_fee_amount} BTC</span>
-                        </div>
-                      )}
-                      {selectedWithdrawal.confirmation_fee_verified_at && (
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Verified At:</span>
-                          <span className="font-medium">{format(new Date(selectedWithdrawal.confirmation_fee_verified_at), "MMM dd, yyyy HH:mm")}</span>
-                        </div>
-                      )}
-                      <a
-                        href={`https://blockchair.com/bitcoin/transaction/${selectedWithdrawal.confirmation_fee_transaction_hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-primary hover:underline flex items-center gap-1"
-                      >
-                        View on Blockchain Explorer <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <Label>Enter BTC Transaction Hash from User</Label>
-                      <Input
-                        placeholder="Enter the BTC transaction hash proving fee payment..."
-                        value={confirmationFeeTxHash}
-                        onChange={(e) => setConfirmationFeeTxHash(e.target.value)}
-                      />
-                      <Button
-                        onClick={handleVerifyConfirmationFee}
-                        disabled={verifyingFee || !confirmationFeeTxHash.trim()}
-                        className="w-full"
-                      >
-                        <Search className="h-4 w-4 mr-2" />
-                        {verifyingFee ? "Verifying on Blockchain..." : "Verify Fee Payment"}
-                      </Button>
-                      <p className="text-xs text-muted-foreground">
-                        ⚠️ Withdrawal cannot be approved until the confirmation fee is verified
-                      </p>
-                    </div>
-                  )}
+                  <div className="space-y-2">
+                    <Label>Verify Fee Transaction Hash</Label>
+                    <Input
+                      placeholder="Enter the BTC transaction hash proving fee payment..."
+                      value={confirmationFeeTxHash}
+                      onChange={(e) => setConfirmationFeeTxHash(e.target.value)}
+                    />
+                    <Button
+                      onClick={handleVerifyConfirmationFee}
+                      disabled={verifyingFee || !confirmationFeeTxHash.trim()}
+                      className="w-full"
+                    >
+                      <Search className="h-4 w-4 mr-2" />
+                      {verifyingFee ? "Verifying on Blockchain..." : "Verify Fee Payment"}
+                    </Button>
+                  </div>
                 </div>
               )}
 
@@ -571,11 +518,7 @@ const AdminWithdrawals = () => {
                     <Button
                       className="flex-1 bg-green-600 hover:bg-green-700"
                       onClick={handleApprove}
-                      disabled={
-                        processing || 
-                        selectedWithdrawal.profiles?.balance_usdt < selectedWithdrawal.amount ||
-                        !selectedWithdrawal.confirmation_fee_verified
-                      }
+                      disabled={processing || selectedWithdrawal.profiles?.balance_usdt < selectedWithdrawal.amount}
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Approve & Process
@@ -590,11 +533,6 @@ const AdminWithdrawals = () => {
                       Reject
                     </Button>
                   </div>
-                  {!selectedWithdrawal.confirmation_fee_verified && (
-                    <p className="text-xs text-center text-yellow-600 font-medium">
-                      ⚠️ Cannot approve: Confirmation fee must be verified first
-                    </p>
-                  )}
                 </div>
               )}
             </div>

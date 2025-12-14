@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ const investmentSchema = z.object({
 });
 
 const Investments = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [plans, setPlans] = useState<any[]>([]);
   const [investments, setInvestments] = useState<any[]>([]);
@@ -65,7 +67,7 @@ const Investments = () => {
       setInvestments(investmentsData || []);
     } catch (error: any) {
       toast({
-        title: "Error loading data",
+        title: t("investments.errorLoading"),
         description: error.message,
         variant: "destructive",
       });
@@ -104,8 +106,8 @@ const Investments = () => {
       if (error) throw error;
 
       toast({
-        title: "Investment created successfully!",
-        description: `$${parsedAmount} invested in ${selectedPlan.name}`,
+        title: t("investments.investmentSuccess"),
+        description: t("investments.amountInvested", { amount: parsedAmount, plan: selectedPlan.name }),
       });
 
       setDialogOpen(false);
@@ -113,7 +115,7 @@ const Investments = () => {
       fetchData();
     } catch (error: any) {
       toast({
-        title: "Investment failed",
+        title: t("investments.investmentFailed"),
         description: error.message,
         variant: "destructive",
       });
@@ -138,7 +140,7 @@ const Investments = () => {
           <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
           <Loader2 className="h-10 w-10 text-primary animate-spin relative z-10" />
         </div>
-        <div className="animate-pulse text-muted-foreground font-medium">Loading investments...</div>
+        <div className="animate-pulse text-muted-foreground font-medium">{t("investments.loading")}</div>
       </div>
     );
   }
@@ -148,12 +150,12 @@ const Investments = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold mb-2 font-display bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
-            Investments
+            {t("investments.title")}
           </h1>
-          <p className="text-muted-foreground">Manage your investment portfolio</p>
+          <p className="text-muted-foreground">{t("investments.subtitle")}</p>
         </div>
         <div className="text-right glass-card-enhanced px-4 py-3 rounded-xl border-primary/20">
-          <div className="text-sm text-muted-foreground">Available Balance</div>
+          <div className="text-sm text-muted-foreground">{t("investments.availableBalance")}</div>
           <div className="text-2xl font-bold font-display text-primary">${balance.toFixed(2)}</div>
         </div>
       </div>
@@ -161,13 +163,13 @@ const Investments = () => {
       <Alert className="border-warning/30 bg-warning/5">
         <AlertTriangle className="h-4 w-4 text-warning" />
         <AlertDescription className="text-muted-foreground">
-          <strong className="text-foreground">Important:</strong> Cryptocurrency investments carry risk. Past performance does not guarantee future results. Only invest what you can afford to lose.
+          <strong className="text-foreground">{t("investments.importantNote")}:</strong> {t("investments.riskWarning")}
         </AlertDescription>
       </Alert>
 
       {/* Investment Plans */}
       <div>
-        <h2 className="text-xl font-semibold mb-4 font-display">Available Plans</h2>
+        <h2 className="text-xl font-semibold mb-4 font-display">{t("investments.availablePlans")}</h2>
         <div className="grid md:grid-cols-3 gap-4">
           {plans.map((plan, index) => (
             <Card 
@@ -185,21 +187,21 @@ const Investments = () => {
                     <CardDescription className="mt-1">{plan.description}</CardDescription>
                   </div>
                   <Badge className={`${getRiskColor(plan.risk_level)} border`}>
-                    {plan.risk_level} risk
+                    {plan.risk_level} {t("investments.risk")}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
-                  <div className="text-xs text-muted-foreground mb-1">Investment Range</div>
+                  <div className="text-xs text-muted-foreground mb-1">{t("investments.investmentRange")}</div>
                   <div className="font-semibold text-foreground">${Number(plan.min_amount).toFixed(0)} - ${Number(plan.max_amount).toFixed(0)}</div>
                 </div>
                 <div className="p-3 rounded-lg bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20">
-                  <div className="text-xs text-muted-foreground mb-1">Expected ROI</div>
+                  <div className="text-xs text-muted-foreground mb-1">{t("investments.expectedRoi")}</div>
                   <div className="font-bold text-lg bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
                     {plan.expected_roi_min}% - {plan.expected_roi_max}%
                   </div>
-                  <div className="text-xs text-muted-foreground">Per {plan.duration_days} days</div>
+                  <div className="text-xs text-muted-foreground">{t("investments.per")} {plan.duration_days} {t("investments.days")}</div>
                 </div>
                 <Dialog open={dialogOpen && selectedPlan?.id === plan.id} onOpenChange={(open) => {
                   setDialogOpen(open);
@@ -208,23 +210,23 @@ const Investments = () => {
                   <DialogTrigger asChild>
                     <Button className="w-full bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300">
                       <Plus className="mr-2 h-4 w-4" />
-                      Invest Now
+                      {t("investments.investNow")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="glass-card-enhanced border-primary/20">
                     <DialogHeader>
-                      <DialogTitle className="font-display">Create Investment</DialogTitle>
+                      <DialogTitle className="font-display">{t("investments.createInvestment")}</DialogTitle>
                       <DialogDescription>
-                        Invest in {plan.name}. Min: ${Number(plan.min_amount).toFixed(0)}, Max: ${Number(plan.max_amount).toFixed(0)}
+                        {t("investments.minMax", { min: Number(plan.min_amount).toFixed(0), max: Number(plan.max_amount).toFixed(0) })}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="amount">Investment Amount (USDT)</Label>
+                        <Label htmlFor="amount">{t("investments.investmentAmount")}</Label>
                         <Input
                           id="amount"
                           type="number"
-                          placeholder="Enter amount"
+                          placeholder={t("investments.enterAmount")}
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                           min={plan.min_amount}
@@ -232,12 +234,12 @@ const Investments = () => {
                           className="border-border/50 focus:border-primary"
                         />
                         <p className="text-xs text-muted-foreground">
-                          Available balance: <span className="text-primary font-medium">${balance.toFixed(2)}</span>
+                          {t("investments.availableBalanceLabel")}: <span className="text-primary font-medium">${balance.toFixed(2)}</span>
                         </p>
                       </div>
                       <Alert className="border-border/50 bg-muted/30">
                         <AlertDescription className="text-xs text-muted-foreground">
-                          By investing, you acknowledge that cryptocurrency investments carry risk and returns are not guaranteed.
+                          {t("investments.investmentDisclaimer")}
                         </AlertDescription>
                       </Alert>
                       <Button 
@@ -248,10 +250,10 @@ const Investments = () => {
                         {submitting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Creating...
+                            {t("investments.creating")}
                           </>
                         ) : (
-                          "Confirm Investment"
+                          t("investments.confirmInvestment")
                         )}
                       </Button>
                     </div>
@@ -265,15 +267,15 @@ const Investments = () => {
 
       {/* My Investments */}
       <div>
-        <h2 className="text-xl font-semibold mb-4 font-display">My Investments</h2>
+        <h2 className="text-xl font-semibold mb-4 font-display">{t("investments.myInvestments")}</h2>
         {investments.length === 0 ? (
           <Card className="glass-card-enhanced border-border/50 hover:shadow-none hover:scale-100">
             <CardContent className="text-center py-12">
               <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mb-4 mx-auto">
                 <TrendingUp className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-muted-foreground">You haven't made any investments yet</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">Choose a plan above to get started</p>
+              <p className="text-muted-foreground">{t("investments.noInvestments")}</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">{t("investments.chooseAPlan")}</p>
             </CardContent>
           </Card>
         ) : (
@@ -289,26 +291,26 @@ const Investments = () => {
                     <div>
                       <div className="font-semibold text-lg font-display">{investment.investment_plans.name}</div>
                       <div className="text-sm text-muted-foreground">
-                        Started {new Date(investment.started_at || investment.created_at).toLocaleDateString()}
+                        {t("investments.started")} {new Date(investment.started_at || investment.created_at).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                       <div className="p-2 rounded-lg bg-muted/30">
-                        <div className="text-xs text-muted-foreground">Invested</div>
+                        <div className="text-xs text-muted-foreground">{t("investments.invested")}</div>
                         <div className="font-semibold text-foreground">${Number(investment.amount_usdt).toFixed(2)}</div>
                       </div>
                       <div className="p-2 rounded-lg bg-primary/10">
-                        <div className="text-xs text-muted-foreground">Current Value</div>
+                        <div className="text-xs text-muted-foreground">{t("investments.currentValue")}</div>
                         <div className="font-semibold text-primary">${Number(investment.current_value).toFixed(2)}</div>
                       </div>
                       <div className="p-2 rounded-lg bg-muted/30">
-                        <div className="text-xs text-muted-foreground">ROI</div>
+                        <div className="text-xs text-muted-foreground">{t("investments.roi")}</div>
                         <div className={`font-semibold ${Number(investment.roi_percentage) >= 0 ? "text-success" : "text-destructive"}`}>
                           {Number(investment.roi_percentage) >= 0 ? "+" : ""}{Number(investment.roi_percentage).toFixed(2)}%
                         </div>
                       </div>
                       <div className="p-2 rounded-lg bg-muted/30">
-                        <div className="text-xs text-muted-foreground">Status</div>
+                        <div className="text-xs text-muted-foreground">{t("investments.status")}</div>
                         <Badge className={`mt-1 ${
                           investment.status === "active" ? "bg-success/10 text-success border-success/30" :
                           investment.status === "completed" ? "bg-primary/10 text-primary border-primary/30" :

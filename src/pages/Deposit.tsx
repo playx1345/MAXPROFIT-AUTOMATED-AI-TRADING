@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ interface RecentDeposit {
 }
 
 const Deposit = () => {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState<"usdt" | "btc">("usdt");
   const [transactionHash, setTransactionHash] = useState("");
@@ -80,8 +82,8 @@ const Deposit = () => {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied!",
-      description: "Wallet address copied to clipboard",
+      title: t("deposit.copied"),
+      description: t("deposit.walletCopied"),
     });
   };
 
@@ -107,8 +109,8 @@ const Deposit = () => {
   const handleSubmitDeposit = async () => {
     if (!validateForm()) {
       toast({
-        title: "Validation Error",
-        description: "Please fix the errors before submitting",
+        title: t("deposit.validationError"),
+        description: t("deposit.fixErrors"),
         variant: "destructive",
       });
       return;
@@ -132,8 +134,8 @@ const Deposit = () => {
       if (error) throw error;
 
       toast({
-        title: "Deposit submitted!",
-        description: "Your deposit request has been submitted and is pending admin approval.",
+        title: t("deposit.submitted"),
+        description: t("deposit.submittedDesc"),
       });
 
       setAmount("");
@@ -144,7 +146,7 @@ const Deposit = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
-        title: "Error submitting deposit",
+        title: t("deposit.errorSubmitting"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -164,26 +166,25 @@ const Deposit = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Deposit Funds</h1>
-        <p className="text-muted-foreground">Add funds to your investment account</p>
+        <h1 className="text-3xl font-bold">{t("deposit.title")}</h1>
+        <p className="text-muted-foreground">{t("deposit.subtitle")}</p>
       </div>
 
       <Alert>
         <AlertDescription>
-          <strong>Important:</strong> Deposits are processed within 24 hours after blockchain confirmation.
-          Make sure to send only {currency.toUpperCase()} to the address below.
+          <strong>{t("deposit.important")}:</strong> {t("deposit.processingNote", { currency: currency.toUpperCase() })}
         </AlertDescription>
       </Alert>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Platform Wallet Address</CardTitle>
-            <CardDescription>Send your crypto to this address</CardDescription>
+            <CardTitle>{t("deposit.platformWallet")}</CardTitle>
+            <CardDescription>{t("deposit.sendCrypto")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="currency">Select Currency</Label>
+              <Label htmlFor="currency">{t("deposit.selectCurrency")}</Label>
               <div className="flex gap-2 mt-2">
                 <Button
                   variant={currency === "usdt" ? "default" : "outline"}
@@ -209,7 +210,7 @@ const Deposit = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Wallet Address</Label>
+              <Label>{t("deposit.walletAddress")}</Label>
               <div className="flex gap-2">
                 <Input
                   value={walletAddress}
@@ -225,20 +226,20 @@ const Deposit = () => {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Network: {currency === "usdt" ? "TRON (TRC20)" : "Bitcoin"}
+                {t("deposit.network")}: {currency === "usdt" ? "TRON (TRC20)" : "Bitcoin"}
               </p>
             </div>
 
             <Alert>
               <AlertDescription className="text-xs">
-                New to crypto? 
+                {t("deposit.newToCrypto")}
                 <a 
                   href="https://bitcoin.com/buy-crypto" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="ml-1 text-primary hover:underline inline-flex items-center gap-1"
                 >
-                  Buy crypto with fiat here <ExternalLink className="h-3 w-3" />
+                  {t("deposit.buyCrypto")} <ExternalLink className="h-3 w-3" />
                 </a>
               </AlertDescription>
             </Alert>
@@ -247,12 +248,12 @@ const Deposit = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Submit Deposit</CardTitle>
-            <CardDescription>Confirm your deposit details</CardDescription>
+            <CardTitle>{t("deposit.submitDeposit")}</CardTitle>
+            <CardDescription>{t("deposit.confirmDetails")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">{t("deposit.amount")}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -273,14 +274,14 @@ const Deposit = () => {
                 <p className="text-xs text-destructive">{errors.amount}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  Minimum deposit: $250 USDT
+                  {t("deposit.minDeposit")}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="txHash">Transaction Hash</Label>
+                <Label htmlFor="txHash">{t("deposit.transactionHash")}</Label>
                 {transactionHash.trim() && (
                   <Button
                     type="button"
@@ -291,7 +292,7 @@ const Deposit = () => {
                     className="h-6 text-xs"
                   >
                     <Shield className="h-3 w-3 mr-1" />
-                    Verify
+                    {t("deposit.verify")}
                   </Button>
                 )}
               </div>
@@ -315,7 +316,7 @@ const Deposit = () => {
               ) : (
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">
-                    Optional but helps speed up approval
+                    {t("deposit.txHashOptional")}
                   </p>
                   <BlockchainVerificationBadge verifying={verifying} result={result} />
                 </div>
@@ -324,16 +325,16 @@ const Deposit = () => {
               {result && result.verified && result.amount !== null && (
                 <div className="p-3 rounded-lg bg-muted/50 space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Blockchain Amount:</span>
+                    <span className="text-muted-foreground">{t("deposit.blockchainAmount")}:</span>
                     <span className="font-medium">{result.amount.toLocaleString()} {currency.toUpperCase()}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Confirmations:</span>
+                    <span className="text-muted-foreground">{t("deposit.confirmations")}:</span>
                     <span className="font-medium">{result.confirmations}</span>
                   </div>
                   {result.timestamp && (
                     <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">Time:</span>
+                      <span className="text-muted-foreground">{t("deposit.time")}:</span>
                       <span className="font-medium">{format(new Date(result.timestamp), "MMM dd, HH:mm")}</span>
                     </div>
                   )}
@@ -346,7 +347,7 @@ const Deposit = () => {
               disabled={submitting}
               className="w-full"
             >
-              {submitting ? "Submitting..." : "Submit Deposit Request"}
+              {submitting ? t("deposit.submitting") : t("deposit.submitRequest")}
             </Button>
           </CardContent>
         </Card>
@@ -355,8 +356,8 @@ const Deposit = () => {
       {recentDeposits.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Recent Deposits</CardTitle>
-            <CardDescription>Your latest deposit requests</CardDescription>
+            <CardTitle>{t("deposit.recentDeposits")}</CardTitle>
+            <CardDescription>{t("deposit.latestRequests")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">

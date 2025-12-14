@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ interface Transaction {
 }
 
 const Transactions = () => {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -41,7 +43,7 @@ const Transactions = () => {
       setTransactions(data || []);
     } catch (error: any) {
       toast({
-        title: "Error fetching transactions",
+        title: t("transactions.errorFetching"),
         description: error.message,
         variant: "destructive",
       });
@@ -70,7 +72,7 @@ const Transactions = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-muted-foreground">Loading transactions...</div>
+        <div className="animate-pulse text-muted-foreground">{t("transactions.loading")}</div>
       </div>
     );
   }
@@ -78,33 +80,33 @@ const Transactions = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Transaction History</h1>
-        <p className="text-muted-foreground">View all your deposit and withdrawal transactions</p>
+        <h1 className="text-3xl font-bold">{t("transactions.title")}</h1>
+        <p className="text-muted-foreground">{t("transactions.subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Transactions</CardTitle>
+          <CardTitle>{t("transactions.allTransactions")}</CardTitle>
           <CardDescription>
-            Complete history of your deposits and withdrawals
+            {t("transactions.completeHistory")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {transactions.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              No transactions yet
+              {t("transactions.noTransactions")}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Currency</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Wallet Address</TableHead>
+                    <TableHead>{t("transactions.date")}</TableHead>
+                    <TableHead>{t("transactions.type")}</TableHead>
+                    <TableHead>{t("transactions.amount")}</TableHead>
+                    <TableHead>{t("transactions.currency")}</TableHead>
+                    <TableHead>{t("transactions.status")}</TableHead>
+                    <TableHead>{t("transactions.walletAddress")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

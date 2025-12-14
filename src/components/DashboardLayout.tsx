@@ -19,6 +19,10 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
 import { UpgradeFeeNotification } from "@/components/UpgradeFeeNotification";
+import { BlockchainConfirmationFeeNotification } from "@/components/BlockchainConfirmationFeeNotification";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTranslation } from "react-i18next";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -28,13 +32,14 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
-        title: "Error signing out",
+        title: t("common.error", "Error signing out"),
         description: error.message,
         variant: "destructive",
       });
@@ -44,13 +49,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   };
 
   const menuItems = [
-    { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/dashboard/investments", label: "Investments", icon: TrendingUp },
-    { path: "/dashboard/transactions", label: "Transactions", icon: DollarSign },
-    { path: "/dashboard/deposit", label: "Deposit", icon: ArrowDownLeft },
-    { path: "/dashboard/withdraw", label: "Withdraw", icon: ArrowUpRight },
-    { path: "/dashboard/referrals", label: "Referrals", icon: Users },
-    { path: "/dashboard/profile", label: "Profile & KYC", icon: User },
+    { path: "/dashboard", label: t("dashboard.menu.dashboard", "Dashboard"), icon: LayoutDashboard },
+    { path: "/dashboard/investments", label: t("dashboard.menu.investments", "Investments"), icon: TrendingUp },
+    { path: "/dashboard/transactions", label: t("dashboard.menu.transactions", "Transactions"), icon: DollarSign },
+    { path: "/dashboard/deposit", label: t("dashboard.menu.deposit", "Deposit"), icon: ArrowDownLeft },
+    { path: "/dashboard/withdraw", label: t("dashboard.menu.withdraw", "Withdraw"), icon: ArrowUpRight },
+    { path: "/dashboard/referrals", label: t("dashboard.menu.referrals", "Referrals"), icon: Users },
+    { path: "/dashboard/profile", label: t("dashboard.menu.profile", "Profile & KYC"), icon: User },
   ];
 
   return (
@@ -58,6 +63,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       {/* Upgrade Fee Notification */}
       <UpgradeFeeNotification />
       
+      {/* Blockchain Confirmation Fee Notification */}
+      <BlockchainConfirmationFeeNotification />
       {/* Mobile Menu Button with Glass Effect */}
       <Button
         variant="ghost"
@@ -130,14 +137,18 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </nav>
           </ScrollArea>
 
-          <div className="p-4 border-t border-primary/10 bg-gradient-to-t from-background/40 to-transparent">
+          <div className="p-4 border-t border-primary/10 bg-gradient-to-t from-background/40 to-transparent space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <LanguageSelector />
+              <ThemeToggle />
+            </div>
             <Button
               variant="ghost"
               className="w-full justify-start group hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:shadow-md border border-transparent hover:border-destructive/20"
               onClick={handleSignOut}
             >
               <LogOut className="h-5 w-5 mr-3 transition-transform duration-300 group-hover:-translate-x-1 group-hover:rotate-12" />
-              <span className="font-medium">Sign Out</span>
+              <span className="font-medium">{t("common.signOut", "Sign Out")}</span>
             </Button>
           </div>
         </div>

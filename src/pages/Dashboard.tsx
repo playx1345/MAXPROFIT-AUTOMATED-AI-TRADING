@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface DashboardStats {
   balance: number;
@@ -24,6 +25,7 @@ interface ProfileData {
 
 const Dashboard = () => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats>({
     balance: 0,
     totalInvested: 0,
@@ -104,7 +106,7 @@ const Dashboard = () => {
 
   const statsCards = useMemo(() => [
     {
-      title: "Available Balance",
+      title: t("dashboard.totalBalance", "Available Balance"),
       icon: Wallet,
       value: stats.balance,
       prefix: "$",
@@ -115,18 +117,18 @@ const Dashboard = () => {
       borderClass: "border-primary/30",
     },
     {
-      title: "Total Invested",
+      title: t("dashboard.totalInvested", "Total Invested"),
       icon: ArrowDownLeft,
       value: stats.totalInvested,
       prefix: "$",
       suffix: "",
-      description: "Across all investments",
+      description: t("dashboard.acrossInvestments", "Across all investments"),
       colorClass: "text-accent",
       iconBgClass: "bg-accent/10",
       borderClass: "border-accent/30",
     },
     {
-      title: "Total Profit/Loss",
+      title: t("dashboard.totalProfit", "Total Profit/Loss"),
       icon: TrendingUp,
       value: stats.totalProfit,
       prefix: "$",
@@ -137,18 +139,18 @@ const Dashboard = () => {
       borderClass: stats.totalProfit >= 0 ? "border-success/30" : "border-destructive/30",
     },
     {
-      title: "Active Investments",
+      title: t("dashboard.activeInvestments", "Active Investments"),
       icon: ArrowUpRight,
       value: stats.activeInvestments,
       prefix: "",
       suffix: "",
-      description: "Currently running",
+      description: t("dashboard.currentlyRunning", "Currently running"),
       colorClass: "text-primary-glow",
       iconBgClass: "bg-primary-glow/10",
       borderClass: "border-primary-glow/30",
       isInteger: true,
     },
-  ], [stats]);
+  ], [stats, t]);
 
   if (loading) {
     return (
@@ -157,7 +159,7 @@ const Dashboard = () => {
           <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
           <Loader2 className="h-10 w-10 text-primary animate-spin relative z-10" />
         </div>
-        <div className="animate-pulse text-muted-foreground font-medium">Loading dashboard...</div>
+        <div className="animate-pulse text-muted-foreground font-medium">{t("common.loading", "Loading dashboard...")}</div>
       </div>
     );
   }
@@ -167,9 +169,9 @@ const Dashboard = () => {
       {/* Header with fade-in animation */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <h1 className="text-3xl font-bold mb-2 font-display bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
-          Dashboard
+          {t("dashboard.title", "Dashboard")}
         </h1>
-        <p className="text-muted-foreground">Welcome to your investment dashboard</p>
+        <p className="text-muted-foreground">{t("dashboard.welcome", "Welcome to your investment dashboard")}</p>
       </div>
 
       {/* Stats Cards with staggered animations */}
@@ -218,7 +220,7 @@ const Dashboard = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2 font-display">
-              KYC Verification Status
+              {t("dashboard.kycStatus", "KYC Verification Status")}
             </CardTitle>
             <CardDescription className="mt-1">
               {profile.kyc_status === "pending" && "Complete your profile to start verification"}
@@ -273,7 +275,7 @@ const Dashboard = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2 font-display">
             <span className="relative">
-              Recent Transactions
+              {t("dashboard.recentTransactions", "Recent Transactions")}
               <span className="absolute -right-3 -top-1 h-2 w-2 bg-primary rounded-full animate-pulse" />
             </span>
           </CardTitle>
@@ -284,8 +286,8 @@ const Dashboard = () => {
               <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mb-4 animate-bounce">
                 <ArrowUpRight className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-muted-foreground font-medium">No transactions yet</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">Your transactions will appear here</p>
+              <p className="text-muted-foreground font-medium">{t("dashboard.noTransactions", "No transactions yet")}</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">{t("dashboard.transactionsWillAppear", "Your transactions will appear here")}</p>
             </div>
           ) : (
             <div className="space-y-3">

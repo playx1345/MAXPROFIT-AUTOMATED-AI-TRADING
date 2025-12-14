@@ -25,7 +25,6 @@ interface RecentWithdrawal {
   created_at: string;
   wallet_address: string | null;
   transaction_hash: string | null;
-  fee_payment_hash: string | null;
 }
 
 const Withdraw = () => {
@@ -88,7 +87,7 @@ const Withdraw = () => {
 
       const { data, error } = await supabase
         .from("transactions")
-        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash, fee_payment_hash")
+        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash")
         .eq("user_id", user.id)
         .eq("type", "withdrawal")
         .order("created_at", { ascending: false })
@@ -208,7 +207,7 @@ const Withdraw = () => {
     try {
       const { error } = await supabase
         .from("transactions")
-        .update({ fee_payment_hash: feePaymentHash.trim() })
+        .update({ admin_notes: `Fee payment hash: ${feePaymentHash.trim()}` })
         .eq("id", pendingWithdrawalId);
 
       if (error) throw error;
@@ -552,7 +551,7 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
     try {
       const { error } = await supabase
         .from("transactions")
-        .update({ fee_payment_hash: feeHash.trim() })
+        .update({ admin_notes: `User submitted fee hash: ${feeHash.trim()}` })
         .eq("id", withdrawal.id);
 
       if (error) throw error;
@@ -624,21 +623,8 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
         </div>
       </div>
 
-      {/* Fee Payment Hash */}
-      {withdrawal.fee_payment_hash && (
-        <div className="pt-2 border-t space-y-1">
-          <p className="text-xs font-medium text-muted-foreground">Confirmation Fee Payment:</p>
-          <p className="text-xs font-mono text-primary truncate">
-            {withdrawal.fee_payment_hash}
-          </p>
-          <Badge variant="outline" className="text-xs">
-            Fee Submitted
-          </Badge>
-        </div>
-      )}
-
       {/* Pending fee payment notice */}
-      {withdrawal.status === "pending" && !withdrawal.fee_payment_hash && (
+      {withdrawal.status === "pending" && (
         <div className="pt-2 border-t space-y-2">
           <Alert className="bg-yellow-500/10 border-yellow-500">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />

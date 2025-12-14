@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ interface Referral {
 }
 
 const Referrals = () => {
+  const { t } = useTranslation();
   const [userId, setUserId] = useState<string>("");
   const [stats, setStats] = useState<ReferralStats>({
     totalReferrals: 0,
@@ -84,7 +86,7 @@ const Referrals = () => {
       });
     } catch (error: any) {
       toast({
-        title: "Error fetching referral data",
+        title: t("referrals.errorFetching"),
         description: error.message,
         variant: "destructive",
       });
@@ -98,8 +100,8 @@ const Referrals = () => {
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink);
     toast({
-      title: "Copied!",
-      description: "Referral link copied to clipboard",
+      title: t("referrals.copied"),
+      description: t("referrals.linkCopied"),
     });
   };
 
@@ -113,7 +115,7 @@ const Referrals = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-muted-foreground">Loading referrals...</div>
+        <div className="animate-pulse text-muted-foreground">{t("referrals.loading")}</div>
       </div>
     );
   }
@@ -121,14 +123,14 @@ const Referrals = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Referral Program</h1>
-        <p className="text-muted-foreground">Earn bonuses by referring friends</p>
+        <h1 className="text-3xl font-bold">{t("referrals.title")}</h1>
+        <p className="text-muted-foreground">{t("referrals.subtitle")}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("referrals.totalReferrals")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalReferrals}</div>
@@ -137,17 +139,17 @@ const Referrals = () => {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Active Referrals</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("referrals.activeReferrals")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{stats.activeReferrals}</div>
-            <p className="text-xs text-muted-foreground">Who made deposits</p>
+            <p className="text-xs text-muted-foreground">{t("referrals.whoMadeDeposits")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Earned</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("referrals.totalEarned")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-primary">
@@ -158,7 +160,7 @@ const Referrals = () => {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Pending Bonus</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("referrals.pendingBonus")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
@@ -170,9 +172,9 @@ const Referrals = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Referral Link</CardTitle>
+          <CardTitle>{t("referrals.yourReferralLink")}</CardTitle>
           <CardDescription>
-            Share this link with friends and earn 5% of their first deposit
+            {t("referrals.shareAndEarn")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -187,12 +189,12 @@ const Referrals = () => {
           </div>
 
           <div className="p-4 bg-muted rounded-lg">
-            <h4 className="font-semibold mb-2">How it works:</h4>
+            <h4 className="font-semibold mb-2">{t("referrals.howItWorks")}</h4>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li>• Share your unique referral link with friends</li>
-              <li>• They sign up using your link</li>
-              <li>• When they make their first deposit, you earn 5% bonus</li>
-              <li>• Bonuses are credited to your account automatically</li>
+              <li>• {t("referrals.step1")}</li>
+              <li>• {t("referrals.step2")}</li>
+              <li>• {t("referrals.step3")}</li>
+              <li>• {t("referrals.step4")}</li>
             </ul>
           </div>
         </CardContent>
@@ -201,8 +203,8 @@ const Referrals = () => {
       {referrals.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Your Referrals</CardTitle>
-            <CardDescription>People who signed up using your link</CardDescription>
+            <CardTitle>{t("referrals.yourReferrals")}</CardTitle>
+            <CardDescription>{t("referrals.peopleSignedUp")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -216,7 +218,7 @@ const Referrals = () => {
                       {referral.referred?.email?.replace(/(.{3}).*(@.*)/, "$1***$2") || "User"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Joined: {format(new Date(referral.created_at), "MMM dd, yyyy")}
+                      {t("referrals.joined")}: {format(new Date(referral.created_at), "MMM dd, yyyy")}
                     </p>
                   </div>
                   <div className="text-right">
@@ -226,7 +228,7 @@ const Referrals = () => {
                         referral.bonus_paid ? "bg-green-500" : "bg-yellow-500"
                       }
                     >
-                      {referral.bonus_paid ? "Paid" : "Pending"}
+                      {referral.bonus_paid ? t("referrals.paid") : t("common.pending")}
                     </Badge>
                   </div>
                 </div>

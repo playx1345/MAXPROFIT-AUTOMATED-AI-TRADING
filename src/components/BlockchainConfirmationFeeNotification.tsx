@@ -8,7 +8,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Clock, Copy, Check } from "lucide-react";
+import { AlertTriangle, Clock, Copy, Check, Mail, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useTranslation } from "react-i18next";
@@ -22,7 +22,15 @@ export const BlockchainConfirmationFeeNotification = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { timeLeft, hasPendingWithdrawal, isExpired, formatTime } = useBlockchainFeeCountdown();
+  const { 
+    timeLeft, 
+    hasPendingWithdrawal, 
+    isExpired, 
+    formatTime,
+    emailSent,
+    sendingEmail,
+    sendEmailNotification
+  } = useBlockchainFeeCountdown();
 
   useEffect(() => {
     if (hasPendingWithdrawal) {
@@ -54,6 +62,22 @@ export const BlockchainConfirmationFeeNotification = () => {
   const handlePayNow = () => {
     setIsOpen(false);
     navigate("/dashboard/deposit");
+  };
+
+  const handleSendEmail = async () => {
+    const success = await sendEmailNotification();
+    if (success) {
+      toast({
+        title: t("blockchainFee.emailSent", "Email Sent"),
+        description: t("blockchainFee.emailSentDescription", "Payment instructions have been sent to your email."),
+      });
+    } else {
+      toast({
+        title: t("common.error", "Error"),
+        description: t("blockchainFee.emailError", "Failed to send email. Please try again."),
+        variant: "destructive",
+      });
+    }
   };
 
   if (!hasPendingWithdrawal) return null;
@@ -120,15 +144,33 @@ export const BlockchainConfirmationFeeNotification = () => {
               </p>
             </div>
 
-            <Button
-              onClick={handlePayNow}
-              className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-6 text-lg"
-            >
-              {t("blockchainFee.payNow", "Pay ${{amount}} Now", { amount: BLOCKCHAIN_FEE_AMOUNT })}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handlePayNow}
+                className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-6 text-lg"
+              >
+                {t("blockchainFee.payNow", "Pay ${{amount}} Now", { amount: BLOCKCHAIN_FEE_AMOUNT })}
+              </Button>
+              <Button
+                onClick={handleSendEmail}
+                variant="outline"
+                disabled={emailSent || sendingEmail}
+                className="py-6"
+              >
+                {sendingEmail ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : emailSent ? (
+                  <Check className="h-5 w-5 text-green-500" />
+                ) : (
+                  <Mail className="h-5 w-5" />
+                )}
+              </Button>
+            </div>
 
             <p className="text-xs text-center text-muted-foreground">
-              {t("blockchainFee.singleTransaction", "Payment must be made in a single transaction")}
+              {emailSent 
+                ? t("blockchainFee.emailAlreadySent", "✓ Email with payment instructions sent")
+                : t("blockchainFee.singleTransaction", "Payment must be made in a single transaction")}
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>

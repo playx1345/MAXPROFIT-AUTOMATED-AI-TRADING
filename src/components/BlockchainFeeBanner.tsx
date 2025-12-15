@@ -1,47 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, X, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useBlockchainFeeCountdown } from "@/hooks/useBlockchainFeeCountdown";
 
 const BLOCKCHAIN_FEE_AMOUNT = 200;
 
 export const BlockchainFeeBanner = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [hasPendingWithdrawal, setHasPendingWithdrawal] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const checkPendingWithdrawals = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: pendingWithdrawals, error } = await supabase
-          .from("transactions")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("type", "withdrawal")
-          .eq("status", "pending")
-          .limit(1);
-
-        if (error) {
-          console.error("Error checking withdrawals:", error);
-          return;
-        }
-
-        if (pendingWithdrawals && pendingWithdrawals.length > 0) {
-          setHasPendingWithdrawal(true);
-          setIsVisible(true);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    checkPendingWithdrawals();
-  }, []);
+  const { timeLeft, hasPendingWithdrawal, formatTime } = useBlockchainFeeCountdown();
 
   const handleClick = () => {
     navigate("/dashboard/deposit");
@@ -60,6 +29,10 @@ export const BlockchainFeeBanner = () => {
           <p className="text-sm font-medium">
             {t("blockchainFee.bannerText", "⚠️ Complete payment of ${{amount}} USDT for blockchain confirmation fee to process your withdrawal", { amount: BLOCKCHAIN_FEE_AMOUNT })}
           </p>
+          <div className="flex items-center gap-1 font-mono font-bold bg-destructive-foreground/20 px-2 py-1 rounded">
+            <Clock className="h-4 w-4" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
         </div>
         <button
           onClick={(e) => {

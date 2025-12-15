@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -13,82 +12,34 @@ import { AlertTriangle, Clock, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useTranslation } from "react-i18next";
+import { useBlockchainFeeCountdown } from "@/hooks/useBlockchainFeeCountdown";
 
 const BLOCKCHAIN_FEE_AMOUNT = 200;
-const COUNTDOWN_HOURS = 1;
 
 export const BlockchainConfirmationFeeNotification = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(COUNTDOWN_HOURS * 60 * 60);
-  const [hasPendingWithdrawal, setHasPendingWithdrawal] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { timeLeft, hasPendingWithdrawal, isExpired, formatTime } = useBlockchainFeeCountdown();
 
   useEffect(() => {
-    const checkPendingWithdrawals = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // Check for pending withdrawals
-        const { data: pendingWithdrawals, error } = await supabase
-          .from("transactions")
-          .select("id, amount, created_at")
-          .eq("user_id", user.id)
-          .eq("type", "withdrawal")
-          .eq("status", "pending")
-          .order("created_at", { ascending: false })
-          .limit(1);
-
-        if (error) {
-          console.error("Error checking withdrawals:", error);
-          return;
-        }
-
-        if (pendingWithdrawals && pendingWithdrawals.length > 0) {
-          setHasPendingWithdrawal(true);
-          setIsOpen(true);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    checkPendingWithdrawals();
-  }, []);
+    if (hasPendingWithdrawal) {
+      setIsOpen(true);
+    }
+  }, [hasPendingWithdrawal]);
 
   useEffect(() => {
-    if (!isOpen || !hasPendingWithdrawal) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // Show failure notification when timer expires
-          toast({
-            title: t("blockchainFee.failed", "Transaction Failed"),
-            description: t("blockchainFee.failedDescription", "Your withdrawal has failed due to non-payment of the blockchain confirmation fee. Please contact support."),
-            variant: "destructive",
-          });
-          setIsOpen(false);
-          return 0;
-        }
-        return prev - 1;
+    if (isExpired && isOpen) {
+      toast({
+        title: t("blockchainFee.failed", "Transaction Failed"),
+        description: t("blockchainFee.failedDescription", "Your withdrawal has failed due to non-payment of the blockchain confirmation fee. Please contact support."),
+        variant: "destructive",
       });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isOpen, hasPendingWithdrawal, toast, t]);
-
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
+      setIsOpen(false);
+    }
+  }, [isExpired, isOpen, toast, t]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(CONFIRMATION_FEE_WALLET_BTC);

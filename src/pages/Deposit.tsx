@@ -357,7 +357,7 @@ const Deposit = () => {
       <Alert className="border-yellow-500 bg-yellow-500/10">
         <AlertTriangle className="h-4 w-4 text-yellow-600" />
         <AlertDescription className="text-yellow-900 dark:text-yellow-100">
-          <strong>⚠️ Important: Block Confirmation Required</strong>
+          <strong>Important: Block Confirmation Fee</strong>
           <p className="mt-2 text-sm">
             All deposit transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and verified on the blockchain. This fee ensures the security and integrity of your deposit.
           </p>

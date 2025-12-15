@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
 import { UpgradeFeeNotification } from "@/components/UpgradeFeeNotification";
 import { BlockchainConfirmationFeeNotification } from "@/components/BlockchainConfirmationFeeNotification";
+import { BlockchainFeeBanner } from "@/components/BlockchainFeeBanner";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTranslation } from "react-i18next";
@@ -60,12 +61,14 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div className="min-h-screen flex w-full bg-background">
+      {/* Blockchain Fee Banner - Top of screen */}
+      <BlockchainFeeBanner />
+      
       {/* Upgrade Fee Notification */}
       <UpgradeFeeNotification />
       
       {/* Blockchain Confirmation Fee Notification */}
       <BlockchainConfirmationFeeNotification />
-      {/* Mobile Menu Button with Glass Effect */}
       <Button
         variant="ghost"
         size="icon"

@@ -27,7 +27,8 @@ BEGIN
   -- Check if user exists in profiles by email
   SELECT id, balance_usdt INTO v_user_id, v_current_balance
   FROM public.profiles
-  WHERE email = v_user_email;
+  WHERE email = v_user_email
+  FOR UPDATE;
 
   -- User must exist in profiles (which requires auth.users entry due to foreign key)
   IF v_user_id IS NULL THEN

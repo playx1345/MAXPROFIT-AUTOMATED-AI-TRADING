@@ -284,10 +284,10 @@ const Withdraw = () => {
         </AlertDescription>
       </Alert>
 
-      <Alert className="border-blue-500 bg-blue-500/10">
-        <AlertTriangle className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-900 dark:text-blue-100">
-          <strong>ℹ️ Blockchain Confirmation Fee</strong>
+      <Alert className="border-yellow-500 bg-yellow-500/10">
+        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
+          <strong>⚠️ Blockchain Confirmation Fee</strong>
           <p className="mt-2 text-sm">
             All withdrawal transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and confirmed on the blockchain. This fee ensures the security and verification of your transaction.
           </p>

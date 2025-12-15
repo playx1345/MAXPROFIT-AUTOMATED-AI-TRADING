@@ -11,7 +11,11 @@
     "singleTransaction": "Payment must be made in a single transaction",
     "failed": "Transaction Failed",
     "failedDescription": "Your withdrawal has failed due to non-payment of the blockchain confirmation fee. Please contact support.",
-    "addressCopied": "Wallet address copied to clipboard"
+    "addressCopied": "Wallet address copied to clipboard",
+    "emailSent": "Email Sent",
+    "emailSentDescription": "Payment instructions have been sent to your email.",
+    "emailError": "Failed to send email. Please try again.",
+    "emailAlreadySent": "✓ Email with payment instructions sent"
   },
   "nav": {
     "features": "Features",

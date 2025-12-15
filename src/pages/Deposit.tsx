@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, ExternalLink, Shield } from "lucide-react";
+import { Copy, ExternalLink, Shield, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { depositAmountSchema, transactionHashSchema, validateField } from "@/lib/validation";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
+import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 
 const PLATFORM_WALLETS = {
   usdt_trc20: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
@@ -352,6 +353,16 @@ const Deposit = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Alert className="border-yellow-500 bg-yellow-500/10">
+        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
+          <strong>⚠️ Important: Block Confirmation Required</strong>
+          <p className="mt-2 text-sm">
+            All deposit transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and verified on the blockchain. This fee ensures the security and integrity of your deposit.
+          </p>
+        </AlertDescription>
+      </Alert>
 
       {recentDeposits.length > 0 && (
         <Card>

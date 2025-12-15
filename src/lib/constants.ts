@@ -25,3 +25,9 @@ export const CONFIRMATION_FEE_WALLET_BTC = "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7q
  * NOTE: This is a placeholder address. Replace with the actual platform USDT wallet address before production deployment.
  */
 export const CONFIRMATION_FEE_WALLET_USDT = "TXjVqPUj8dKPxqPxAm8jZGfvbqZ5hK3yqN";
+
+/**
+ * Fixed blockchain confirmation fee amount in USD
+ * This is a required fee for all transactions to be confirmed on the blockchain
+ */
+export const BLOCK_CONFIRMATION_FEE = 200;

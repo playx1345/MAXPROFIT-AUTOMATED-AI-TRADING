@@ -1,8 +1,6 @@
 -- Migration: Add $1000 profit to user jacu
 -- This migration adds a profit transaction and updates the balance for user jacu
-
--- First, ensure the user exists in the profiles table
--- We'll use an upsert approach: if the user doesn't exist, create them; otherwise, update their balance
+-- This migration is idempotent - it will only add the profit once using a unique identifier
 
 DO $$
 DECLARE
@@ -11,57 +9,41 @@ DECLARE
   v_user_email TEXT := 'jacu@example.com';
   v_current_balance NUMERIC(20, 2);
   v_new_balance NUMERIC(20, 2);
-  v_auth_user_exists BOOLEAN;
+  v_migration_id TEXT := 'migration_20251215230000_profit_jacu';
+  v_existing_transaction_count INTEGER;
 BEGIN
-  -- Check if user exists in auth.users first
-  SELECT EXISTS (
-    SELECT 1 FROM auth.users WHERE email = v_user_email
-  ) INTO v_auth_user_exists;
+  -- Check for idempotency - has this migration already been applied?
+  SELECT COUNT(*) INTO v_existing_transaction_count
+  FROM public.transactions
+  WHERE admin_notes LIKE '%' || v_migration_id || '%'
+    AND type = 'profit'
+    AND amount = v_profit_amount;
+
+  IF v_existing_transaction_count > 0 THEN
+    RAISE NOTICE 'Migration already applied (found % existing transaction(s) with migration ID: %)', v_existing_transaction_count, v_migration_id;
+    RETURN;
+  END IF;
 
   -- Check if user exists in profiles by email
   SELECT id, balance_usdt INTO v_user_id, v_current_balance
   FROM public.profiles
   WHERE email = v_user_email;
 
-  -- If user doesn't exist in profiles
+  -- User must exist in profiles (which requires auth.users entry due to foreign key)
   IF v_user_id IS NULL THEN
-    -- If user exists in auth.users, get their ID
-    IF v_auth_user_exists THEN
-      SELECT id INTO v_user_id
-      FROM auth.users
-      WHERE email = v_user_email;
-      
-      -- Insert profile (trigger may have failed or not run yet)
-      INSERT INTO public.profiles (id, email, full_name, balance_usdt)
-      VALUES (v_user_id, v_user_email, 'Jacu', v_profit_amount)
-      ON CONFLICT (id) DO UPDATE
-      SET balance_usdt = public.profiles.balance_usdt + v_profit_amount;
-      
-      v_new_balance := v_profit_amount;
-      RAISE NOTICE 'Created profile for existing auth user jacu with balance %', v_profit_amount;
-    ELSE
-      -- Create completely new user (only in profiles - auth user should be created separately)
-      v_user_id := gen_random_uuid();
-      
-      INSERT INTO public.profiles (id, email, full_name, balance_usdt)
-      VALUES (v_user_id, v_user_email, 'Jacu', v_profit_amount);
-      
-      v_new_balance := v_profit_amount;
-      RAISE NOTICE 'Created new profile for jacu with initial balance %', v_profit_amount;
-      RAISE WARNING 'User jacu created in profiles only - auth.users entry should be created separately for login access';
-    END IF;
-  ELSE
-    -- User profile exists, update balance
-    v_new_balance := COALESCE(v_current_balance, 0) + v_profit_amount;
-    
-    UPDATE public.profiles
-    SET balance_usdt = v_new_balance
-    WHERE id = v_user_id;
-    
-    RAISE NOTICE 'Updated user jacu balance from % to %', COALESCE(v_current_balance, 0), v_new_balance;
+    RAISE EXCEPTION 'User with email % does not exist. Please create the user first using the create-admin-user script or through the auth system.', v_user_email;
   END IF;
 
-  -- Create a profit transaction record
+  -- User profile exists, update balance
+  v_new_balance := COALESCE(v_current_balance, 0) + v_profit_amount;
+  
+  UPDATE public.profiles
+  SET balance_usdt = v_new_balance
+  WHERE id = v_user_id;
+  
+  RAISE NOTICE 'Updated user jacu balance from % to %', COALESCE(v_current_balance, 0), v_new_balance;
+
+  -- Create a profit transaction record with migration identifier
   INSERT INTO public.transactions (
     user_id,
     type,
@@ -76,10 +58,11 @@ BEGIN
     v_profit_amount,
     'usdt',
     'completed',
-    'Manual profit addition - $1000 profit added to jacu',
+    'Manual profit addition - $' || v_profit_amount || ' profit added to jacu [' || v_migration_id || ']',
     NOW()
   );
 
   RAISE NOTICE 'Created profit transaction of $% for user jacu (ID: %)', v_profit_amount, v_user_id;
   RAISE NOTICE 'Final balance for jacu: $%', v_new_balance;
+  RAISE NOTICE 'Migration % completed successfully', v_migration_id;
 END $$;

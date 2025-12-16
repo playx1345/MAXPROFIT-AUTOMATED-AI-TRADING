@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -13,6 +13,8 @@
     <meta name="author" content="Live Win Trade Investment" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0F1729" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="canonical" href="https://livewintradeiv.com/" />
     
     <!-- Performance Optimization -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -47,10 +49,36 @@
     
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialService",
+      "name": "Live Win Trade Investment",
+      "description": "Professional cryptocurrency investment platform with AI-powered automated trading strategies",
+      "url": "https://livewintradeiv.com/",
+      "logo": "https://lovable.dev/opengraph-image-p98pqg.png",
+      "sameAs": [
+        "https://twitter.com/livewintradeiv"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Support",
+        "email": "livewintrade105@gmail.com"
+      }
+    }
+    </script>
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root" role="main"></div>
+    <noscript>
+      <div style="padding: 2rem; text-align: center; background: #0F1729; color: white;">
+        <h1>JavaScript Required</h1>
+        <p>This application requires JavaScript to be enabled. Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

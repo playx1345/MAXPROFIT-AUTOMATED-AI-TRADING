@@ -367,7 +367,11 @@
   
   /* High Contrast Mode Support */
   @media (prefers-contrast: high) {
-    * {
+    button,
+    input,
+    select,
+    textarea,
+    a {
       border-width: 2px !important;
     }
   }

@@ -84,7 +84,8 @@ body {
     text-decoration: underline;
   }
   
-  a[href]::after {
+  a[href^="http"]::after,
+  a[href^="https://"]::after {
     content: " (" attr(href) ")";
   }
 }

@@ -11,7 +11,11 @@
     "singleTransaction": "Plata trebuie făcută într-o singură tranzacție",
     "failed": "Tranzacție Eșuată",
     "failedDescription": "Retragerea ta a eșuat din cauza neplății taxei de confirmare blockchain. Te rugăm să contactezi suportul.",
-    "addressCopied": "Adresa portofelului a fost copiată"
+    "addressCopied": "Adresa portofelului a fost copiată",
+    "emailSent": "Email trimis",
+    "emailSentDescription": "Notificarea privind taxa de confirmare blockchain a fost trimisă pe email.",
+    "emailError": "Nu s-a putut trimite notificarea pe email",
+    "emailAlreadySent": "Notificarea pe email a fost deja trimisă"
   },
   "nav": {
     "features": "Funcții",

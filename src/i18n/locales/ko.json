@@ -11,7 +11,11 @@
     "singleTransaction": "결제는 단일 거래로 이루어져야 합니다",
     "failed": "거래 실패",
     "failedDescription": "블록체인 확인 수수료 미결제로 인해 출금이 실패했습니다. 고객 지원에 문의하세요.",
-    "addressCopied": "지갑 주소가 복사되었습니다"
+    "addressCopied": "지갑 주소가 복사되었습니다",
+    "emailSent": "이메일 발송됨",
+    "emailSentDescription": "블록체인 확인 수수료 알림이 이메일로 발송되었습니다.",
+    "emailError": "이메일 알림 발송에 실패했습니다",
+    "emailAlreadySent": "이메일 알림이 이미 발송되었습니다"
   },
   "nav": {
     "features": "기능",

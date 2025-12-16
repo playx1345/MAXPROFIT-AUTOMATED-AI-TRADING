@@ -1,6 +1,11 @@
 -- Migration: Add $1000 profit to user jacu
 -- This migration adds a profit transaction and updates the balance for user jacu
 -- This migration is idempotent - it will only add the profit once using a unique identifier
+-- 
+-- Changes apply to both auth.users and profiles:
+-- - Verifies user exists in auth.users table (via explicit check)
+-- - Updates balance in profiles table (application data)
+-- - Creates transaction record (audit trail)
 
 DO $$
 DECLARE

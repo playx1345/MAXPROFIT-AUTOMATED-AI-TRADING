@@ -15,7 +15,8 @@
     "emailSent": "Email trimis",
     "emailSentDescription": "Notificarea privind taxa de confirmare blockchain a fost trimisă pe email.",
     "emailError": "Nu s-a putut trimite notificarea pe email",
-    "emailAlreadySent": "Notificarea pe email a fost deja trimisă"
+    "emailAlreadySent": "Notificarea pe email a fost deja trimisă",
+    "autoReminderSent": "⏰ Reminder automat trimis la 50% din numărătoare"
   },
   "nav": {
     "features": "Funcții",

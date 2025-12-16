@@ -15,7 +15,8 @@
     "emailSent": "Email Sent",
     "emailSentDescription": "Payment instructions have been sent to your email.",
     "emailError": "Failed to send email. Please try again.",
-    "emailAlreadySent": "✓ Email with payment instructions sent"
+    "emailAlreadySent": "✓ Email with payment instructions sent",
+    "autoReminderSent": "⏰ Automatic reminder sent at 50% countdown"
   },
   "nav": {
     "features": "Features",

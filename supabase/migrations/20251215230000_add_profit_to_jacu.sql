@@ -11,6 +11,7 @@ DECLARE
   v_new_balance NUMERIC(20, 2);
   v_migration_id TEXT := 'migration_20251215230000_profit_jacu';
   v_existing_transaction_count INTEGER;
+  v_auth_user_exists BOOLEAN;
 BEGIN
   -- Check for idempotency - has this migration already been applied?
   SELECT COUNT(*) INTO v_existing_transaction_count
@@ -30,10 +31,21 @@ BEGIN
   WHERE email = v_user_email
   FOR UPDATE;
 
-  -- User must exist in profiles (which requires auth.users entry due to foreign key)
+  -- User must exist in profiles
   IF v_user_id IS NULL THEN
-    RAISE EXCEPTION 'User with email % does not exist. Please create the user first using the create-admin-user script or through the auth system.', v_user_email;
+    RAISE EXCEPTION 'User with email % does not exist in profiles. Please create the user first using the create-admin-user script or through the auth system.', v_user_email;
   END IF;
+
+  -- Verify user also exists in auth.users table
+  SELECT EXISTS (
+    SELECT 1 FROM auth.users WHERE id = v_user_id
+  ) INTO v_auth_user_exists;
+
+  IF NOT v_auth_user_exists THEN
+    RAISE EXCEPTION 'User with ID % exists in profiles but not in auth.users. Data integrity issue detected.', v_user_id;
+  END IF;
+
+  RAISE NOTICE 'User verified in both auth.users and profiles tables (ID: %)', v_user_id;
 
   -- User profile exists, update balance
   v_new_balance := COALESCE(v_current_balance, 0) + v_profit_amount;

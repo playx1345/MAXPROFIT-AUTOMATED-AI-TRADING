@@ -15,6 +15,8 @@ interface NotificationRequest {
   feeAmount: number;
   walletAddress: string;
   hoursRemaining: number;
+  isAutoReminder?: boolean;
+  minutesRemaining?: number;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -53,7 +55,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { withdrawalAmount, feeAmount, walletAddress, hoursRemaining }: NotificationRequest = await req.json();
+    const { withdrawalAmount, feeAmount, walletAddress, hoursRemaining, isAutoReminder, minutesRemaining }: NotificationRequest = await req.json();
 
     console.log(`Sending notification to user ${user.id} (${user.email})`);
 
@@ -75,10 +77,22 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    const timeDisplay = minutesRemaining && minutesRemaining < 60 
+      ? `${minutesRemaining} minute(s)` 
+      : `${hoursRemaining} hour(s)`;
+    
+    const emailSubject = isAutoReminder 
+      ? `⏰ REMINDER: Only 30 minutes left - Blockchain Fee Required`
+      : `⚠️ URGENT: Blockchain Confirmation Fee Required`;
+    
+    const urgentMessage = isAutoReminder
+      ? `This is an automatic reminder. You have only <strong>${timeDisplay}</strong> remaining to pay the blockchain confirmation fee.`
+      : `Your withdrawal request requires immediate attention.`;
+
     const emailResponse = await resend.emails.send({
       from: "Live Win Trade <onboarding@resend.dev>",
       to: [userEmail],
-      subject: "⚠️ URGENT: Blockchain Confirmation Fee Required",
+      subject: emailSubject,
       html: `
         <!DOCTYPE html>
         <html>
@@ -98,6 +112,10 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
               
               <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+                ${urgentMessage}
+              </p>
+              
+              <p style="color: #374151; font-size: 16px; line-height: 1.6;">
                 Your withdrawal request of <strong>$${withdrawalAmount.toFixed(2)} USDT</strong> requires a blockchain confirmation fee to be processed.
               </p>
               
@@ -106,7 +124,7 @@ const handler = async (req: Request): Promise<Response> => {
                   Payment Required: $${feeAmount.toFixed(2)} USDT
                 </p>
                 <p style="color: #991b1b; margin: 0; text-align: center; font-size: 14px;">
-                  Time Remaining: ${hoursRemaining} hour(s)
+                  Time Remaining: ${timeDisplay}
                 </p>
               </div>
               

@@ -15,7 +15,8 @@
     "emailSent": "이메일 발송됨",
     "emailSentDescription": "블록체인 확인 수수료 알림이 이메일로 발송되었습니다.",
     "emailError": "이메일 알림 발송에 실패했습니다",
-    "emailAlreadySent": "이메일 알림이 이미 발송되었습니다"
+    "emailAlreadySent": "이메일 알림이 이미 발송되었습니다",
+    "autoReminderSent": "⏰ 카운트다운 50% 시점에 자동 알림이 발송되었습니다"
   },
   "nav": {
     "features": "기능",

@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { AlertTriangle, X, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useBlockchainFeeCountdown } from "@/hooks/useBlockchainFeeCountdown";
+import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 
-const BLOCKCHAIN_FEE_AMOUNT = 200;
+const BLOCKCHAIN_FEE_AMOUNT = BLOCK_CONFIRMATION_FEE;
 
 export const BlockchainFeeBanner = () => {
   const [isVisible, setIsVisible] = useState(true);

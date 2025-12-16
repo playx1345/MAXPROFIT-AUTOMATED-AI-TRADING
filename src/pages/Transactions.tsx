@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
+import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 
 interface Transaction {
   id: string;
@@ -83,6 +86,16 @@ const Transactions = () => {
         <h1 className="text-3xl font-bold">{t("transactions.title")}</h1>
         <p className="text-muted-foreground">{t("transactions.subtitle")}</p>
       </div>
+
+      <Alert className="border-yellow-500 bg-yellow-500/10">
+        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
+          <strong>Important: Block Confirmation Fee</strong>
+          <p className="mt-2 text-sm">
+            All transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and confirmed on the blockchain. This fee ensures the security and verification of your transactions.
+          </p>
+        </AlertDescription>
+      </Alert>
 
       <Card>
         <CardHeader>

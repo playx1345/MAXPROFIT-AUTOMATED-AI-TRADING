@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT, MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -280,6 +280,16 @@ const Withdraw = () => {
           <p className="mt-2 text-xs">
             After submitting your withdrawal request, send the 10% confirmation fee to the appropriate address above. 
             Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal within 24 hours.
+          </p>
+        </AlertDescription>
+      </Alert>
+
+      <Alert className="border-yellow-500 bg-yellow-500/10">
+        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
+          <strong>Important: Block Confirmation Fee</strong>
+          <p className="mt-2 text-sm">
+            All withdrawal transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and confirmed on the blockchain. This fee ensures the security and verification of your transaction.
           </p>
         </AlertDescription>
       </Alert>

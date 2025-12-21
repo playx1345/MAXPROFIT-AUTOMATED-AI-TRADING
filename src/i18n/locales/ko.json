@@ -177,5 +177,17 @@
     "ar": "아랍어",
     "ko": "한국어",
     "ro": "루마니아어"
+  },
+  "chat": {
+    "title": "실시간 지원",
+    "online": "온라인",
+    "openChat": "채팅 열기",
+    "placeholder": "메시지를 입력하세요...",
+    "emailNote": "이메일: ",
+    "welcomeMessage": "안녕하세요! 👋 Win Trade Invest 지원에 오신 것을 환영합니다.\n\n오늘 무엇을 도와드릴까요?\n\n다음에 대해 질문할 수 있습니다:\n• 입금 및 출금\n• 투자 계획\n• KYC 인증\n• 계정 문제\n\n또는 질문을 입력하세요!",
+    "quickWithdrawal": "출금",
+    "quickDeposit": "입금",
+    "quickInvestment": "투자",
+    "quickSupport": "지원"
   }
 }

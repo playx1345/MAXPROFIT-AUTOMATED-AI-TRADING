@@ -177,5 +177,17 @@
     "ar": "Arabă",
     "ko": "Coreeană",
     "ro": "Română"
+  },
+  "chat": {
+    "title": "Suport Live",
+    "online": "Online",
+    "openChat": "Deschide chat",
+    "placeholder": "Scrie mesajul tău...",
+    "emailNote": "Email: ",
+    "welcomeMessage": "Bună! 👋 Bine ai venit la suportul Win Trade Invest.\n\nCum te pot ajuta astăzi?\n\nPoți întreba despre:\n• Depuneri și retrageri\n• Planuri de investiții\n• Verificare KYC\n• Probleme cu contul\n\nSau pur și simplu scrie întrebarea ta!",
+    "quickWithdrawal": "Retragere",
+    "quickDeposit": "Depunere",
+    "quickInvestment": "Investiție",
+    "quickSupport": "Suport"
   }
 }

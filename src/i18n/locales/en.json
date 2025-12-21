@@ -403,5 +403,17 @@
     "walletAddress": "Wallet Address",
     "loading": "Loading transactions...",
     "errorFetching": "Error fetching transactions"
+  },
+  "chat": {
+    "title": "Live Support",
+    "online": "Online",
+    "openChat": "Open chat",
+    "placeholder": "Type your message...",
+    "emailNote": "Email: ",
+    "welcomeMessage": "Hello! 👋 Welcome to Win Trade Invest support.\n\nHow can I help you today?\n\nYou can ask about:\n• Deposits & Withdrawals\n• Investment Plans\n• KYC Verification\n• Account Issues\n\nOr just type your question!",
+    "quickWithdrawal": "Withdrawal",
+    "quickDeposit": "Deposit",
+    "quickInvestment": "Investment",
+    "quickSupport": "Support"
   }
 }

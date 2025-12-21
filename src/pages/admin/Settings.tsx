@@ -117,16 +117,30 @@ const AdminSettings = () => {
               <p className="font-medium">Win Trade Invest AI Trading Platform</p>
             </div>
             <div>
-              <Label className="text-muted-foreground">Support Email</Label>
-              <p className="font-medium">maxforexautomatedforexroboti@gmail.com</p>
-            </div>
-            <div>
               <Label className="text-muted-foreground">Platform Fee</Label>
               <p className="font-medium">20% of profits</p>
             </div>
             <div>
               <Label className="text-muted-foreground">Withdrawal Processing</Label>
               <p className="font-medium">Within 24 hours</p>
+            </div>
+          </div>
+          
+          <div className="pt-4 border-t border-border">
+            <Label className="text-muted-foreground mb-3 block">Platform Contact Emails</Label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-xs text-muted-foreground">Admin Email</p>
+                <p className="font-medium text-sm">admin@win-tradex.com</p>
+              </div>
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-xs text-muted-foreground">Live Support Email</p>
+                <p className="font-medium text-sm">live@win-tradex.com</p>
+              </div>
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-xs text-muted-foreground">General Support Email</p>
+                <p className="font-medium text-sm">support@win-tradex.com</p>
+              </div>
             </div>
           </div>
         </CardContent>

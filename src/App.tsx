@@ -27,6 +27,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import DashboardLayout from "./components/DashboardLayout";
 import AdminLayout from "./components/AdminLayout";
+import LiveChat from "./components/LiveChat";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <LiveChat />
         <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />

@@ -218,6 +218,15 @@ const AdminWithdrawals = () => {
   const WithdrawalTableRow = ({ withdrawal }: { withdrawal: Withdrawal }) => {
     const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
     
+    // Check if fee has been submitted (stored in admin_notes)
+    const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
+                            withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
+
+    // Determine display status - show "Processing" for fee-paid pending withdrawals
+    const displayStatus = withdrawal.status === 'pending' && hasFeeSubmitted 
+      ? 'processing' 
+      : withdrawal.status;
+    
     return (
       <TableRow>
         <TableCell>
@@ -242,17 +251,26 @@ const AdminWithdrawals = () => {
               className={
                 withdrawal.status === "completed" || withdrawal.status === "approved"
                   ? "bg-green-500"
+                  : displayStatus === "processing"
+                  ? "bg-blue-500"
                   : withdrawal.status === "pending"
                   ? "bg-yellow-500"
                   : "bg-red-500"
               }
             >
-              {withdrawal.status}
+              {displayStatus}
             </Badge>
             {withdrawal.status === "pending" && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
-                <span>{isEligible ? "Auto soon" : timeRemaining}</span>
+                <span>
+                  {hasFeeSubmitted 
+                    ? "Fee paid" 
+                    : isEligible 
+                      ? "Auto soon" 
+                      : timeRemaining
+                  }
+                </span>
               </div>
             )}
           </div>
@@ -422,17 +440,28 @@ const AdminWithdrawals = () => {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Status</Label>
-                  <Badge
-                    className={
-                      selectedWithdrawal.status === "completed"
-                        ? "bg-green-500"
-                        : selectedWithdrawal.status === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }
-                  >
-                    {selectedWithdrawal.status}
-                  </Badge>
+                  {(() => {
+                    const hasFeeSubmitted = selectedWithdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
+                                            selectedWithdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
+                    const displayStatus = selectedWithdrawal.status === 'pending' && hasFeeSubmitted 
+                      ? 'processing' 
+                      : selectedWithdrawal.status;
+                    return (
+                      <Badge
+                        className={
+                          selectedWithdrawal.status === "completed"
+                            ? "bg-green-500"
+                            : displayStatus === "processing"
+                            ? "bg-blue-500"
+                            : selectedWithdrawal.status === "pending"
+                            ? "bg-yellow-500"
+                            : "bg-red-500"
+                        }
+                      >
+                        {displayStatus}
+                      </Badge>
+                    );
+                  })()}
                 </div>
               </div>
 

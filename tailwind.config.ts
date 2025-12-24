@@ -203,6 +203,77 @@ export default {
           "0%, 20%": { opacity: "0", transform: "translateY(20px)", filter: "blur(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
         },
+        "particle-float": {
+          "0%, 100%": { transform: "translate(0, 0) rotate(0deg)", opacity: "0.6" },
+          "25%": { transform: "translate(10px, -15px) rotate(90deg)", opacity: "1" },
+          "50%": { transform: "translate(20px, 0) rotate(180deg)", opacity: "0.6" },
+          "75%": { transform: "translate(10px, 15px) rotate(270deg)", opacity: "1" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { 
+            boxShadow: "0 0 20px hsl(45 93% 49% / 0.4), 0 0 40px hsl(45 93% 49% / 0.2), 0 0 60px hsl(45 93% 49% / 0.1)",
+            borderColor: "hsl(45 93% 49% / 0.5)"
+          },
+          "50%": { 
+            boxShadow: "0 0 30px hsl(45 93% 49% / 0.6), 0 0 60px hsl(45 93% 49% / 0.4), 0 0 80px hsl(45 93% 49% / 0.2)",
+            borderColor: "hsl(45 93% 49% / 0.8)"
+          },
+        },
+        "border-glow-animate": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "coin-rotate": {
+          "0%": { transform: "rotateY(0deg) rotateX(10deg)" },
+          "100%": { transform: "rotateY(360deg) rotateX(10deg)" },
+        },
+        "slide-notification": {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "10%": { transform: "translateX(0)", opacity: "1" },
+          "90%": { transform: "translateX(0)", opacity: "1" },
+          "100%": { transform: "translateX(-100%)", opacity: "0" },
+        },
+        "typing": {
+          "0%": { width: "0" },
+          "100%": { width: "100%" },
+        },
+        "blink": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
+        "sparkle": {
+          "0%, 100%": { transform: "scale(0) rotate(0deg)", opacity: "0" },
+          "50%": { transform: "scale(1) rotate(180deg)", opacity: "1" },
+        },
+        "ripple": {
+          "0%": { transform: "scale(0.8)", opacity: "1" },
+          "100%": { transform: "scale(2.4)", opacity: "0" },
+        },
+        "tilt-3d": {
+          "0%, 100%": { transform: "perspective(1000px) rotateX(0) rotateY(0)" },
+          "25%": { transform: "perspective(1000px) rotateX(2deg) rotateY(3deg)" },
+          "75%": { transform: "perspective(1000px) rotateX(-2deg) rotateY(-3deg)" },
+        },
+        "counter-tick": {
+          "0%": { transform: "translateY(100%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "success-pulse": {
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(160 85% 43% / 0.4)" },
+          "50%": { boxShadow: "0 0 0 10px hsl(160 85% 43% / 0)" },
+        },
+        "neon-border": {
+          "0%, 100%": { 
+            boxShadow: "0 0 5px hsl(45 93% 49% / 0.5), inset 0 0 5px hsl(45 93% 49% / 0.1)"
+          },
+          "50%": { 
+            boxShadow: "0 0 20px hsl(45 93% 49% / 0.8), inset 0 0 10px hsl(45 93% 49% / 0.2)"
+          },
+        },
+        "logo-carousel": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -234,6 +305,20 @@ export default {
         "spin-slow": "spin-slow 3s linear infinite",
         "text-reveal": "text-reveal 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
         "text-reveal-delayed": "text-reveal-delayed 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
+        "particle-float": "particle-float 8s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "border-glow": "border-glow-animate 3s ease infinite",
+        "coin-rotate": "coin-rotate 8s linear infinite",
+        "slide-notification": "slide-notification 5s ease-in-out forwards",
+        "typing": "typing 3s steps(40, end) forwards",
+        "blink": "blink 1s step-end infinite",
+        "sparkle": "sparkle 2s ease-in-out infinite",
+        "ripple": "ripple 0.6s linear",
+        "tilt-3d": "tilt-3d 6s ease-in-out infinite",
+        "counter-tick": "counter-tick 0.3s ease-out",
+        "success-pulse": "success-pulse 2s ease-out infinite",
+        "neon-border": "neon-border 2s ease-in-out infinite",
+        "logo-carousel": "logo-carousel 30s linear infinite",
       },
     },
   },

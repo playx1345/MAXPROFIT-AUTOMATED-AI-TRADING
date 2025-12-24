@@ -25,6 +25,7 @@ interface RecentWithdrawal {
   created_at: string;
   wallet_address: string | null;
   transaction_hash: string | null;
+  admin_notes: string | null;
 }
 
 const Withdraw = () => {
@@ -87,7 +88,7 @@ const Withdraw = () => {
 
       const { data, error } = await supabase
         .from("transactions")
-        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash")
+        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash, admin_notes")
         .eq("user_id", user.id)
         .eq("type", "withdrawal")
         .order("created_at", { ascending: false })
@@ -540,6 +541,15 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
   const [submittingFee, setSubmittingFee] = useState(false);
   const { toast } = useToast();
 
+  // Check if fee has been submitted (stored in admin_notes)
+  const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
+                          withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
+
+  // Determine display status - show "Processing" for fee-paid pending withdrawals
+  const displayStatus = withdrawal.status === 'pending' && hasFeeSubmitted 
+    ? 'processing' 
+    : withdrawal.status;
+
   const handleVerify = async () => {
     if (withdrawal.transaction_hash) {
       await verifyTransaction(withdrawal.transaction_hash, withdrawal.currency as "usdt" | "btc");
@@ -616,25 +626,34 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
             className={
               withdrawal.status === "approved" || withdrawal.status === "completed"
                 ? "bg-green-500"
+                : displayStatus === "processing"
+                ? "bg-blue-500"
                 : withdrawal.status === "pending"
                 ? "bg-yellow-500"
                 : "bg-red-500"
             }
           >
-            {withdrawal.status}
+            {displayStatus}
           </Badge>
           {/* Auto-process countdown for pending withdrawals */}
           {withdrawal.status === "pending" && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
-              <span>{isEligible ? "Processing soon..." : `Auto in ${timeRemaining}`}</span>
+              <span>
+                {hasFeeSubmitted 
+                  ? "Awaiting confirmation..." 
+                  : isEligible 
+                    ? "Processing soon..." 
+                    : `Auto in ${timeRemaining}`
+                }
+              </span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Pending fee payment notice */}
-      {withdrawal.status === "pending" && (
+      {/* Pending fee payment notice - only show if fee NOT yet submitted */}
+      {withdrawal.status === "pending" && !hasFeeSubmitted && (
         <div className="pt-2 border-t space-y-2">
           <Alert className="bg-yellow-500/10 border-yellow-500">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
@@ -693,6 +712,18 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
         </div>
       )}
 
+      {/* Processing notice - show when fee has been submitted */}
+      {withdrawal.status === "pending" && hasFeeSubmitted && (
+        <div className="pt-2 border-t">
+          <Alert className="bg-blue-500/10 border-blue-500">
+            <Clock className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-xs">
+              <strong>Processing:</strong> Your confirmation fee has been submitted. Your withdrawal is being verified and will be processed within 24 hours.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       {/* Transaction Hash & Blockchain Tracking */}
       {withdrawal.transaction_hash && (
         <div className="pt-2 border-t space-y-2">
@@ -742,9 +773,11 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
       {withdrawal.status === "pending" && !withdrawal.transaction_hash && (
         <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground">
-            {isEligible 
-              ? "🔄 Eligible for auto-processing. Will be processed in the next scheduled run."
-              : `⏳ Will auto-process in ${timeRemaining} if not manually reviewed.`
+            {hasFeeSubmitted
+              ? "✅ Fee payment submitted. Awaiting admin verification and processing."
+              : isEligible 
+                ? "🔄 Eligible for auto-processing. Will be processed in the next scheduled run."
+                : `⏳ Will auto-process in ${timeRemaining} if not manually reviewed.`
             }
           </p>
         </div>

@@ -10,6 +10,7 @@ import { LiveTradingFeed } from "@/components/landing/LiveTradingFeed";
 import { TrustedPartners } from "@/components/landing/TrustedPartners";
 import { FAQ } from "@/components/landing/FAQ";
 import { Header } from "@/components/landing/Header";
+import { TypingEffect } from "@/components/landing/TypingEffect";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useParallax } from "@/hooks/useParallax";
 import { Link } from "react-router-dom";
@@ -82,7 +83,14 @@ const Landing = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className={`text-center mb-10 sm:mb-12 lg:mb-16 scroll-fade-up ${featuresRef.isVisible ? 'visible' : ''}`}>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-3 sm:mb-4 shimmer-text">
-              Why Choose Live Win Trade?
+              <TypingEffect 
+                texts={[
+                  "Why Choose Live Win Trade?",
+                  "Cutting-Edge Technology",
+                  "Trusted by Thousands",
+                  "Industry-Leading Security"
+                ]} 
+              />
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto font-serif px-4">
               Advanced technology meets professional trading expertise
@@ -105,7 +113,14 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className={`text-center mb-10 sm:mb-12 lg:mb-16 scroll-fade-up ${plansRef.isVisible ? 'visible' : ''}`}>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-3 sm:mb-4 shimmer-text">
-              Investment Plans
+              <TypingEffect 
+                texts={[
+                  "Investment Plans",
+                  "Grow Your Wealth",
+                  "Smart Strategies",
+                  "Maximize Returns"
+                ]} 
+              />
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto font-serif px-4">
               Choose a plan that matches your investment goals
@@ -138,7 +153,14 @@ const Landing = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className={`text-center mb-10 sm:mb-12 lg:mb-16 scroll-fade-up ${howItWorksRef.isVisible ? 'visible' : ''}`}>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-3 sm:mb-4 shimmer-text">
-              How It Works
+              <TypingEffect 
+                texts={[
+                  "How It Works",
+                  "Simple & Easy",
+                  "Start in Minutes",
+                  "Your Journey Begins"
+                ]} 
+              />
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground font-serif">Get started in four simple steps</p>
           </div>
@@ -172,7 +194,14 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className={`text-center mb-10 sm:mb-12 lg:mb-16 scroll-fade-up ${faqRef.isVisible ? 'visible' : ''}`}>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-3 sm:mb-4 shimmer-text">
-              Frequently Asked Questions
+              <TypingEffect 
+                texts={[
+                  "Frequently Asked Questions",
+                  "Got Questions?",
+                  "We Have Answers",
+                  "Learn More"
+                ]} 
+              />
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto font-serif px-4">
               Find answers to common questions

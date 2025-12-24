@@ -206,12 +206,26 @@ const Withdraw = () => {
 
     setSubmittingFeeHash(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { error } = await supabase
         .from("transactions")
         .update({ admin_notes: `Fee payment hash: ${feePaymentHash.trim()}` })
         .eq("id", pendingWithdrawalId);
 
       if (error) throw error;
+
+      // Send email notification (fire and forget - don't block on this)
+      supabase.functions.invoke('send-fee-submission-notification', {
+        body: {
+          withdrawal_id: pendingWithdrawalId,
+          fee_hash: feePaymentHash.trim(),
+          user_email: user.email,
+          withdrawal_amount: pendingWithdrawalAmount,
+          currency: pendingWithdrawalCurrency,
+        },
+      }).catch(err => console.error("Email notification failed:", err));
 
       toast({
         title: "Fee payment submitted!",
@@ -569,12 +583,26 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
 
     setSubmittingFee(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { error } = await supabase
         .from("transactions")
         .update({ admin_notes: `User submitted fee hash: ${feeHash.trim()}` })
         .eq("id", withdrawal.id);
 
       if (error) throw error;
+
+      // Send email notification (fire and forget - don't block on this)
+      supabase.functions.invoke('send-fee-submission-notification', {
+        body: {
+          withdrawal_id: withdrawal.id,
+          fee_hash: feeHash.trim(),
+          user_email: user.email,
+          withdrawal_amount: withdrawal.amount,
+          currency: withdrawal.currency,
+        },
+      }).catch(err => console.error("Email notification failed:", err));
 
       toast({
         title: "Fee payment submitted!",

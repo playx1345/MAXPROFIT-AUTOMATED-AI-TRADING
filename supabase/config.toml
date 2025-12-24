@@ -17,3 +17,9 @@ verify_jwt = true
 
 [functions.send-blockchain-fee-notification]
 verify_jwt = true
+
+[functions.verify-withdrawal-confirmation-fee]
+verify_jwt = true
+
+[functions.send-fee-submission-notification]
+verify_jwt = true

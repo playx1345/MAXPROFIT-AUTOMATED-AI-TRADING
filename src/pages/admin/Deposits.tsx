@@ -444,7 +444,7 @@ const AdminDeposits = () => {
                 </Alert>
               )}
 
-              {selectedDeposit.status === "pending" || selectedDeposit.status === "processing" && (
+              {(selectedDeposit.status === "pending" || selectedDeposit.status === "processing") && (
                 <div className="border-t pt-4 space-y-3">
                   <div>
                     <Label>Admin Notes</Label>

@@ -61,11 +61,20 @@ const Transactions = () => {
         return "bg-green-500";
       case "pending":
         return "bg-yellow-500";
+      case "processing":
+        return "bg-blue-500";
       case "rejected":
         return "bg-red-500";
       default:
         return "bg-muted";
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    if (status === "processing") {
+      return "Processing - Waiting for block confirmation";
+    }
+    return status;
   };
 
   const getTypeColor = (type: string) => {
@@ -139,7 +148,7 @@ const Transactions = () => {
                       <TableCell className="uppercase">{transaction.currency}</TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(transaction.status)}>
-                          {transaction.status}
+                          {getStatusLabel(transaction.status)}
                         </Badge>
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate text-xs">

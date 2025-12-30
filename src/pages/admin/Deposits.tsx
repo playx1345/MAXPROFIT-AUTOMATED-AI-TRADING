@@ -169,9 +169,23 @@ const AdminDeposits = () => {
     return `https://blockchair.com/bitcoin/transaction/${deposit.transaction_hash}`;
   };
 
-  const pendingDeposits = deposits.filter((d) => d.status === "pending");
+  const pendingDeposits = deposits.filter((d) => d.status === "pending" || d.status === "processing");
   const completedDeposits = deposits.filter((d) => d.status === "approved");
   const rejectedDeposits = deposits.filter((d) => d.status === "rejected");
+
+  const getStatusColor = (status: string) => {
+    if (status === "approved") return "bg-green-500";
+    if (status === "pending") return "bg-yellow-500";
+    if (status === "processing") return "bg-blue-500";
+    return "bg-red-500";
+  };
+
+  const getStatusLabel = (status: string) => {
+    if (status === "processing") {
+      return "Processing - Waiting for block confirmation";
+    }
+    return status;
+  };
 
   const DepositTable = ({ data }: { data: Deposit[] }) => (
     <Table>
@@ -209,16 +223,8 @@ const AdminDeposits = () => {
                 {format(new Date(deposit.created_at), "MMM dd, yyyy HH:mm")}
               </TableCell>
               <TableCell>
-                <Badge
-                  className={
-                    deposit.status === "approved"
-                      ? "bg-green-500"
-                      : deposit.status === "pending"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }
-                >
-                  {deposit.status}
+                <Badge className={getStatusColor(deposit.status)}>
+                  {getStatusLabel(deposit.status)}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -352,16 +358,8 @@ const AdminDeposits = () => {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Status</Label>
-                  <Badge
-                    className={
-                      selectedDeposit.status === "approved"
-                        ? "bg-green-500"
-                        : selectedDeposit.status === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }
-                  >
-                    {selectedDeposit.status}
+                  <Badge className={getStatusColor(selectedDeposit.status)}>
+                    {getStatusLabel(selectedDeposit.status)}
                   </Badge>
                 </div>
               </div>
@@ -446,7 +444,7 @@ const AdminDeposits = () => {
                 </Alert>
               )}
 
-              {selectedDeposit.status === "pending" && (
+              {selectedDeposit.status === "pending" || selectedDeposit.status === "processing" && (
                 <div className="border-t pt-4 space-y-3">
                   <div>
                     <Label>Admin Notes</Label>

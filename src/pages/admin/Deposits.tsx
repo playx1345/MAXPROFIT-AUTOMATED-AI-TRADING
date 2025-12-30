@@ -169,10 +169,6 @@ const AdminDeposits = () => {
     return `https://blockchair.com/bitcoin/transaction/${deposit.transaction_hash}`;
   };
 
-  const pendingDeposits = deposits.filter((d) => d.status === "pending" || d.status === "processing");
-  const completedDeposits = deposits.filter((d) => d.status === "approved");
-  const rejectedDeposits = deposits.filter((d) => d.status === "rejected");
-
   const getStatusColor = (status: string) => {
     if (status === "approved") return "bg-green-500";
     if (status === "pending") return "bg-yellow-500";
@@ -186,6 +182,14 @@ const AdminDeposits = () => {
     }
     return status;
   };
+
+  const isEditableStatus = (status: string) => {
+    return ["pending", "processing"].includes(status);
+  };
+
+  const pendingDeposits = deposits.filter((d) => isEditableStatus(d.status));
+  const completedDeposits = deposits.filter((d) => d.status === "approved");
+  const rejectedDeposits = deposits.filter((d) => d.status === "rejected");
 
   const DepositTable = ({ data }: { data: Deposit[] }) => (
     <Table>
@@ -444,7 +448,7 @@ const AdminDeposits = () => {
                 </Alert>
               )}
 
-              {(selectedDeposit.status === "pending" || selectedDeposit.status === "processing") && (
+              {isEditableStatus(selectedDeposit.status) && (
                 <div className="border-t pt-4 space-y-3">
                   <div>
                     <Label>Admin Notes</Label>

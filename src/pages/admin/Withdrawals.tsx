@@ -405,15 +405,15 @@ const AdminWithdrawals = () => {
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Blockchain Confirmation Fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%)</Label>
+                  <Label className="text-muted-foreground">Confirmation Fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%)</Label>
                   <p className="font-semibold text-lg text-yellow-600">
-                    ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
+                    ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)} (paid separately by user)
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Net Amount to Send</Label>
+                  <Label className="text-muted-foreground">Amount to Send</Label>
                   <p className="font-bold text-xl text-green-600">
-                    ${(selectedWithdrawal.amount * (1 - WITHDRAWAL_FEE_PERCENTAGE)).toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
+                    ${selectedWithdrawal.amount.toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
                   </p>
                 </div>
                 <div>

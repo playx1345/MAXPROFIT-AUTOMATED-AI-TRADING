@@ -19,7 +19,7 @@ export const useBlockchainVerification = () => {
 
   const verifyTransaction = async (
     transactionHash: string,
-    currency: "usdt" | "btc"
+    currency: "usdt" | "btc" | "eth" | "usdc"
   ): Promise<BlockchainVerificationResult | null> => {
     if (!transactionHash.trim()) {
       setResult(null);

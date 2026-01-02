@@ -44,6 +44,15 @@ export const btcAddressSchema = walletAddressSchema.refine(
   "Invalid BTC address format"
 );
 
+// ETH/ERC20 address validation (0x followed by 40 hex characters)
+export const ethAddressSchema = walletAddressSchema.refine(
+  (val) => /^0x[a-fA-F0-9]{40}$/.test(val.trim()),
+  "Invalid ETH/ERC20 address format (should start with 0x and be 42 characters)"
+);
+
+// USDC uses the same format as ETH (ERC20)
+export const usdcAddressSchema = ethAddressSchema;
+
 // Transaction hash validation
 export const transactionHashSchema = z
   .string()
@@ -112,6 +121,17 @@ export function validateField<T>(
 }
 
 // Get wallet address schema based on currency
-export function getWalletAddressSchema(currency: "usdt" | "btc") {
-  return currency === "usdt" ? usdtTrc20AddressSchema : btcAddressSchema;
+export function getWalletAddressSchema(currency: "usdt" | "btc" | "eth" | "usdc") {
+  switch (currency) {
+    case "usdt":
+      return usdtTrc20AddressSchema;
+    case "btc":
+      return btcAddressSchema;
+    case "eth":
+      return ethAddressSchema;
+    case "usdc":
+      return usdcAddressSchema;
+    default:
+      return walletAddressSchema;
+  }
 }

@@ -219,6 +219,8 @@ export type Database = {
           phone: string | null
           upgrade_fee_paid: boolean
           wallet_btc: string | null
+          wallet_eth: string | null
+          wallet_usdc: string | null
           wallet_usdt: string | null
         }
         Insert: {
@@ -233,6 +235,8 @@ export type Database = {
           phone?: string | null
           upgrade_fee_paid?: boolean
           wallet_btc?: string | null
+          wallet_eth?: string | null
+          wallet_usdc?: string | null
           wallet_usdt?: string | null
         }
         Update: {
@@ -247,6 +251,8 @@ export type Database = {
           phone?: string | null
           upgrade_fee_paid?: boolean
           wallet_btc?: string | null
+          wallet_eth?: string | null
+          wallet_usdc?: string | null
           wallet_usdt?: string | null
         }
         Relationships: []

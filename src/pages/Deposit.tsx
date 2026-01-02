@@ -16,8 +16,10 @@ import { BlockchainVerificationBadge } from "@/components/BlockchainVerification
 import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 
 const PLATFORM_WALLETS = {
-  usdt_trc20: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
+  usdt: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
   btc: "bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h",
+  eth: "0xe6FD2896583721d1e7e14c8fBB6319E92bD65196",
+  usdc: "0x739B307F28100563d5f14Fba93dDf6F96Cd4d642",
 };
 
 interface RecentDeposit {
@@ -32,7 +34,7 @@ interface RecentDeposit {
 const Deposit = () => {
   const { t } = useTranslation();
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState<"usdt" | "btc">("usdt");
+  const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc">("usdt");
   const [transactionHash, setTransactionHash] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [recentDeposits, setRecentDeposits] = useState<RecentDeposit[]>([]);
@@ -128,7 +130,7 @@ const Deposit = () => {
         amount: parseFloat(amount),
         currency: currency,
         status: "pending",
-        wallet_address: currency === "usdt" ? PLATFORM_WALLETS.usdt_trc20 : PLATFORM_WALLETS.btc,
+        wallet_address: PLATFORM_WALLETS[currency],
         transaction_hash: transactionHash.trim() || null,
       });
 
@@ -162,7 +164,7 @@ const Deposit = () => {
     }
   };
 
-  const walletAddress = currency === "usdt" ? PLATFORM_WALLETS.usdt_trc20 : PLATFORM_WALLETS.btc;
+  const walletAddress = PLATFORM_WALLETS[currency];
 
   return (
     <div className="space-y-6">
@@ -186,14 +188,13 @@ const Deposit = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="currency">{t("deposit.selectCurrency")}</Label>
-              <div className="flex gap-2 mt-2">
+              <div className="grid grid-cols-2 gap-2 mt-2">
                 <Button
                   variant={currency === "usdt" ? "default" : "outline"}
                   onClick={() => {
                     setCurrency("usdt");
                     clearResult();
                   }}
-                  className="flex-1"
                 >
                   USDT (TRC20)
                 </Button>
@@ -203,9 +204,26 @@ const Deposit = () => {
                     setCurrency("btc");
                     clearResult();
                   }}
-                  className="flex-1"
                 >
                   BTC
+                </Button>
+                <Button
+                  variant={currency === "eth" ? "default" : "outline"}
+                  onClick={() => {
+                    setCurrency("eth");
+                    clearResult();
+                  }}
+                >
+                  ETH
+                </Button>
+                <Button
+                  variant={currency === "usdc" ? "default" : "outline"}
+                  onClick={() => {
+                    setCurrency("usdc");
+                    clearResult();
+                  }}
+                >
+                  USDC (ERC20)
                 </Button>
               </div>
             </div>
@@ -227,7 +245,12 @@ const Deposit = () => {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t("deposit.network")}: {currency === "usdt" ? "TRON (TRC20)" : "Bitcoin"}
+                {t("deposit.network")}: {
+                  currency === "usdt" ? "TRON (TRC20)" : 
+                  currency === "btc" ? "Bitcoin" : 
+                  currency === "eth" ? "Ethereum (ERC20)" : 
+                  "Ethereum (ERC20)"
+                }
               </p>
             </div>
 

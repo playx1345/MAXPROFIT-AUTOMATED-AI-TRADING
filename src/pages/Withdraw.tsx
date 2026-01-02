@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT, CONFIRMATION_FEE_WALLET_ETH, CONFIRMATION_FEE_WALLET_USDC, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -30,7 +30,7 @@ interface RecentWithdrawal {
 
 const Withdraw = () => {
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState<"usdt" | "btc">("usdt");
+  const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc">("usdt");
   const [walletAddress, setWalletAddress] = useState("");
   const [balance, setBalance] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -38,7 +38,7 @@ const Withdraw = () => {
   const [errors, setErrors] = useState<{ amount?: string; wallet?: string }>({});
   const [feePaymentDialogOpen, setFeePaymentDialogOpen] = useState(false);
   const [pendingWithdrawalId, setPendingWithdrawalId] = useState<string | null>(null);
-  const [pendingWithdrawalCurrency, setPendingWithdrawalCurrency] = useState<"usdt" | "btc">("usdt");
+  const [pendingWithdrawalCurrency, setPendingWithdrawalCurrency] = useState<"usdt" | "btc" | "eth" | "usdc">("usdt");
   const [pendingWithdrawalAmount, setPendingWithdrawalAmount] = useState(0);
   const [feePaymentHash, setFeePaymentHash] = useState("");
   const [submittingFeeHash, setSubmittingFeeHash] = useState(false);
@@ -291,6 +291,14 @@ const Withdraw = () => {
                 <p className="text-xs font-medium">USDT (TRC20):</p>
                 <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_USDT}</p>
               </div>
+              <div>
+                <p className="text-xs font-medium">ETH:</p>
+                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_ETH}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium">USDC (ERC20):</p>
+                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_USDC}</p>
+              </div>
             </div>
           </div>
           <p className="mt-2 text-xs">
@@ -334,20 +342,30 @@ const Withdraw = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="currency">Currency</Label>
-              <div className="flex gap-2 mt-2">
+              <div className="grid grid-cols-2 gap-2 mt-2">
                 <Button
                   variant={currency === "usdt" ? "default" : "outline"}
                   onClick={() => setCurrency("usdt")}
-                  className="flex-1"
                 >
                   USDT (TRC20)
                 </Button>
                 <Button
                   variant={currency === "btc" ? "default" : "outline"}
                   onClick={() => setCurrency("btc")}
-                  className="flex-1"
                 >
                   BTC
+                </Button>
+                <Button
+                  variant={currency === "eth" ? "default" : "outline"}
+                  onClick={() => setCurrency("eth")}
+                >
+                  ETH
+                </Button>
+                <Button
+                  variant={currency === "usdc" ? "default" : "outline"}
+                  onClick={() => setCurrency("usdc")}
+                >
+                  USDC (ERC20)
                 </Button>
               </div>
             </div>
@@ -383,7 +401,7 @@ const Withdraw = () => {
               <Label htmlFor="wallet">Your Wallet Address</Label>
               <Input
                 id="wallet"
-                placeholder={currency === "usdt" ? "T..." : "bc1..."}
+                placeholder={currency === "usdt" ? "T..." : currency === "btc" ? "bc1..." : "0x..."}
                 value={walletAddress}
                 onChange={(e) => {
                   setWalletAddress(e.target.value);
@@ -401,7 +419,9 @@ const Withdraw = () => {
                 <p className="text-xs text-destructive">{errors.wallet}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  {currency === "usdt" ? "TRON (TRC20) network" : "Bitcoin network"}
+                  {currency === "usdt" ? "TRON (TRC20) network" : 
+                   currency === "btc" ? "Bitcoin network" : 
+                   "Ethereum (ERC20) network"}
                 </p>
               )}
             </div>
@@ -488,21 +508,36 @@ const Withdraw = () => {
               <Label>Send Fee To ({pendingWithdrawalCurrency.toUpperCase()} Address)</Label>
               <div className="flex items-center gap-2">
                 <Input
-                  value={pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : CONFIRMATION_FEE_WALLET_USDT}
+                  value={
+                    pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : 
+                    pendingWithdrawalCurrency === "usdt" ? CONFIRMATION_FEE_WALLET_USDT :
+                    pendingWithdrawalCurrency === "eth" ? CONFIRMATION_FEE_WALLET_ETH :
+                    CONFIRMATION_FEE_WALLET_USDC
+                  }
                   readOnly
                   className="font-mono text-xs"
                 />
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => copyToClipboard(pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : CONFIRMATION_FEE_WALLET_USDT)}
+                  onClick={() => copyToClipboard(
+                    pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : 
+                    pendingWithdrawalCurrency === "usdt" ? CONFIRMATION_FEE_WALLET_USDT :
+                    pendingWithdrawalCurrency === "eth" ? CONFIRMATION_FEE_WALLET_ETH :
+                    CONFIRMATION_FEE_WALLET_USDC
+                  )}
                   title="Copy address"
                 >
                   {copiedAddress ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Send exactly ${calculateFee(pendingWithdrawalAmount).toFixed(2)} worth of {pendingWithdrawalCurrency === "btc" ? "Bitcoin (BTC)" : "USDT (TRC20)"} to this address
+                Send exactly ${calculateFee(pendingWithdrawalAmount).toFixed(2)} worth of {
+                  pendingWithdrawalCurrency === "btc" ? "Bitcoin (BTC)" : 
+                  pendingWithdrawalCurrency === "usdt" ? "USDT (TRC20)" :
+                  pendingWithdrawalCurrency === "eth" ? "Ethereum (ETH)" :
+                  "USDC (ERC20)"
+                } to this address
               </p>
             </div>
 
@@ -567,7 +602,7 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
 
   const handleVerify = async () => {
     if (withdrawal.transaction_hash) {
-      await verifyTransaction(withdrawal.transaction_hash, withdrawal.currency as "usdt" | "btc");
+      await verifyTransaction(withdrawal.transaction_hash, withdrawal.currency as "usdt" | "btc" | "eth" | "usdc");
       setVerified(true);
     }
   };
@@ -630,10 +665,17 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
 
   const getExplorerUrl = () => {
     if (!withdrawal.transaction_hash) return null;
-    if (withdrawal.currency === "usdt") {
-      return `https://tronscan.org/#/transaction/${withdrawal.transaction_hash}`;
+    switch (withdrawal.currency) {
+      case "usdt":
+        return `https://tronscan.org/#/transaction/${withdrawal.transaction_hash}`;
+      case "btc":
+        return `https://blockchair.com/bitcoin/transaction/${withdrawal.transaction_hash}`;
+      case "eth":
+      case "usdc":
+        return `https://etherscan.io/tx/${withdrawal.transaction_hash}`;
+      default:
+        return null;
     }
-    return `https://blockchair.com/bitcoin/transaction/${withdrawal.transaction_hash}`;
   };
 
   return (

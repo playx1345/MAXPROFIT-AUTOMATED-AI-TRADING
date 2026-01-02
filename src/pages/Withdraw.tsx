@@ -106,7 +106,8 @@ const Withdraw = () => {
   };
 
   const calculateNetAmount = (withdrawalAmount: number): number => {
-    return withdrawalAmount - calculateFee(withdrawalAmount);
+    // User receives full amount - fee is paid separately
+    return withdrawalAmount;
   };
 
   const estimatedFees = calculateFee(parseFloat(amount || "0"));
@@ -412,15 +413,15 @@ const Withdraw = () => {
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-yellow-600 dark:text-yellow-500">
-                  <span>Network fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
-                  <span>-${estimatedFees.toFixed(2)}</span>
+                  <span>Confirmation fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
+                  <span>${estimatedFees.toFixed(2)} (paid separately)</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">
                   <span>You will receive:</span>
                   <span className="text-green-600 dark:text-green-500">${netAmount.toFixed(2)}</span>
                 </div>
                 <div className="mt-3 p-2 bg-yellow-500/20 rounded text-xs text-yellow-900 dark:text-yellow-100">
-                  <strong>Important:</strong> You must pay a ${estimatedFees.toFixed(2)} confirmation fee separately to the {currency.toUpperCase()} address shown above before your withdrawal can be approved. This fee verifies your transaction on the blockchain.
+                  <strong>Important:</strong> You must pay a ${estimatedFees.toFixed(2)} confirmation fee separately to the {currency.toUpperCase()} address shown above before your withdrawal can be approved. This fee is NOT deducted from your withdrawal - you will receive the full ${parseFloat(amount).toLocaleString()} after approval.
                 </div>
               </div>
             )}

@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock, Filter } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +17,7 @@ import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/co
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown, getAutoProcessTime } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
+
 interface Withdrawal {
   id: string;
   user_id: string;
@@ -43,6 +45,9 @@ const AdminWithdrawals = () => {
   const [processing, setProcessing] = useState(false);
   const [verifyingFee, setVerifyingFee] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -71,6 +76,126 @@ const AdminWithdrawals = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Filter withdrawals based on search term
+  const filterWithdrawals = (items: Withdrawal[]) => {
+    if (!searchTerm) return items;
+    const term = searchTerm.toLowerCase();
+    return items.filter(w => 
+      w.profiles?.email?.toLowerCase().includes(term) ||
+      w.profiles?.full_name?.toLowerCase().includes(term) ||
+      w.wallet_address?.toLowerCase().includes(term) ||
+      w.amount.toString().includes(term)
+    );
+  };
+
+  // Toggle selection for bulk actions
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = (items: Withdrawal[]) => {
+    if (selectedIds.length === items.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(items.map(w => w.id));
+    }
+  };
+
+  // Bulk approve selected withdrawals
+  const handleBulkApprove = async () => {
+    if (selectedIds.length === 0) return;
+    setBulkProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const id of selectedIds) {
+        try {
+          const { error } = await supabase.rpc("approve_withdrawal_atomic", {
+            p_transaction_id: id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_transaction_hash: null,
+            p_admin_notes: "Bulk approved by admin",
+          });
+          if (error) throw error;
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk approval complete",
+        description: `${successCount} approved, ${failCount} failed`,
+      });
+
+      setSelectedIds([]);
+      fetchWithdrawals();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Bulk approval failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  // Bulk reject selected withdrawals
+  const handleBulkReject = async () => {
+    if (selectedIds.length === 0) return;
+    setBulkProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const id of selectedIds) {
+        try {
+          const { error } = await supabase.rpc("reject_withdrawal_atomic", {
+            p_transaction_id: id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_admin_notes: "Bulk rejected by admin",
+          });
+          if (error) throw error;
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk rejection complete",
+        description: `${successCount} rejected, ${failCount} failed`,
+      });
+
+      setSelectedIds([]);
+      fetchWithdrawals();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Bulk rejection failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setBulkProcessing(false);
     }
   };
 
@@ -211,9 +336,9 @@ const AdminWithdrawals = () => {
     }
   };
 
-  const pendingWithdrawals = withdrawals.filter((w) => w.status === "pending");
-  const completedWithdrawals = withdrawals.filter((w) => w.status === "completed");
-  const rejectedWithdrawals = withdrawals.filter((w) => w.status === "rejected");
+  const pendingWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "pending"));
+  const completedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "completed" || w.status === "approved"));
+  const rejectedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "rejected"));
 
   const WithdrawalTableRow = ({ withdrawal }: { withdrawal: Withdrawal }) => {
     const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
@@ -291,10 +416,18 @@ const AdminWithdrawals = () => {
     );
   };
 
-  const WithdrawalTable = ({ data }: { data: Withdrawal[] }) => (
+  const WithdrawalTable = ({ data, showCheckbox = false }: { data: Withdrawal[]; showCheckbox?: boolean }) => (
     <Table>
       <TableHeader>
         <TableRow>
+          {showCheckbox && (
+            <TableHead className="w-12">
+              <Checkbox
+                checked={selectedIds.length === data.length && data.length > 0}
+                onCheckedChange={() => selectAll(data)}
+              />
+            </TableHead>
+          )}
           <TableHead>User</TableHead>
           <TableHead>Amount</TableHead>
           <TableHead>Currency</TableHead>
@@ -307,13 +440,63 @@ const AdminWithdrawals = () => {
       <TableBody>
         {data.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={7} className="text-center text-muted-foreground">
+            <TableCell colSpan={showCheckbox ? 8 : 7} className="text-center text-muted-foreground">
               No withdrawals found
             </TableCell>
           </TableRow>
         ) : (
           data.map((withdrawal) => (
-            <WithdrawalTableRow key={withdrawal.id} withdrawal={withdrawal} />
+            <TableRow key={withdrawal.id}>
+              {showCheckbox && (
+                <TableCell>
+                  <Checkbox
+                    checked={selectedIds.includes(withdrawal.id)}
+                    onCheckedChange={() => toggleSelection(withdrawal.id)}
+                  />
+                </TableCell>
+              )}
+              <TableCell>
+                <div>
+                  <p className="font-medium">{withdrawal.profiles?.full_name || "N/A"}</p>
+                  <p className="text-xs text-muted-foreground">{withdrawal.profiles?.email}</p>
+                </div>
+              </TableCell>
+              <TableCell className="font-semibold">
+                ${withdrawal.amount.toLocaleString()}
+              </TableCell>
+              <TableCell className="uppercase">{withdrawal.currency}</TableCell>
+              <TableCell className="font-mono text-xs max-w-[150px] truncate">
+                {withdrawal.wallet_address}
+              </TableCell>
+              <TableCell>
+                {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
+              </TableCell>
+              <TableCell>
+                <Badge
+                  className={
+                    withdrawal.status === "completed" || withdrawal.status === "approved"
+                      ? "bg-green-500"
+                      : withdrawal.status === "pending"
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }
+                >
+                  {withdrawal.status}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setSelectedWithdrawal(withdrawal);
+                    setDetailsOpen(true);
+                  }}
+                >
+                  View Details
+                </Button>
+              </TableCell>
+            </TableRow>
           ))
         )}
       </TableBody>
@@ -345,7 +528,42 @@ const AdminWithdrawals = () => {
           <CardTitle>All Withdrawals</CardTitle>
           <CardDescription>Manage platform withdrawals</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Search and Bulk Actions */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by email, name, wallet, or amount..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            {selectedIds.length > 0 && (
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={handleBulkApprove}
+                  disabled={bulkProcessing}
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Approve ({selectedIds.length})
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive"
+                  onClick={handleBulkReject}
+                  disabled={bulkProcessing}
+                >
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Reject ({selectedIds.length})
+                </Button>
+              </div>
+            )}
+          </div>
+
           <Tabs defaultValue="pending">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="pending">
@@ -360,7 +578,7 @@ const AdminWithdrawals = () => {
             </TabsList>
 
             <TabsContent value="pending" className="mt-4">
-              <WithdrawalTable data={pendingWithdrawals} />
+              <WithdrawalTable data={pendingWithdrawals} showCheckbox />
             </TabsContent>
 
             <TabsContent value="completed" className="mt-4">

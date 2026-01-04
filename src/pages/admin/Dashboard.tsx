@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Users, DollarSign, TrendingUp, AlertCircle } from "lucide-react";
+import { Users, DollarSign, TrendingUp, AlertCircle, CheckCircle, XCircle, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface Stats {
   totalUsers: number;
@@ -12,6 +14,14 @@ interface Stats {
   pendingDeposits: number;
   pendingWithdrawals: number;
   activeInvestments: number;
+}
+
+interface PendingTransaction {
+  id: string;
+  type: string;
+  amount: number;
+  user_email: string;
+  created_at: string;
 }
 
 interface Activity {
@@ -30,8 +40,11 @@ const AdminDashboard = () => {
     activeInvestments: 0,
   });
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [pendingTransactions, setPendingTransactions] = useState<PendingTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -89,6 +102,35 @@ const AdminDashboard = () => {
         activeInvestments: investmentsCount || 0,
       });
 
+      // Fetch pending transactions for quick actions
+      const { data: pendingTx, error: pendingTxError } = await supabase
+        .from("transactions")
+        .select("id, type, amount, user_id, created_at")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (pendingTxError) throw pendingTxError;
+
+      // Get user emails for pending transactions
+      if (pendingTx && pendingTx.length > 0) {
+        const userIds = [...new Set(pendingTx.map(tx => tx.user_id))];
+        const { data: userProfiles } = await supabase
+          .from("profiles")
+          .select("id, email")
+          .in("id", userIds);
+
+        const emailMap = new Map(userProfiles?.map(p => [p.id, p.email]) || []);
+        
+        setPendingTransactions(pendingTx.map(tx => ({
+          id: tx.id,
+          type: tx.type,
+          amount: tx.amount,
+          user_email: emailMap.get(tx.user_id) || "Unknown",
+          created_at: tx.created_at,
+        })));
+      }
+
       // Fetch recent activity (latest transactions)
       const { data: recentTransactions, error: transactionsError } = await supabase
         .from("transactions")
@@ -133,6 +175,87 @@ const AdminDashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleQuickApprove = async (transaction: PendingTransaction) => {
+    setProcessingId(transaction.id);
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const rpcFunction = transaction.type === "deposit" 
+        ? "approve_deposit_atomic" 
+        : "approve_withdrawal_atomic";
+
+      const params = transaction.type === "deposit" 
+        ? {
+            p_transaction_id: transaction.id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_admin_notes: "Quick approved from dashboard",
+          }
+        : {
+            p_transaction_id: transaction.id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_transaction_hash: null,
+            p_admin_notes: "Quick approved from dashboard",
+          };
+
+      const { error } = await supabase.rpc(rpcFunction as any, params);
+      if (error) throw error;
+
+      toast({
+        title: `${transaction.type === "deposit" ? "Deposit" : "Withdrawal"} approved`,
+        description: `$${transaction.amount} for ${transaction.user_email}`,
+      });
+
+      fetchDashboardData();
+    } catch (error: any) {
+      toast({
+        title: "Error approving transaction",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleQuickReject = async (transaction: PendingTransaction) => {
+    setProcessingId(transaction.id);
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const rpcFunction = transaction.type === "deposit" 
+        ? "reject_deposit_atomic" 
+        : "reject_withdrawal_atomic";
+
+      const { error } = await supabase.rpc(rpcFunction as any, {
+        p_transaction_id: transaction.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_admin_notes: "Quick rejected from dashboard",
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: `${transaction.type === "deposit" ? "Deposit" : "Withdrawal"} rejected`,
+        description: `$${transaction.amount} for ${transaction.user_email}`,
+      });
+
+      fetchDashboardData();
+    } catch (error: any) {
+      toast({
+        title: "Error rejecting transaction",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -186,7 +309,10 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="glass-card-enhanced border-warning/20 group hover:border-warning/40 transition-all duration-300">
+        <Card 
+          className="glass-card-enhanced border-warning/20 group hover:border-warning/40 transition-all duration-300 cursor-pointer"
+          onClick={() => navigate("/admin/deposits")}
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending Deposits</CardTitle>
             <div className="p-2 rounded-lg bg-warning/10 group-hover:scale-110 transition-transform duration-300">
@@ -201,7 +327,10 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="glass-card-enhanced border-destructive/20 group hover:border-destructive/40 transition-all duration-300">
+        <Card 
+          className="glass-card-enhanced border-destructive/20 group hover:border-destructive/40 transition-all duration-300 cursor-pointer"
+          onClick={() => navigate("/admin/withdrawals")}
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending Withdrawals</CardTitle>
             <div className="p-2 rounded-lg bg-destructive/10 group-hover:scale-110 transition-transform duration-300">
@@ -231,6 +360,68 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick Actions for Pending Transactions */}
+      {pendingTransactions.length > 0 && (
+        <Card className="glass-card-enhanced border-warning/30">
+          <CardHeader>
+            <CardTitle className="font-display flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-warning" />
+              Quick Actions
+            </CardTitle>
+            <CardDescription>Approve or reject pending transactions directly</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {pendingTransactions.map((tx) => (
+                <div
+                  key={tx.id}
+                  className="flex items-center justify-between p-4 border border-border/30 rounded-lg hover:bg-muted/20 transition-all duration-300"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={tx.type === "deposit" ? "default" : "secondary"}
+                        className={tx.type === "deposit" ? "bg-primary/20 text-primary" : "bg-accent/20 text-accent"}
+                      >
+                        {tx.type}
+                      </Badge>
+                      <span className="font-semibold">${tx.amount.toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {tx.user_email} • {format(new Date(tx.created_at), "MMM dd, HH:mm")}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => handleQuickApprove(tx)}
+                      disabled={processingId === tx.id}
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleQuickReject(tx)}
+                      disabled={processingId === tx.id}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin/deposits")}>
+                View All Transactions
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recent Activity */}
       <Card className="glass-card-enhanced border-border/50">

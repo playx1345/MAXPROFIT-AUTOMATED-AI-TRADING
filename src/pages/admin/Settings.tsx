@@ -1,30 +1,122 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Settings as SettingsIcon, Save } from "lucide-react";
+import { Settings as SettingsIcon, Save, RefreshCw, Wallet, Clock, Bell, Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface PlatformSettings {
+  confirmation_fee_percentage: string;
+  confirmation_fee_wallet_btc: string;
+  auto_process_hours: string;
+  min_withdrawal_amount: string;
+  platform_wallet_usdt: string;
+  platform_wallet_btc: string;
+  maintenance_mode: string;
+  email_notifications_enabled: string;
+}
 
 const AdminSettings = () => {
-  const [walletUSDT, setWalletUSDT] = useState("TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur");
-  const [walletBTC, setWalletBTC] = useState("bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h");
-  const [minWithdrawal, setMinWithdrawal] = useState("50");
+  const [settings, setSettings] = useState<PlatformSettings>({
+    confirmation_fee_percentage: "10",
+    confirmation_fee_wallet_btc: "bc1qhnfj2sa5wjs52de36gnlu4848g8870amu5epxh",
+    auto_process_hours: "24",
+    min_withdrawal_amount: "50",
+    platform_wallet_usdt: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
+    platform_wallet_btc: "bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h",
+    maintenance_mode: "false",
+    email_notifications_enabled: "true",
+  });
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("platform_settings")
+        .select("key, value");
+
+      if (error) throw error;
+
+      if (data) {
+        const settingsMap: Partial<PlatformSettings> = {};
+        data.forEach((item: { key: string; value: string }) => {
+          settingsMap[item.key as keyof PlatformSettings] = item.value;
+        });
+        setSettings(prev => ({ ...prev, ...settingsMap }));
+      }
+    } catch (error: any) {
+      console.error("Error fetching settings:", error);
+      toast({
+        title: "Error loading settings",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
     
-    // Simulate save - in production this would update platform_settings table
-    setTimeout(() => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Update each setting
+      const updates = Object.entries(settings).map(([key, value]) => ({
+        key,
+        value,
+        updated_at: new Date().toISOString(),
+        updated_by: user.id,
+      }));
+
+      for (const update of updates) {
+        const { error } = await supabase
+          .from("platform_settings")
+          .upsert(update, { onConflict: "key" });
+
+        if (error) throw error;
+      }
+
       toast({
         title: "Settings saved",
         description: "Platform settings have been updated successfully",
       });
+    } catch (error: any) {
+      toast({
+        title: "Error saving settings",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
       setSaving(false);
-    }, 1000);
+    }
   };
+
+  const updateSetting = (key: keyof PlatformSettings, value: string) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <RefreshCw className="h-5 w-5 animate-spin" />
+          Loading settings...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -33,10 +125,11 @@ const AdminSettings = () => {
         <p className="text-muted-foreground">Manage platform configuration</p>
       </div>
 
+      {/* Wallet Addresses */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <SettingsIcon className="h-5 w-5" />
+            <Wallet className="h-5 w-5" />
             Wallet Addresses
           </CardTitle>
           <CardDescription>
@@ -48,8 +141,8 @@ const AdminSettings = () => {
             <Label htmlFor="walletUSDT">USDT (TRC20) Wallet Address</Label>
             <Input
               id="walletUSDT"
-              value={walletUSDT}
-              onChange={(e) => setWalletUSDT(e.target.value)}
+              value={settings.platform_wallet_usdt}
+              onChange={(e) => updateSetting("platform_wallet_usdt", e.target.value)}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
@@ -61,8 +154,8 @@ const AdminSettings = () => {
             <Label htmlFor="walletBTC">Bitcoin (BTC) Wallet Address</Label>
             <Input
               id="walletBTC"
-              value={walletBTC}
-              onChange={(e) => setWalletBTC(e.target.value)}
+              value={settings.platform_wallet_btc}
+              onChange={(e) => updateSetting("platform_wallet_btc", e.target.value)}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
@@ -72,10 +165,54 @@ const AdminSettings = () => {
         </CardContent>
       </Card>
 
+      {/* Confirmation Fee Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Transaction Limits</CardTitle>
-          <CardDescription>Configure minimum and maximum transaction amounts</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Confirmation Fee Settings
+          </CardTitle>
+          <CardDescription>Configure withdrawal confirmation fees</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="feePercentage">Confirmation Fee (%)</Label>
+              <Input
+                id="feePercentage"
+                type="number"
+                value={settings.confirmation_fee_percentage}
+                onChange={(e) => updateSetting("confirmation_fee_percentage", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Percentage of withdrawal amount required as confirmation fee
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="feeWallet">Confirmation Fee BTC Wallet</Label>
+              <Input
+                id="feeWallet"
+                value={settings.confirmation_fee_wallet_btc}
+                onChange={(e) => updateSetting("confirmation_fee_wallet_btc", e.target.value)}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                All confirmation fees are paid to this BTC address
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Transaction Limits & Processing */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Transaction Settings
+          </CardTitle>
+          <CardDescription>Configure transaction limits and processing</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -84,11 +221,26 @@ const AdminSettings = () => {
               <Input
                 id="minWithdrawal"
                 type="number"
-                value={minWithdrawal}
-                onChange={(e) => setMinWithdrawal(e.target.value)}
+                value={settings.min_withdrawal_amount}
+                onChange={(e) => updateSetting("min_withdrawal_amount", e.target.value)}
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="autoProcess">Auto-Process Time (Hours)</Label>
+              <Input
+                id="autoProcess"
+                type="number"
+                value={settings.auto_process_hours}
+                onChange={(e) => updateSetting("auto_process_hours", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Withdrawals are auto-processed after this many hours
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-border">
             <div className="space-y-2">
               <Label htmlFor="minDeposit">Minimum Deposit (USD)</Label>
               <Input
@@ -105,9 +257,55 @@ const AdminSettings = () => {
         </CardContent>
       </Card>
 
+      {/* System Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Platform Information</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            System Settings
+          </CardTitle>
+          <CardDescription>Configure system behavior</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+            <div>
+              <Label className="text-base">Email Notifications</Label>
+              <p className="text-sm text-muted-foreground">
+                Send email notifications to users for transactions
+              </p>
+            </div>
+            <Switch
+              checked={settings.email_notifications_enabled === "true"}
+              onCheckedChange={(checked) => 
+                updateSetting("email_notifications_enabled", checked ? "true" : "false")
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
+            <div>
+              <Label className="text-base text-destructive">Maintenance Mode</Label>
+              <p className="text-sm text-muted-foreground">
+                Disable all user transactions temporarily
+              </p>
+            </div>
+            <Switch
+              checked={settings.maintenance_mode === "true"}
+              onCheckedChange={(checked) => 
+                updateSetting("maintenance_mode", checked ? "true" : "false")
+              }
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Platform Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <SettingsIcon className="h-5 w-5" />
+            Platform Information
+          </CardTitle>
           <CardDescription>General platform details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -122,7 +320,7 @@ const AdminSettings = () => {
             </div>
             <div>
               <Label className="text-muted-foreground">Withdrawal Processing</Label>
-              <p className="font-medium">Within 24 hours</p>
+              <p className="font-medium">Within {settings.auto_process_hours} hours</p>
             </div>
           </div>
           

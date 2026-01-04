@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, CONFIRMATION_FEE_WALLET_USDT, CONFIRMATION_FEE_WALLET_ETH, CONFIRMATION_FEE_WALLET_USDC, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -278,31 +278,14 @@ const Withdraw = () => {
         <AlertDescription className="text-yellow-900 dark:text-yellow-100">
           <strong>⚠️ Important: Confirmation Fee Required</strong>
           <p className="mt-2 text-sm">
-            Before your withdrawal can be approved, you must pay a <strong>10% confirmation fee</strong> to verify your transaction. The fee must be paid in the same currency as your withdrawal.
+            Before your withdrawal can be approved, you must pay a <strong>10% confirmation fee in BTC</strong> to verify your transaction (regardless of withdrawal currency).
           </p>
           <div className="mt-3 p-2 bg-background rounded border border-yellow-600">
-            <p className="text-xs font-semibold mb-1">Fee Payment Addresses:</p>
-            <div className="space-y-1">
-              <div>
-                <p className="text-xs font-medium">BTC:</p>
-                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium">USDT (TRC20):</p>
-                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_USDT}</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium">ETH:</p>
-                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_ETH}</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium">USDC (ERC20):</p>
-                <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_USDC}</p>
-              </div>
-            </div>
+            <p className="text-xs font-semibold mb-1">Send BTC to:</p>
+            <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
           </div>
           <p className="mt-2 text-xs">
-            After submitting your withdrawal request, send the 10% confirmation fee to the appropriate address above. 
+            After submitting your withdrawal request, send the 10% confirmation fee in BTC to the address above. 
             Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal within 24 hours.
           </p>
         </AlertDescription>
@@ -505,39 +488,24 @@ const Withdraw = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Send Fee To ({pendingWithdrawalCurrency.toUpperCase()} Address)</Label>
+              <Label>Send Fee To (BTC Only)</Label>
               <div className="flex items-center gap-2">
                 <Input
-                  value={
-                    pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : 
-                    pendingWithdrawalCurrency === "usdt" ? CONFIRMATION_FEE_WALLET_USDT :
-                    pendingWithdrawalCurrency === "eth" ? CONFIRMATION_FEE_WALLET_ETH :
-                    CONFIRMATION_FEE_WALLET_USDC
-                  }
+                  value={CONFIRMATION_FEE_WALLET_BTC}
                   readOnly
                   className="font-mono text-xs"
                 />
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => copyToClipboard(
-                    pendingWithdrawalCurrency === "btc" ? CONFIRMATION_FEE_WALLET_BTC : 
-                    pendingWithdrawalCurrency === "usdt" ? CONFIRMATION_FEE_WALLET_USDT :
-                    pendingWithdrawalCurrency === "eth" ? CONFIRMATION_FEE_WALLET_ETH :
-                    CONFIRMATION_FEE_WALLET_USDC
-                  )}
+                  onClick={() => copyToClipboard(CONFIRMATION_FEE_WALLET_BTC)}
                   title="Copy address"
                 >
                   {copiedAddress ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Send exactly ${calculateFee(pendingWithdrawalAmount).toFixed(2)} worth of {
-                  pendingWithdrawalCurrency === "btc" ? "Bitcoin (BTC)" : 
-                  pendingWithdrawalCurrency === "usdt" ? "USDT (TRC20)" :
-                  pendingWithdrawalCurrency === "eth" ? "Ethereum (ETH)" :
-                  "USDC (ERC20)"
-                } to this address
+                Send exactly ${calculateFee(pendingWithdrawalAmount).toFixed(2)} worth of BTC to this address
               </p>
             </div>
 

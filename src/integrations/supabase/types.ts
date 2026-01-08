@@ -448,6 +448,41 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_approvals: {
+        Row: {
+          admin_email: string
+          admin_id: string
+          approved_at: string
+          id: string
+          notes: string | null
+          transaction_id: string
+        }
+        Insert: {
+          admin_email: string
+          admin_id: string
+          approved_at?: string
+          id?: string
+          notes?: string | null
+          transaction_id: string
+        }
+        Update: {
+          admin_email?: string
+          admin_id?: string
+          approved_at?: string
+          id?: string
+          notes?: string | null
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_approvals_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

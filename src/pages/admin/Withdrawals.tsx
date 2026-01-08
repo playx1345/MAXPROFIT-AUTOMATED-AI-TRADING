@@ -9,13 +9,15 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock, Filter } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock, Users, Shield } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
+import { useWithdrawalApprovals } from "@/hooks/useWithdrawalApprovals";
+import { WithdrawalApprovalBadge } from "@/components/admin/WithdrawalApprovalBadge";
 
 interface Withdrawal {
   id: string;
@@ -50,11 +52,40 @@ const AdminWithdrawals = () => {
   const [reverseReason, setReverseReason] = useState("");
   const [showReverseConfirm, setShowReverseConfirm] = useState(false);
   const [showReopenConfirm, setShowReopenConfirm] = useState(false);
+  const [currentAdminId, setCurrentAdminId] = useState<string>("");
+  const [currentAdminEmail, setCurrentAdminEmail] = useState<string>("");
   const { toast } = useToast();
+  
+  const {
+    approvals,
+    settings,
+    fetchApprovals,
+    addApproval,
+    removeApproval,
+    clearApprovals,
+    getApprovalStatus,
+  } = useWithdrawalApprovals();
 
   useEffect(() => {
     fetchWithdrawals();
+    fetchCurrentAdmin();
   }, []);
+
+  useEffect(() => {
+    // Fetch approvals when withdrawals change
+    const pendingIds = withdrawals
+      .filter((w) => w.status === "pending")
+      .map((w) => w.id);
+    fetchApprovals(pendingIds);
+  }, [withdrawals, fetchApprovals]);
+
+  const fetchCurrentAdmin = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setCurrentAdminId(user.id);
+      setCurrentAdminEmail(user.email || "");
+    }
+  };
 
   const fetchWithdrawals = async () => {
     try {
@@ -201,6 +232,50 @@ const AdminWithdrawals = () => {
     }
   };
 
+  // Handle adding approval for large withdrawals
+  const handleAddApproval = async () => {
+    if (!selectedWithdrawal || !currentAdminId) return;
+    setProcessing(true);
+
+    try {
+      const success = await addApproval(
+        selectedWithdrawal.id,
+        currentAdminId,
+        currentAdminEmail,
+        adminNotes || undefined
+      );
+
+      if (success) {
+        // Refresh approvals
+        const pendingIds = withdrawals
+          .filter((w) => w.status === "pending")
+          .map((w) => w.id);
+        await fetchApprovals(pendingIds);
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Handle removing own approval
+  const handleRemoveApproval = async () => {
+    if (!selectedWithdrawal || !currentAdminId) return;
+    setProcessing(true);
+
+    try {
+      const success = await removeApproval(selectedWithdrawal.id, currentAdminId);
+
+      if (success) {
+        const pendingIds = withdrawals
+          .filter((w) => w.status === "pending")
+          .map((w) => w.id);
+        await fetchApprovals(pendingIds);
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleApprove = async () => {
     if (!selectedWithdrawal) return;
 
@@ -209,6 +284,17 @@ const AdminWithdrawals = () => {
       toast({
         title: "Insufficient balance",
         description: "User doesn't have enough balance for this withdrawal",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check multi-admin approval requirement
+    const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
+    if (!approvalStatus.canFinalize) {
+      toast({
+        title: "More Approvals Required",
+        description: `Large withdrawals (>${settings.threshold.toLocaleString()}) need ${approvalStatus.requiredCount} admin approvals. Currently has ${approvalStatus.currentCount}.`,
         variant: "destructive",
       });
       return;
@@ -231,6 +317,9 @@ const AdminWithdrawals = () => {
       });
 
       if (error) throw error;
+
+      // Clear approvals for this transaction (cleanup)
+      await clearApprovals(selectedWithdrawal.id);
 
       toast({
         title: "Withdrawal approved",
@@ -427,6 +516,10 @@ const AdminWithdrawals = () => {
     const displayStatus = withdrawal.status === 'pending' && hasFeeSubmitted 
       ? 'processing' 
       : withdrawal.status;
+
+    // Get approval status for this withdrawal
+    const approvalStatus = getApprovalStatus(withdrawal.id, withdrawal.amount);
+    const txApprovals = approvals[withdrawal.id] || [];
     
     return (
       <TableRow>
@@ -436,8 +529,18 @@ const AdminWithdrawals = () => {
             <p className="text-xs text-muted-foreground">{withdrawal.profiles?.email}</p>
           </div>
         </TableCell>
-        <TableCell className="font-semibold">
-          ${withdrawal.amount.toLocaleString()}
+        <TableCell>
+          <div className="space-y-1">
+            <span className="font-semibold">${withdrawal.amount.toLocaleString()}</span>
+            {approvalStatus.isLarge && withdrawal.status === "pending" && (
+              <div className="flex items-center gap-1">
+                <Badge variant="outline" className="text-xs border-orange-500 text-orange-600">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Large
+                </Badge>
+              </div>
+            )}
+          </div>
         </TableCell>
         <TableCell className="uppercase">{withdrawal.currency}</TableCell>
         <TableCell className="font-mono text-xs max-w-[150px] truncate">
@@ -465,6 +568,14 @@ const AdminWithdrawals = () => {
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
                 <span>Fee paid</span>
+              </div>
+            )}
+            {withdrawal.status === "pending" && approvalStatus.isLarge && (
+              <div className="flex items-center gap-1 text-xs">
+                <Users className="h-3 w-3" />
+                <span className={approvalStatus.canFinalize ? "text-green-600" : "text-orange-600"}>
+                  {approvalStatus.currentCount}/{approvalStatus.requiredCount} approvals
+                </span>
               </div>
             )}
           </div>
@@ -810,6 +921,79 @@ const AdminWithdrawals = () => {
 
               {selectedWithdrawal.status === "pending" && (
                 <div className="border-t pt-4 space-y-3">
+                  {/* Multi-Admin Approval Section for Large Withdrawals */}
+                  {(() => {
+                    const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
+                    const txApprovals = approvals[selectedWithdrawal.id] || [];
+                    const hasApproved = txApprovals.some((a) => a.admin_id === currentAdminId);
+
+                    if (approvalStatus.isLarge) {
+                      return (
+                        <div className="p-4 border border-orange-500 rounded-lg space-y-3 bg-orange-500/5">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Shield className="h-5 w-5 text-orange-500" />
+                              <span className="font-semibold text-orange-600">
+                                Large Withdrawal - Multi-Admin Review Required
+                              </span>
+                            </div>
+                            <Badge
+                              variant="outline"
+                              className={approvalStatus.canFinalize ? "border-green-500 text-green-600" : "border-orange-500 text-orange-600"}
+                            >
+                              {approvalStatus.currentCount}/{approvalStatus.requiredCount} Approvals
+                            </Badge>
+                          </div>
+                          
+                          <p className="text-sm text-muted-foreground">
+                            Withdrawals over ${settings.threshold.toLocaleString()} require {settings.requiredApprovals} admin approvals before final processing.
+                          </p>
+
+                          {txApprovals.length > 0 && (
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">Current Approvals:</Label>
+                              {txApprovals.map((approval) => (
+                                <div key={approval.id} className="flex items-center justify-between text-sm p-2 bg-muted rounded">
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4 text-green-500" />
+                                    <span>{approval.admin_email}</span>
+                                  </div>
+                                  <span className="text-xs text-muted-foreground">
+                                    {format(new Date(approval.approved_at), "MMM dd, HH:mm")}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="flex gap-2">
+                            {!hasApproved ? (
+                              <Button
+                                className="flex-1 bg-orange-600 hover:bg-orange-700"
+                                onClick={handleAddApproval}
+                                disabled={processing}
+                              >
+                                <Users className="h-4 w-4 mr-2" />
+                                Add My Approval
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                className="flex-1"
+                                onClick={handleRemoveApproval}
+                                disabled={processing}
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Remove My Approval
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
                   <div>
                     <Label>Transaction Hash (After sending)</Label>
                     <Input
@@ -827,14 +1011,25 @@ const AdminWithdrawals = () => {
                     />
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                      onClick={handleApprove}
-                      disabled={processing || selectedWithdrawal.profiles?.balance_usdt < selectedWithdrawal.amount}
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Approve & Process
-                    </Button>
+                    {(() => {
+                      const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
+                      const canProcess = approvalStatus.canFinalize && selectedWithdrawal.profiles?.balance_usdt >= selectedWithdrawal.amount;
+                      
+                      return (
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={handleApprove}
+                          disabled={processing || !canProcess}
+                          title={!approvalStatus.canFinalize ? `Requires ${approvalStatus.requiredCount} approvals (has ${approvalStatus.currentCount})` : undefined}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          {approvalStatus.isLarge && !approvalStatus.canFinalize 
+                            ? `Need ${approvalStatus.requiredCount - approvalStatus.currentCount} More Approval(s)`
+                            : "Approve & Process"
+                          }
+                        </Button>
+                      );
+                    })()}
                     <Button
                       variant="destructive"
                       className="flex-1"

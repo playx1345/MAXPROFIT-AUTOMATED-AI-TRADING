@@ -10,11 +10,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface PlatformSettings {
   confirmation_fee_percentage: string;
+  xrp_confirmation_fee_percentage: string;
   confirmation_fee_wallet_btc: string;
   auto_process_hours: string;
   min_withdrawal_amount: string;
   platform_wallet_usdt: string;
   platform_wallet_btc: string;
+  platform_wallet_xrp: string;
   maintenance_mode: string;
   email_notifications_enabled: string;
 }
@@ -22,11 +24,13 @@ interface PlatformSettings {
 const AdminSettings = () => {
   const [settings, setSettings] = useState<PlatformSettings>({
     confirmation_fee_percentage: "10",
+    xrp_confirmation_fee_percentage: "2",
     confirmation_fee_wallet_btc: "bc1qhnfj2sa5wjs52de36gnlu4848g8870amu5epxh",
     auto_process_hours: "24",
     min_withdrawal_amount: "50",
     platform_wallet_usdt: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
     platform_wallet_btc: "bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h",
+    platform_wallet_xrp: "ranmERjBSRh9Z3Dp9pPsHFv2Uhk6i2aP37",
     maintenance_mode: "false",
     email_notifications_enabled: "true",
   });
@@ -162,6 +166,19 @@ const AdminSettings = () => {
               This address will be shown to users when they make BTC deposits
             </p>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="walletXRP">XRP (Ripple) Wallet Address</Label>
+            <Input
+              id="walletXRP"
+              value={settings.platform_wallet_xrp}
+              onChange={(e) => updateSetting("platform_wallet_xrp", e.target.value)}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              This address will be shown to users when they make XRP deposits
+            </p>
+          </div>
         </CardContent>
       </Card>
 
@@ -184,23 +201,36 @@ const AdminSettings = () => {
                 value={settings.confirmation_fee_percentage}
                 onChange={(e) => updateSetting("confirmation_fee_percentage", e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
-                Percentage of withdrawal amount required as confirmation fee
+            <p className="text-xs text-muted-foreground">
+                Percentage of withdrawal amount required as confirmation fee (default currencies)
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="feeWallet">Confirmation Fee BTC Wallet</Label>
+              <Label htmlFor="xrpFeePercentage">XRP Confirmation Fee (%)</Label>
               <Input
-                id="feeWallet"
-                value={settings.confirmation_fee_wallet_btc}
-                onChange={(e) => updateSetting("confirmation_fee_wallet_btc", e.target.value)}
-                className="font-mono text-sm"
+                id="xrpFeePercentage"
+                type="number"
+                value={settings.xrp_confirmation_fee_percentage}
+                onChange={(e) => updateSetting("xrp_confirmation_fee_percentage", e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                All confirmation fees are paid to this BTC address
+                Confirmation fee percentage for XRP withdrawals only
               </p>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="feeWallet">Confirmation Fee BTC Wallet</Label>
+            <Input
+              id="feeWallet"
+              value={settings.confirmation_fee_wallet_btc}
+              onChange={(e) => updateSetting("confirmation_fee_wallet_btc", e.target.value)}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              All confirmation fees are paid to this BTC address
+            </p>
           </div>
         </CardContent>
       </Card>

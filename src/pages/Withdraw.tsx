@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, XRP_WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
@@ -30,7 +30,7 @@ interface RecentWithdrawal {
 
 const Withdraw = () => {
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc">("usdt");
+  const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
   const [walletAddress, setWalletAddress] = useState("");
   const [balance, setBalance] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -38,7 +38,7 @@ const Withdraw = () => {
   const [errors, setErrors] = useState<{ amount?: string; wallet?: string }>({});
   const [feePaymentDialogOpen, setFeePaymentDialogOpen] = useState(false);
   const [pendingWithdrawalId, setPendingWithdrawalId] = useState<string | null>(null);
-  const [pendingWithdrawalCurrency, setPendingWithdrawalCurrency] = useState<"usdt" | "btc" | "eth" | "usdc">("usdt");
+  const [pendingWithdrawalCurrency, setPendingWithdrawalCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
   const [pendingWithdrawalAmount, setPendingWithdrawalAmount] = useState(0);
   const [feePaymentHash, setFeePaymentHash] = useState("");
   const [submittingFeeHash, setSubmittingFeeHash] = useState(false);
@@ -101,8 +101,15 @@ const Withdraw = () => {
     }
   };
 
-  const calculateFee = (withdrawalAmount: number): number => {
+  const calculateFee = (withdrawalAmount: number, curr: string = currency): number => {
+    if (curr === 'xrp') {
+      return withdrawalAmount * XRP_WITHDRAWAL_FEE_PERCENTAGE;
+    }
     return withdrawalAmount * WITHDRAWAL_FEE_PERCENTAGE;
+  };
+
+  const getCurrentFeePercentage = (): number => {
+    return currency === 'xrp' ? XRP_WITHDRAWAL_FEE_PERCENTAGE : WITHDRAWAL_FEE_PERCENTAGE;
   };
 
   const calculateNetAmount = (withdrawalAmount: number): number => {
@@ -175,7 +182,7 @@ const Withdraw = () => {
 
       toast({
         title: "Withdrawal created!",
-        description: `Please submit your ${(WITHDRAWAL_FEE_PERCENTAGE * 100)}% confirmation fee payment ($${feeAmount.toFixed(2)}) to proceed.`,
+        description: `Please submit your ${(getCurrentFeePercentage() * 100)}% confirmation fee payment ($${feeAmount.toFixed(2)}) to proceed.`,
       });
 
       setAmount("");
@@ -278,14 +285,14 @@ const Withdraw = () => {
         <AlertDescription className="text-yellow-900 dark:text-yellow-100">
           <strong>⚠️ Important: Confirmation Fee Required</strong>
           <p className="mt-2 text-sm">
-            Before your withdrawal can be approved, you must pay a <strong>10% confirmation fee in BTC</strong> to verify your transaction (regardless of withdrawal currency).
+            Before your withdrawal can be approved, you must pay a <strong>{currency === 'xrp' ? '2%' : '10%'} confirmation fee in BTC</strong> to verify your transaction (regardless of withdrawal currency).
           </p>
           <div className="mt-3 p-2 bg-background rounded border border-yellow-600">
             <p className="text-xs font-semibold mb-1">Send BTC to:</p>
             <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
           </div>
           <p className="mt-2 text-xs">
-            After submitting your withdrawal request, send the 10% confirmation fee in BTC to the address above. 
+            After submitting your withdrawal request, send the {currency === 'xrp' ? '2%' : '10%'} confirmation fee in BTC to the address above. 
             Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal within 24 hours.
           </p>
         </AlertDescription>
@@ -350,6 +357,13 @@ const Withdraw = () => {
                 >
                   USDC (ERC20)
                 </Button>
+                <Button
+                  variant={currency === "xrp" ? "default" : "outline"}
+                  onClick={() => setCurrency("xrp")}
+                  className="col-span-2"
+                >
+                  XRP (Ripple) - 2% Fee
+                </Button>
               </div>
             </div>
 
@@ -384,7 +398,7 @@ const Withdraw = () => {
               <Label htmlFor="wallet">Your Wallet Address</Label>
               <Input
                 id="wallet"
-                placeholder={currency === "usdt" ? "T..." : currency === "btc" ? "bc1..." : "0x..."}
+                placeholder={currency === "usdt" ? "T..." : currency === "btc" ? "bc1..." : currency === "xrp" ? "r..." : "0x..."}
                 value={walletAddress}
                 onChange={(e) => {
                   setWalletAddress(e.target.value);
@@ -404,6 +418,7 @@ const Withdraw = () => {
                 <p className="text-xs text-muted-foreground">
                   {currency === "usdt" ? "TRON (TRC20) network" : 
                    currency === "btc" ? "Bitcoin network" : 
+                   currency === "xrp" ? "XRP Ledger network" :
                    "Ethereum (ERC20) network"}
                 </p>
               )}
@@ -416,7 +431,7 @@ const Withdraw = () => {
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-yellow-600 dark:text-yellow-500">
-                  <span>Confirmation fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%):</span>
+                  <span>Confirmation fee ({(getCurrentFeePercentage() * 100)}%):</span>
                   <span>${estimatedFees.toFixed(2)} (paid separately)</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">
@@ -466,7 +481,7 @@ const Withdraw = () => {
           <DialogHeader>
             <DialogTitle>Submit Confirmation Fee Payment</DialogTitle>
             <DialogDescription>
-              Complete your withdrawal by paying the {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% confirmation fee
+              Complete your withdrawal by paying the {pendingWithdrawalCurrency === 'xrp' ? '2%' : '10%'} confirmation fee
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -480,10 +495,10 @@ const Withdraw = () => {
             <div className="space-y-2">
               <Label>Fee Amount (in USD equivalent)</Label>
               <div className="text-2xl font-bold text-primary">
-                ${calculateFee(pendingWithdrawalAmount).toFixed(2)}
+                ${calculateFee(pendingWithdrawalAmount, pendingWithdrawalCurrency).toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">
-                {(WITHDRAWAL_FEE_PERCENTAGE * 100)}% of ${pendingWithdrawalAmount.toLocaleString()} withdrawal
+                {(pendingWithdrawalCurrency === 'xrp' ? XRP_WITHDRAWAL_FEE_PERCENTAGE : WITHDRAWAL_FEE_PERCENTAGE) * 100}% of ${pendingWithdrawalAmount.toLocaleString()} withdrawal
               </p>
             </div>
 
@@ -505,7 +520,7 @@ const Withdraw = () => {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Send exactly ${calculateFee(pendingWithdrawalAmount).toFixed(2)} worth of BTC to this address
+                Send exactly ${calculateFee(pendingWithdrawalAmount, pendingWithdrawalCurrency).toFixed(2)} worth of BTC to this address
               </p>
             </div>
 

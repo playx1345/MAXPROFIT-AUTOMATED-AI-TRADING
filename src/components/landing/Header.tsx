@@ -23,57 +23,60 @@ export const Header = () => {
     }
   };
 
+  const navLinks = [
+    { label: t('nav.features'), id: 'features' },
+    { label: t('nav.plans'), id: 'plans' },
+    { label: t('nav.howItWorks'), id: 'how-it-works' },
+    { label: t('nav.faq'), id: 'faq' },
+  ];
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-b border-border/40 safe-area-top">
-      <nav className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <nav className="container mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group min-w-0">
-            <div className="relative flex-shrink-0">
-              <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-primary rounded-lg blur opacity-30 group-hover:opacity-50 transition-opacity" />
-              <img src={logo} alt="Live Win Trade" className="relative w-7 h-7 sm:w-9 sm:h-9 rounded-lg object-cover" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <img src={logo} alt="Live Win Trade" className="w-10 h-10 rounded-xl object-cover border border-border/50 group-hover:border-primary/50 transition-colors" />
             </div>
-            <span className="font-serif font-bold text-xs sm:text-sm text-foreground truncate max-w-[100px] sm:max-w-none">Live Win Trade</span>
+            <span className="font-bold text-lg text-foreground hidden sm:block">Live Win Trade</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8">
-            <button onClick={() => scrollToSection("features")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              {t('nav.features')}
-            </button>
-            <button onClick={() => scrollToSection("plans")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              {t('nav.plans')}
-            </button>
-            <button onClick={() => scrollToSection("how-it-works")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              {t('nav.howItWorks')}
-            </button>
-            <button onClick={() => scrollToSection("faq")} className="text-sm font-serif font-medium text-muted-foreground hover:text-primary transition-colors">
-              {t('nav.faq')}
-            </button>
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => scrollToSection(link.id)}
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+              >
+                {link.label}
+              </button>
+            ))}
           </div>
 
-          {/* Desktop CTA Buttons & Theme Toggle & Language */}
-          <div className="hidden md:flex items-center gap-2 lg:gap-3">
+          {/* Desktop CTA */}
+          <div className="hidden md:flex items-center gap-3">
             <LanguageSelector />
             <ThemeToggle />
             <Link to="/auth">
-              <Button variant="ghost" size="sm" className="font-serif font-medium">
+              <Button variant="ghost" size="sm" className="font-medium">
                 {t('nav.signIn')}
               </Button>
             </Link>
             <Link to="/auth">
-              <Button size="sm" className="bg-gradient-primary font-serif font-medium shadow-elegant hover:shadow-glow transition-all">
+              <Button size="sm" className="font-medium bg-primary hover:bg-primary/90">
                 {t('nav.getStarted')}
               </Button>
             </Link>
           </div>
 
-          {/* Mobile: Language, Theme Toggle & Menu Button */}
-          <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+          {/* Mobile Controls */}
+          <div className="flex md:hidden items-center gap-2">
             <LanguageSelector />
             <ThemeToggle />
             <button 
-              className="p-1.5 sm:p-2 text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted/50" 
+              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors" 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
               aria-label="Toggle menu"
             >
@@ -84,28 +87,25 @@ export const Header = () => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-3 sm:mt-4 pb-4 border-t border-border/40 pt-4 animate-fade-in">
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <button onClick={() => scrollToSection("features")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                {t('nav.features')}
-              </button>
-              <button onClick={() => scrollToSection("plans")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                {t('nav.plans')}
-              </button>
-              <button onClick={() => scrollToSection("how-it-works")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                {t('nav.howItWorks')}
-              </button>
-              <button onClick={() => scrollToSection("faq")} className="text-sm sm:text-base font-serif font-medium text-muted-foreground hover:text-primary transition-colors text-left py-1">
-                {t('nav.faq')}
-              </button>
-              <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-border/30">
+          <div className="md:hidden mt-4 pb-4 border-t border-border/50 pt-4 animate-fade-in">
+            <div className="flex flex-col gap-1">
+              {navLinks.map((link) => (
+                <button
+                  key={link.id}
+                  onClick={() => scrollToSection(link.id)}
+                  className="w-full text-left px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+                >
+                  {link.label}
+                </button>
+              ))}
+              <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full font-serif font-medium h-10 sm:h-11">
+                  <Button variant="outline" className="w-full h-11">
                     {t('nav.signIn')}
                   </Button>
                 </Link>
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                  <Button size="sm" className="w-full bg-gradient-primary font-serif font-medium h-10 sm:h-11">
+                  <Button className="w-full h-11 bg-primary hover:bg-primary/90">
                     {t('nav.getStarted')}
                   </Button>
                 </Link>

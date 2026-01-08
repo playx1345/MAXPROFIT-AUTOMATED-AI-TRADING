@@ -1,7 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, TrendingUp } from "lucide-react";
+import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface InvestmentPlanCardProps {
@@ -23,88 +22,74 @@ export const InvestmentPlanCard = ({
   expectedROI,
   features,
   popular = false,
-  glowColor = "from-primary to-primary-glow"
 }: InvestmentPlanCardProps) => {
-  return (
-    <div className="relative group">
-      {/* Glow effect */}
-      <div className={`absolute -inset-1 bg-gradient-to-r ${glowColor} rounded-2xl opacity-0 group-hover:opacity-60 blur-xl transition-all duration-500`} />
-      
-      <Card className="relative transform group-hover:-translate-y-2 transition-all duration-300 glass-card-enhanced border-primary/20 overflow-hidden hover:shadow-none hover:scale-100">
-        {/* Gradient accent line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-        
-        {/* Background pattern */}
-        <div className="absolute top-0 right-0 opacity-5">
-          <TrendingUp className="w-48 h-48 text-primary" />
-        </div>
+  const getRiskColor = (riskLevel: string) => {
+    if (riskLevel.toLowerCase().includes('low')) return 'text-success';
+    if (riskLevel.toLowerCase().includes('medium')) return 'text-primary';
+    return 'text-destructive';
+  };
 
+  return (
+    <div className={`relative group h-full ${popular ? 'scale-[1.02]' : ''}`}>
+      {/* Popular highlight */}
+      {popular && (
+        <div className="absolute -inset-px bg-gradient-to-b from-primary to-primary/50 rounded-2xl" />
+      )}
+      
+      <div className={`relative h-full flex flex-col p-6 sm:p-8 rounded-2xl bg-card border ${popular ? 'border-transparent' : 'border-border'} transition-all duration-300 hover:shadow-xl`}>
+        {/* Popular badge */}
         {popular && (
-          <div className="absolute top-4 right-4 z-20">
-            <Badge className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground border-0 shadow-lg">
-              POPULAR
-            </Badge>
-          </div>
+          <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground border-0 px-4">
+            MOST POPULAR
+          </Badge>
         )}
 
-        <CardHeader className="relative z-10 p-4 sm:p-6">
-          <CardTitle className="text-2xl sm:text-3xl mb-2 font-serif">{title}</CardTitle>
-          <CardDescription className="text-base sm:text-lg font-serif">
-            <span className="font-semibold text-foreground">Risk Level:</span>{" "}
-            <span className={`font-medium ${
-              risk === "Low" || risk === "Low Risk" ? "text-success" : 
-              risk === "Medium" || risk === "Medium Risk" ? "text-primary" : "text-destructive"
-            }`}>
-              {risk}
-            </span>
-          </CardDescription>
-        </CardHeader>
+        {/* Header */}
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold mb-2">{title}</h3>
+          <p className="text-sm">
+            <span className="text-muted-foreground">Risk Level: </span>
+            <span className={`font-semibold ${getRiskColor(risk)}`}>{risk}</span>
+          </p>
+        </div>
 
-        <CardContent className="relative z-10 space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
-          {/* Investment range */}
-          <div className="space-y-2 sm:space-y-3">
-            <div className="flex justify-between items-center p-2.5 sm:p-3 rounded-lg bg-muted/50 border border-border/50">
-              <span className="text-muted-foreground text-xs sm:text-sm font-serif">Min Investment</span>
-              <span className="text-lg sm:text-xl font-bold text-primary font-serif">
-                {minInvestment}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-2.5 sm:p-3 rounded-lg bg-muted/50 border border-border/50">
-              <span className="text-muted-foreground text-xs sm:text-sm font-serif">Max Investment</span>
-              <span className="text-lg sm:text-xl font-bold text-primary font-serif">
-                {maxInvestment}
-              </span>
-            </div>
+        {/* ROI */}
+        <div className="mb-6 p-4 rounded-xl bg-muted/50 border border-border">
+          <p className="text-sm text-muted-foreground mb-1">Expected ROI</p>
+          <p className="text-3xl font-bold text-primary">{expectedROI}</p>
+        </div>
+
+        {/* Investment range */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+            <p className="text-xs text-muted-foreground mb-1">Min</p>
+            <p className="text-lg font-bold">{minInvestment}</p>
           </div>
-
-          {/* Expected ROI */}
-          <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 border border-primary/20">
-            <div className="text-xs sm:text-sm text-muted-foreground mb-1 font-serif">Expected ROI</div>
-            <div className="text-2xl sm:text-3xl font-bold font-serif bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-transparent">
-              {expectedROI}
-            </div>
+          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+            <p className="text-xs text-muted-foreground mb-1">Max</p>
+            <p className="text-lg font-bold">{maxInvestment}</p>
           </div>
+        </div>
 
-          {/* Features */}
-          <ul className="space-y-2 sm:space-y-3">
-            {features.map((feature, index) => (
-              <li key={index} className="flex items-start gap-2 sm:gap-3">
-                <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-primary" />
-                </div>
-                <span className="text-xs sm:text-sm text-muted-foreground font-serif">{feature}</span>
-              </li>
-            ))}
-          </ul>
+        {/* Features */}
+        <ul className="space-y-3 mb-8 flex-grow">
+          {features.map((feature, index) => (
+            <li key={index} className="flex items-start gap-3">
+              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Check className="w-3 h-3 text-primary" />
+              </div>
+              <span className="text-sm text-muted-foreground">{feature}</span>
+            </li>
+          ))}
+        </ul>
 
-          {/* CTA Button */}
-          <Link to="/auth" className="block">
-            <Button className="w-full font-serif bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 h-10 sm:h-11 text-sm sm:text-base">
-              Start Investing
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
+        {/* CTA */}
+        <Link to="/auth" className="block mt-auto">
+          <Button className={`w-full h-12 font-semibold ${popular ? 'bg-primary hover:bg-primary/90' : 'bg-muted hover:bg-muted/80 text-foreground'}`}>
+            Start Investing
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

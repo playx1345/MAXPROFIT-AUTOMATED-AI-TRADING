@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import { TrendingUp, DollarSign, Activity } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Activity, BarChart3 } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+
 interface MarketData {
   total_market_cap: number;
   total_volume: number;
   market_cap_change_percentage_24h: number;
 }
+
 export const MarketStats = () => {
   const [marketData, setMarketData] = useState<MarketData | null>(null);
-  const {
-    ref,
-    isVisible
-  } = useScrollAnimation(0.2);
+  const { ref, isVisible } = useScrollAnimation(0.2);
+
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
@@ -28,61 +28,73 @@ export const MarketStats = () => {
       }
     };
     fetchMarketData();
-    const interval = setInterval(fetchMarketData, 300000); // Update every 5 minutes
-
+    const interval = setInterval(fetchMarketData, 300000);
     return () => clearInterval(interval);
   }, []);
+
   const marketCap = useCountUp(marketData ? Math.floor(marketData.total_market_cap / 1e9) : 0, 2000, 0, isVisible);
   const volume = useCountUp(marketData ? Math.floor(marketData.total_volume / 1e9) : 0, 2000, 0, isVisible);
-  return <section ref={ref} className="py-16 bg-gradient-to-b from-background via-muted/20 to-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary-rgb),0.1),transparent_50%)]" />
-      <div className="container mx-auto px-4 relative z-10">
-        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-foreground font-serif">
-            Live Market Overview
-          </h2>
-          <p className="text-foreground/70 font-serif text-justify">Real-time cryptocurrency market data</p>
+  const isPositive = marketData && marketData.market_cap_change_percentage_24h >= 0;
+
+  const stats = [
+    {
+      icon: DollarSign,
+      label: 'Global Market Cap',
+      value: `$${marketCap}B+`,
+      change: marketData ? `${isPositive ? '+' : ''}${marketData.market_cap_change_percentage_24h.toFixed(2)}%` : null,
+      isPositive,
+    },
+    {
+      icon: Activity,
+      label: '24h Trading Volume',
+      value: `$${volume}B+`,
+      change: null,
+      isPositive: true,
+    },
+    {
+      icon: BarChart3,
+      label: 'Active Markets',
+      value: '10,000+',
+      change: null,
+      isPositive: true,
+    },
+  ];
+
+  return (
+    <section ref={ref} className="py-16 sm:py-20 bg-muted/30 border-y border-border/50">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Live Market Overview</h2>
+          <p className="text-muted-foreground text-lg">Real-time cryptocurrency market data</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className={`glass-card p-6 rounded-xl hover-lift animate-optimized transition-all duration-300 group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
-                <DollarSign className="w-6 h-6 text-primary" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={index}
+                className={`p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-6 h-6 text-primary" />
+                  </div>
+                  {stat.change && (
+                    <div className={`flex items-center gap-1 text-sm font-medium ${stat.isPositive ? 'text-success' : 'text-destructive'}`}>
+                      {stat.isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                      {stat.change}
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">{stat.label}</p>
+                <p className="text-3xl font-bold text-foreground">{stat.value}</p>
               </div>
-              {marketData && <span className={`text-sm font-medium ${marketData.market_cap_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {marketData.market_cap_change_percentage_24h >= 0 ? '+' : ''}
-                  {marketData.market_cap_change_percentage_24h.toFixed(2)}%
-                </span>}
-            </div>
-            <h3 className="text-sm text-muted-foreground mb-2">Global Market Cap</h3>
-            <p className="text-3xl font-bold text-yellow-400">
-              ${marketCap}B+
-            </p>
-          </div>
-
-          <div className={`glass-card p-6 rounded-xl hover-lift animate-optimized transition-all duration-300 [transition-delay:100ms] group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors duration-200">
-                <Activity className="w-6 h-6 text-accent" />
-              </div>
-            </div>
-            <h3 className="text-sm text-muted-foreground mb-2">24h Trading Volume</h3>
-            <p className="text-3xl font-bold text-yellow-400">
-              ${volume}B+
-            </p>
-          </div>
-
-          <div className={`glass-card p-6 rounded-xl hover-lift animate-optimized transition-all duration-300 [transition-delay:200ms] group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
-                <TrendingUp className="w-6 h-6 text-primary" />
-              </div>
-            </div>
-            <h3 className="text-sm text-muted-foreground mb-2">Active Markets</h3>
-            <p className="text-3xl font-bold text-yellow-400">10,000+</p>
-          </div>
+            );
+          })}
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };

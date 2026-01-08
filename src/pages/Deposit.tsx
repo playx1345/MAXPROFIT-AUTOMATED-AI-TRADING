@@ -20,6 +20,7 @@ const PLATFORM_WALLETS = {
   btc: "bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h",
   eth: "0xe6FD2896583721d1e7e14c8fBB6319E92bD65196",
   usdc: "0x739B307F28100563d5f14Fba93dDf6F96Cd4d642",
+  xrp: "ranmERjBSRh9Z3Dp9pPsHFv2Uhk6i2aP37",
 };
 
 interface RecentDeposit {
@@ -34,7 +35,7 @@ interface RecentDeposit {
 const Deposit = () => {
   const { t } = useTranslation();
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc">("usdt");
+  const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
   const [transactionHash, setTransactionHash] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [recentDeposits, setRecentDeposits] = useState<RecentDeposit[]>([]);
@@ -225,6 +226,16 @@ const Deposit = () => {
                 >
                   USDC (ERC20)
                 </Button>
+                <Button
+                  variant={currency === "xrp" ? "default" : "outline"}
+                  onClick={() => {
+                    setCurrency("xrp");
+                    clearResult();
+                  }}
+                  className="col-span-2"
+                >
+                  XRP (Ripple)
+                </Button>
               </div>
             </div>
 
@@ -249,6 +260,7 @@ const Deposit = () => {
                   currency === "usdt" ? "TRON (TRC20)" : 
                   currency === "btc" ? "Bitcoin" : 
                   currency === "eth" ? "Ethereum (ERC20)" : 
+                  currency === "xrp" ? "XRP Ledger" :
                   "Ethereum (ERC20)"
                 }
               </p>

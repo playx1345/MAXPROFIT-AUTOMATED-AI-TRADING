@@ -215,6 +215,124 @@ async function verifyBTCTransaction(txHash: string): Promise<BlockchainVerificat
   }
 }
 
+// Verify XRP transaction using XRP Ledger API
+async function verifyXRPTransaction(txHash: string): Promise<BlockchainVerificationResult> {
+  try {
+    console.log(`Verifying XRP transaction: ${txHash}`);
+    
+    const response = await fetch('https://s1.ripple.com:51234/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        method: 'tx',
+        params: [{
+          transaction: txHash,
+          binary: false,
+        }],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`XRP Ledger API error: ${response.status}`);
+      return {
+        verified: false,
+        confirmed: false,
+        confirmations: 0,
+        amount: null,
+        to_address: null,
+        from_address: null,
+        block_number: null,
+        timestamp: null,
+        error: 'Transaction not found on XRP Ledger',
+      };
+    }
+
+    const data = await response.json();
+    console.log('XRP Ledger response:', JSON.stringify(data));
+
+    if (data.result.status !== 'success' || !data.result) {
+      return {
+        verified: false,
+        confirmed: false,
+        confirmations: 0,
+        amount: null,
+        to_address: null,
+        from_address: null,
+        block_number: null,
+        timestamp: null,
+        error: data.result.error_message || 'Transaction not found',
+      };
+    }
+
+    const tx = data.result;
+    const isValidated = tx.validated === true;
+    
+    // XRP amounts are in drops (1 XRP = 1,000,000 drops)
+    let amount = null;
+    if (tx.Amount) {
+      if (typeof tx.Amount === 'string') {
+        amount = parseInt(tx.Amount) / 1000000;
+      } else if (typeof tx.Amount === 'object' && tx.Amount.value) {
+        // Token payment
+        amount = parseFloat(tx.Amount.value);
+      }
+    }
+
+    // Get ledger info for confirmations estimate
+    let confirmations = 0;
+    if (isValidated && tx.ledger_index) {
+      try {
+        const ledgerResponse = await fetch('https://s1.ripple.com:51234/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            method: 'ledger_current',
+            params: [{}],
+          }),
+        });
+        if (ledgerResponse.ok) {
+          const ledgerData = await ledgerResponse.json();
+          const currentLedger = ledgerData.result.ledger_current_index;
+          confirmations = Math.max(0, currentLedger - tx.ledger_index);
+        }
+      } catch (e) {
+        console.error('Error getting current ledger:', e);
+        confirmations = isValidated ? 1 : 0;
+      }
+    }
+
+    // XRP is considered confirmed once validated (usually within 4 seconds)
+    const isConfirmed = isValidated;
+
+    return {
+      verified: true,
+      confirmed: isConfirmed,
+      confirmations,
+      amount,
+      to_address: tx.Destination || null,
+      from_address: tx.Account || null,
+      block_number: tx.ledger_index || null,
+      timestamp: tx.date ? new Date((tx.date + 946684800) * 1000).toISOString() : null,
+    };
+  } catch (error) {
+    console.error('XRP verification error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return {
+      verified: false,
+      confirmed: false,
+      confirmations: 0,
+      amount: null,
+      to_address: null,
+      from_address: null,
+      block_number: null,
+      timestamp: null,
+      error: `Verification failed: ${errorMessage}`,
+    };
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -231,9 +349,9 @@ serve(async (req) => {
       );
     }
 
-    if (!currency || !['usdt', 'btc'].includes(currency.toLowerCase())) {
+    if (!currency || !['usdt', 'btc', 'xrp'].includes(currency.toLowerCase())) {
       return new Response(
-        JSON.stringify({ error: 'Currency must be usdt or btc' }),
+        JSON.stringify({ error: 'Currency must be usdt, btc, or xrp' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -244,6 +362,8 @@ serve(async (req) => {
 
     if (currency.toLowerCase() === 'usdt') {
       result = await verifyTRC20Transaction(transaction_hash);
+    } else if (currency.toLowerCase() === 'xrp') {
+      result = await verifyXRPTransaction(transaction_hash);
     } else {
       result = await verifyBTCTransaction(transaction_hash);
     }

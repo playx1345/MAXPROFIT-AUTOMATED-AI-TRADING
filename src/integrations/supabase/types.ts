@@ -453,6 +453,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      adjust_user_balance: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_amount: number
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       approve_deposit_atomic: {
         Args: {
           p_admin_email: string
@@ -501,6 +511,42 @@ export type Database = {
           p_admin_email: string
           p_admin_id: string
           p_admin_notes?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reopen_rejected_deposit: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reopen_rejected_withdrawal: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reverse_approved_deposit: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reverse_approved_withdrawal: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
           p_transaction_id: string
         }
         Returns: Json

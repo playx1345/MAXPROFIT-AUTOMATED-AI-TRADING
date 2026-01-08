@@ -37,11 +37,14 @@ const AdminDeposits = () => {
   const [selectedDeposit, setSelectedDeposit] = useState<Deposit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  const [reverseReason, setReverseReason] = useState("");
   const [processing, setProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [showReverseConfirm, setShowReverseConfirm] = useState(false);
+  const [showReopenConfirm, setShowReopenConfirm] = useState(false);
   const { toast } = useToast();
   const { verifying, result, verifyTransaction, clearResult } = useBlockchainVerification();
 
@@ -266,6 +269,80 @@ const AdminDeposits = () => {
     } catch (error: any) {
       toast({
         title: "Error rejecting deposit",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReverseDeposit = async () => {
+    if (!selectedDeposit) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reverse_approved_deposit" as any, {
+        p_transaction_id: selectedDeposit.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Deposit reversed",
+        description: "Amount deducted from user balance and deposit marked as rejected",
+      });
+
+      fetchDeposits();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReverseConfirm(false);
+    } catch (error: any) {
+      toast({
+        title: "Error reversing deposit",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReopenDeposit = async () => {
+    if (!selectedDeposit) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reopen_rejected_deposit" as any, {
+        p_transaction_id: selectedDeposit.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Deposit re-approved",
+        description: "Amount credited to user balance and deposit marked as approved",
+      });
+
+      fetchDeposits();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReopenConfirm(false);
+    } catch (error: any) {
+      toast({
+        title: "Error re-approving deposit",
         description: error.message,
         variant: "destructive",
       });
@@ -648,6 +725,98 @@ const AdminDeposits = () => {
                       Reject
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {/* Reverse approved deposit */}
+              {selectedDeposit.status === "approved" && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReverseConfirm ? (
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => setShowReverseConfirm(true)}
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Reverse This Deposit
+                    </Button>
+                  ) : (
+                    <div className="p-4 border border-destructive rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-destructive">
+                        ⚠️ This will deduct ${selectedDeposit.amount.toLocaleString()} from the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for reversal</Label>
+                        <Textarea
+                          placeholder="Why are you reversing this deposit?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReverseConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1"
+                          onClick={handleReverseDeposit}
+                          disabled={processing}
+                        >
+                          {processing ? "Reversing..." : "Confirm Reversal"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Re-approve rejected deposit */}
+              {selectedDeposit.status === "rejected" && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReopenConfirm ? (
+                    <Button
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={() => setShowReopenConfirm(true)}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Re-approve This Deposit
+                    </Button>
+                  ) : (
+                    <div className="p-4 border border-green-500 rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-green-600">
+                        ✓ This will credit ${selectedDeposit.amount.toLocaleString()} to the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for re-approval</Label>
+                        <Textarea
+                          placeholder="Why are you re-approving this deposit?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReopenConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={handleReopenDeposit}
+                          disabled={processing}
+                        >
+                          {processing ? "Re-approving..." : "Confirm Re-approval"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

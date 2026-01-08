@@ -48,6 +48,9 @@ const AdminWithdrawals = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [reverseReason, setReverseReason] = useState("");
+  const [showReverseConfirm, setShowReverseConfirm] = useState(false);
+  const [showReopenConfirm, setShowReopenConfirm] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -333,6 +336,82 @@ const AdminWithdrawals = () => {
       });
     } finally {
       setVerifyingFee(false);
+    }
+  };
+
+  const handleReverseWithdrawal = async () => {
+    if (!selectedWithdrawal) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reverse_approved_withdrawal" as any, {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Withdrawal reversed",
+        description: "Amount refunded to user balance and withdrawal marked as rejected",
+      });
+
+      fetchWithdrawals();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReverseConfirm(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Error reversing withdrawal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReopenWithdrawal = async () => {
+    if (!selectedWithdrawal) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reopen_rejected_withdrawal" as any, {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Withdrawal re-approved",
+        description: "Amount deducted from user balance and withdrawal marked as approved",
+      });
+
+      fetchWithdrawals();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReopenConfirm(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Error re-approving withdrawal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -780,6 +859,98 @@ const AdminWithdrawals = () => {
                       Reject
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {/* Reverse approved/completed withdrawal */}
+              {(selectedWithdrawal.status === "approved" || selectedWithdrawal.status === "completed") && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReverseConfirm ? (
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => setShowReverseConfirm(true)}
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Reverse This Withdrawal
+                    </Button>
+                  ) : (
+                    <div className="p-4 border border-destructive rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-destructive">
+                        ⚠️ This will refund ${selectedWithdrawal.amount.toLocaleString()} to the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for reversal</Label>
+                        <Textarea
+                          placeholder="Why are you reversing this withdrawal?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReverseConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1"
+                          onClick={handleReverseWithdrawal}
+                          disabled={processing}
+                        >
+                          {processing ? "Reversing..." : "Confirm Reversal"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Re-approve rejected withdrawal */}
+              {selectedWithdrawal.status === "rejected" && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReopenConfirm ? (
+                    <Button
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={() => setShowReopenConfirm(true)}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Re-approve This Withdrawal
+                    </Button>
+                  ) : (
+                    <div className="p-4 border border-green-500 rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-green-600">
+                        ✓ This will deduct ${selectedWithdrawal.amount.toLocaleString()} from the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for re-approval</Label>
+                        <Textarea
+                          placeholder="Why are you re-approving this withdrawal?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReopenConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={handleReopenWithdrawal}
+                          disabled={processing}
+                        >
+                          {processing ? "Re-approving..." : "Confirm Re-approval"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

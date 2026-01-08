@@ -12,7 +12,6 @@ import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
 import { WITHDRAWAL_FEE_PERCENTAGE, XRP_WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
-import { useAutoProcessCountdown } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -276,7 +275,7 @@ const Withdraw = () => {
       <Alert>
         <Clock className="h-4 w-4" />
         <AlertDescription>
-          <strong>Auto-Processing:</strong> Withdrawals are automatically processed after 24 hours. Admins may approve earlier. Make sure your wallet address is correct - transactions cannot be reversed.
+          <strong>Processing:</strong> Withdrawals are reviewed and processed by admins. Make sure your wallet address is correct - transactions cannot be reversed.
         </AlertDescription>
       </Alert>
 
@@ -567,7 +566,6 @@ const Withdraw = () => {
 // Component for individual withdrawal with blockchain tracking
 const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWithdrawal; onFeeSubmitted: () => void }) => {
   const { verifying, result, verifyTransaction } = useBlockchainVerification();
-  const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
   const [verified, setVerified] = useState(false);
   const [showFeeInput, setShowFeeInput] = useState(false);
   const [feeHash, setFeeHash] = useState("");
@@ -689,16 +687,14 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
           >
             {displayStatus}
           </Badge>
-          {/* Auto-process countdown for pending withdrawals */}
+          {/* Processing status for pending withdrawals */}
           {withdrawal.status === "pending" && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
               <span>
                 {hasFeeSubmitted 
                   ? "Awaiting confirmation..." 
-                  : isEligible 
-                    ? "Processing soon..." 
-                    : `Auto in ${timeRemaining}`
+                  : "Pending review"
                 }
               </span>
             </div>
@@ -823,15 +819,13 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
         </div>
       )}
 
-      {/* Pending status info with auto-process note */}
+      {/* Pending status info */}
       {withdrawal.status === "pending" && !withdrawal.transaction_hash && (
         <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground">
             {hasFeeSubmitted
               ? "✅ Fee payment submitted. Awaiting admin verification and processing."
-              : isEligible 
-                ? "🔄 Eligible for auto-processing. Will be processed in the next scheduled run."
-                : `⏳ Will auto-process in ${timeRemaining} if not manually reviewed.`
+              : "⏳ Pending admin review."
             }
           </p>
         </div>

@@ -15,7 +15,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
-import { useAutoProcessCountdown, getAutoProcessTime } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 
 interface Withdrawal {
@@ -420,8 +419,6 @@ const AdminWithdrawals = () => {
   const rejectedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "rejected"));
 
   const WithdrawalTableRow = ({ withdrawal }: { withdrawal: Withdrawal }) => {
-    const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
-    
     // Check if fee has been submitted (stored in admin_notes)
     const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
                             withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
@@ -464,17 +461,10 @@ const AdminWithdrawals = () => {
             >
               {displayStatus}
             </Badge>
-            {withdrawal.status === "pending" && (
+            {withdrawal.status === "pending" && hasFeeSubmitted && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
-                <span>
-                  {hasFeeSubmitted 
-                    ? "Fee paid" 
-                    : isEligible 
-                      ? "Auto soon" 
-                      : timeRemaining
-                  }
-                </span>
+                <span>Fee paid</span>
               </div>
             )}
           </div>
@@ -810,10 +800,6 @@ const AdminWithdrawals = () => {
                 </div>
               )}
 
-              {/* Auto-process countdown for pending withdrawals */}
-              {selectedWithdrawal.status === "pending" && (
-                <AutoProcessInfo createdAt={selectedWithdrawal.created_at} />
-              )}
 
               {/* Blockchain Verification Section for completed withdrawals */}
               {selectedWithdrawal.transaction_hash && (
@@ -1052,27 +1038,5 @@ const BlockchainVerificationSection = ({ withdrawal }: { withdrawal: Withdrawal 
   );
 };
 
-// Auto-process info component for admin dialog
-const AutoProcessInfo = ({ createdAt }: { createdAt: string }) => {
-  const { timeRemaining, isEligible } = useAutoProcessCountdown(createdAt);
-  const autoProcessTime = getAutoProcessTime(createdAt);
-
-  return (
-    <div className={`flex items-center gap-2 p-3 rounded-lg ${isEligible ? 'bg-primary/10 border border-primary' : 'bg-muted'}`}>
-      <Clock className={`h-5 w-5 ${isEligible ? 'text-primary' : 'text-muted-foreground'}`} />
-      <div>
-        <p className={`text-sm font-medium ${isEligible ? 'text-primary' : ''}`}>
-          {isEligible 
-            ? "⚡ Eligible for auto-processing" 
-            : `Auto-processes in ${timeRemaining}`
-          }
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Scheduled: {format(autoProcessTime, "MMM dd, yyyy HH:mm")}
-        </p>
-      </div>
-    </div>
-  );
-};
 
 export default AdminWithdrawals;

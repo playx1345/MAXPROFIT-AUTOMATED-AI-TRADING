@@ -20,6 +20,7 @@ import AdminTradingBot from "@/pages/admin/TradingBot";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminActivityLog from "@/pages/admin/ActivityLog";
 import AdminTransactions from "@/pages/admin/Transactions";
+import AdminAnalytics from "@/pages/admin/Analytics";
 import NotFound from "@/pages/NotFound";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminProtectedRoute from "./AdminProtectedRoute";
@@ -135,6 +136,15 @@ export const AnimatedRoutes = () => {
             <AdminLayout>
               <PageTransition>
                 <AdminTransactions />
+              </PageTransition>
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/analytics" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <PageTransition>
+                <AdminAnalytics />
               </PageTransition>
             </AdminLayout>
           </AdminProtectedRoute>

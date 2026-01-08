@@ -18,6 +18,7 @@ import {
   Shield,
   Activity,
   ArrowLeftRight,
+  BarChart3,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -47,6 +48,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   const menuItems = [
     { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { path: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     { path: "/admin/users", label: "Users", icon: Users },
     { path: "/admin/transactions", label: "Transactions", icon: ArrowLeftRight },
     { path: "/admin/deposits", label: "Deposits", icon: ArrowDownLeft },

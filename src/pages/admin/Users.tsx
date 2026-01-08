@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck, DollarSign } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck, DollarSign, Plus, Minus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -60,6 +60,11 @@ const AdminUsers = () => {
     balance_usdt: 0,
     kyc_status: "pending",
   });
+  const [balanceAdjustmentOpen, setBalanceAdjustmentOpen] = useState(false);
+  const [adjustmentAmount, setAdjustmentAmount] = useState("");
+  const [adjustmentReason, setAdjustmentReason] = useState("");
+  const [adjustmentType, setAdjustmentType] = useState<"add" | "subtract">("add");
+  const [adjustingBalance, setAdjustingBalance] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -402,6 +407,70 @@ const AdminUsers = () => {
     }
   };
 
+  const handleBalanceAdjustment = async () => {
+    if (!selectedUser || !adjustmentAmount || !adjustmentReason.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter an amount and reason for the adjustment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const amount = parseFloat(adjustmentAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid positive number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const finalAmount = adjustmentType === "add" ? amount : -amount;
+
+    setAdjustingBalance(true);
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { data, error } = await supabase.rpc("adjust_user_balance" as any, {
+        p_user_id: selectedUser.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_amount: finalAmount,
+        p_reason: adjustmentReason.trim(),
+      });
+
+      if (error) throw error;
+
+      const result = data as { previous_balance: number; new_balance: number };
+      toast({
+        title: "Balance adjusted",
+        description: `${adjustmentType === "add" ? "Added" : "Subtracted"} $${amount.toLocaleString()}. New balance: $${result.new_balance.toLocaleString()}`,
+      });
+
+      setBalanceAdjustmentOpen(false);
+      setAdjustmentAmount("");
+      setAdjustmentReason("");
+      fetchUsers();
+      
+      // Update selected user locally
+      setSelectedUser({
+        ...selectedUser,
+        balance_usdt: result.new_balance,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error adjusting balance",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setAdjustingBalance(false);
+    }
+  };
+
   const getKycBadgeColor = (status: string) => {
     switch (status) {
       case "verified":
@@ -556,9 +625,33 @@ const AdminUsers = () => {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Balance</Label>
-                  <p className="font-medium text-primary">
-                    ${selectedUser.balance_usdt.toLocaleString()}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-primary text-lg">
+                      ${selectedUser.balance_usdt.toLocaleString()}
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2"
+                      onClick={() => {
+                        setAdjustmentType("add");
+                        setBalanceAdjustmentOpen(true);
+                      }}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2"
+                      onClick={() => {
+                        setAdjustmentType("subtract");
+                        setBalanceAdjustmentOpen(true);
+                      }}
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">KYC Status</Label>
@@ -938,6 +1031,82 @@ const AdminUsers = () => {
             </Button>
             <Button onClick={handleUpdateUser} disabled={loading}>
               {loading ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Balance Adjustment Dialog */}
+      <Dialog open={balanceAdjustmentOpen} onOpenChange={setBalanceAdjustmentOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {adjustmentType === "add" ? "Add to Balance" : "Subtract from Balance"}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedUser && (
+                <>
+                  Adjusting balance for <strong>{selectedUser.email}</strong>
+                  <br />
+                  Current balance: <strong>${selectedUser.balance_usdt.toLocaleString()}</strong>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Amount (USD)</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={adjustmentAmount}
+                  onChange={(e) => setAdjustmentAmount(e.target.value)}
+                  className="pl-7"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Reason (required)</Label>
+              <Textarea
+                placeholder={adjustmentType === "add" 
+                  ? "e.g., Bonus credit, referral reward, correction..." 
+                  : "e.g., Chargeback, fee deduction, correction..."
+                }
+                value={adjustmentReason}
+                onChange={(e) => setAdjustmentReason(e.target.value)}
+              />
+            </div>
+            {adjustmentAmount && parseFloat(adjustmentAmount) > 0 && (
+              <div className={`p-3 rounded-lg ${adjustmentType === "add" ? "bg-green-500/10 border border-green-500" : "bg-red-500/10 border border-red-500"}`}>
+                <p className={`text-sm font-medium ${adjustmentType === "add" ? "text-green-600" : "text-red-600"}`}>
+                  {adjustmentType === "add" ? "+" : "-"}${parseFloat(adjustmentAmount).toLocaleString()} will be {adjustmentType === "add" ? "added to" : "subtracted from"} the user's balance
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  New balance: ${(
+                    selectedUser?.balance_usdt 
+                      ? adjustmentType === "add" 
+                        ? selectedUser.balance_usdt + parseFloat(adjustmentAmount)
+                        : selectedUser.balance_usdt - parseFloat(adjustmentAmount)
+                      : 0
+                  ).toLocaleString()}
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBalanceAdjustmentOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleBalanceAdjustment} 
+              disabled={adjustingBalance || !adjustmentAmount || !adjustmentReason.trim()}
+              className={adjustmentType === "add" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
+            >
+              {adjustingBalance ? "Processing..." : adjustmentType === "add" ? "Add Funds" : "Deduct Funds"}
             </Button>
           </DialogFooter>
         </DialogContent>

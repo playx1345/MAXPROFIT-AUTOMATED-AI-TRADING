@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Settings as SettingsIcon, Save, RefreshCw, Wallet, Clock, Bell, Shield } from "lucide-react";
+import { Settings as SettingsIcon, Save, RefreshCw, Wallet, Clock, Bell, Shield, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PlatformSettings {
@@ -19,6 +19,8 @@ interface PlatformSettings {
   platform_wallet_xrp: string;
   maintenance_mode: string;
   email_notifications_enabled: string;
+  large_withdrawal_threshold: string;
+  required_approvals_count: string;
 }
 
 const AdminSettings = () => {
@@ -33,6 +35,8 @@ const AdminSettings = () => {
     platform_wallet_xrp: "ranmERjBSRh9Z3Dp9pPsHFv2Uhk6i2aP37",
     maintenance_mode: "false",
     email_notifications_enabled: "true",
+    large_withdrawal_threshold: "5000",
+    required_approvals_count: "2",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -235,6 +239,55 @@ const AdminSettings = () => {
         </CardContent>
       </Card>
 
+      {/* Multi-Admin Approval Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Multi-Admin Approval
+          </CardTitle>
+          <CardDescription>Configure approval requirements for large withdrawals</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="largeThreshold">Large Withdrawal Threshold (USD)</Label>
+              <Input
+                id="largeThreshold"
+                type="number"
+                value={settings.large_withdrawal_threshold}
+                onChange={(e) => updateSetting("large_withdrawal_threshold", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Withdrawals above this amount require multi-admin approval
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="requiredApprovals">Required Approvals</Label>
+              <Input
+                id="requiredApprovals"
+                type="number"
+                min="1"
+                max="5"
+                value={settings.required_approvals_count}
+                onChange={(e) => updateSetting("required_approvals_count", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Number of admin approvals needed for large withdrawals
+              </p>
+            </div>
+          </div>
+
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-sm">
+              <span className="font-medium">Current policy:</span> Withdrawals over ${parseFloat(settings.large_withdrawal_threshold).toLocaleString()} 
+              require {settings.required_approvals_count} admin approval{parseInt(settings.required_approvals_count) !== 1 ? 's' : ''} before processing.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Transaction Limits & Processing */}
       <Card>
         <CardHeader>
@@ -263,9 +316,10 @@ const AdminSettings = () => {
                 type="number"
                 value={settings.auto_process_hours}
                 onChange={(e) => updateSetting("auto_process_hours", e.target.value)}
+                disabled
               />
               <p className="text-xs text-muted-foreground">
-                Withdrawals are auto-processed after this many hours
+                Auto-processing is disabled. All withdrawals require manual admin approval.
               </p>
             </div>
           </div>

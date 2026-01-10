@@ -274,6 +274,14 @@ export default {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        "hover-glow": {
+          "0%, 100%": { boxShadow: "0 0 0 hsl(45 93% 49% / 0)" },
+          "50%": { boxShadow: "0 0 30px hsl(45 93% 49% / 0.3)" },
+        },
+        "card-shine": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -319,6 +327,8 @@ export default {
         "success-pulse": "success-pulse 2s ease-out infinite",
         "neon-border": "neon-border 2s ease-in-out infinite",
         "logo-carousel": "logo-carousel 30s linear infinite",
+        "hover-glow": "hover-glow 2s ease-in-out infinite",
+        "card-shine": "card-shine 3s linear infinite",
       },
     },
   },

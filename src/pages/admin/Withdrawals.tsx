@@ -52,6 +52,7 @@ const AdminWithdrawals = () => {
   const [reverseReason, setReverseReason] = useState("");
   const [showReverseConfirm, setShowReverseConfirm] = useState(false);
   const [showReopenConfirm, setShowReopenConfirm] = useState(false);
+  const [processMode, setProcessMode] = useState<'none' | 'approve' | 'reject'>('none');
   const [currentAdminId, setCurrentAdminId] = useState<string>("");
   const [currentAdminEmail, setCurrentAdminEmail] = useState<string>("");
   const { toast } = useToast();
@@ -330,6 +331,7 @@ const AdminWithdrawals = () => {
       setDetailsOpen(false);
       setAdminNotes("");
       setTxHash("");
+      setProcessMode('none');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
@@ -369,6 +371,7 @@ const AdminWithdrawals = () => {
       fetchWithdrawals();
       setDetailsOpen(false);
       setAdminNotes("");
+      setProcessMode('none');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
@@ -586,6 +589,7 @@ const AdminWithdrawals = () => {
             variant="ghost"
             onClick={() => {
               setSelectedWithdrawal(withdrawal);
+              setProcessMode('none');
               setDetailsOpen(true);
             }}
           >
@@ -668,8 +672,9 @@ const AdminWithdrawals = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => {
+                onClick={() => {
                     setSelectedWithdrawal(withdrawal);
+                    setProcessMode('none');
                     setDetailsOpen(true);
                   }}
                 >
@@ -994,52 +999,110 @@ const AdminWithdrawals = () => {
                     return null;
                   })()}
 
-                  <div>
-                    <Label>Transaction Hash (After sending)</Label>
-                    <Input
-                      placeholder="Enter blockchain transaction hash..."
-                      value={txHash}
-                      onChange={(e) => setTxHash(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label>Admin Notes</Label>
-                    <Textarea
-                      placeholder="Add notes about this withdrawal..."
-                      value={adminNotes}
-                      onChange={(e) => setAdminNotes(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    {(() => {
-                      const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
-                      const canProcess = approvalStatus.canFinalize && selectedWithdrawal.profiles?.balance_usdt >= selectedWithdrawal.amount;
-                      
-                      return (
+                  {/* Process Withdrawal Section */}
+                  {processMode === 'none' && (
+                    <Button 
+                      className="w-full" 
+                      onClick={() => setProcessMode('approve')}
+                    >
+                      Process Withdrawal
+                    </Button>
+                  )}
+                  
+                  {processMode !== 'none' && (
+                    <div className="p-4 border rounded-lg space-y-4">
+                      <div className="flex gap-2">
                         <Button
-                          className="flex-1 bg-green-600 hover:bg-green-700"
-                          onClick={handleApprove}
-                          disabled={processing || !canProcess}
-                          title={!approvalStatus.canFinalize ? `Requires ${approvalStatus.requiredCount} approvals (has ${approvalStatus.currentCount})` : undefined}
+                          variant={processMode === 'approve' ? 'default' : 'outline'}
+                          className={processMode === 'approve' ? 'bg-green-600 hover:bg-green-700 flex-1' : 'flex-1'}
+                          onClick={() => setProcessMode('approve')}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          {approvalStatus.isLarge && !approvalStatus.canFinalize 
-                            ? `Need ${approvalStatus.requiredCount - approvalStatus.currentCount} More Approval(s)`
-                            : "Approve & Process"
-                          }
+                          Approve
                         </Button>
-                      );
-                    })()}
-                    <Button
-                      variant="destructive"
-                      className="flex-1"
-                      onClick={handleReject}
-                      disabled={processing}
-                    >
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Reject
-                    </Button>
-                  </div>
+                        <Button
+                          variant={processMode === 'reject' ? 'destructive' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setProcessMode('reject')}
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Reject
+                        </Button>
+                      </div>
+                      
+                      {/* Approve fields */}
+                      {processMode === 'approve' && (
+                        <div className="space-y-3">
+                          <div>
+                            <Label>Transaction Hash (Optional)</Label>
+                            <Input
+                              placeholder="Enter the blockchain transaction hash..."
+                              value={txHash}
+                              onChange={(e) => setTxHash(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label>Admin Notes</Label>
+                            <Textarea
+                              placeholder="Add notes about this approval..."
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                            />
+                          </div>
+                          {(() => {
+                            const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
+                            const canProcess = approvalStatus.canFinalize && selectedWithdrawal.profiles?.balance_usdt >= selectedWithdrawal.amount;
+                            
+                            return (
+                              <Button
+                                className="w-full bg-green-600 hover:bg-green-700"
+                                onClick={handleApprove}
+                                disabled={processing || !canProcess}
+                                title={!approvalStatus.canFinalize ? `Requires ${approvalStatus.requiredCount} approvals (has ${approvalStatus.currentCount})` : undefined}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                {processing ? "Processing..." : approvalStatus.isLarge && !approvalStatus.canFinalize 
+                                  ? `Need ${approvalStatus.requiredCount - approvalStatus.currentCount} More Approval(s)`
+                                  : "Confirm Approval"
+                                }
+                              </Button>
+                            );
+                          })()}
+                        </div>
+                      )}
+                      
+                      {/* Reject fields */}
+                      {processMode === 'reject' && (
+                        <div className="space-y-3">
+                          <div>
+                            <Label>Rejection Reason</Label>
+                            <Textarea
+                              placeholder="Enter reason for rejection..."
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            onClick={handleReject}
+                            disabled={processing}
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            {processing ? "Rejecting..." : "Confirm Rejection"}
+                          </Button>
+                        </div>
+                      )}
+                      
+                      <Button 
+                        variant="ghost" 
+                        className="w-full"
+                        onClick={() => setProcessMode('none')}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
 

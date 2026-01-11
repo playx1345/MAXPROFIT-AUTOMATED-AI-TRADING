@@ -21,6 +21,7 @@ import AdminSettings from "@/pages/admin/Settings";
 import AdminActivityLog from "@/pages/admin/ActivityLog";
 import AdminTransactions from "@/pages/admin/Transactions";
 import AdminAnalytics from "@/pages/admin/Analytics";
+import AdminReversals from "@/pages/admin/Reversals";
 import NotFound from "@/pages/NotFound";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminProtectedRoute from "./AdminProtectedRoute";
@@ -190,6 +191,15 @@ export const AnimatedRoutes = () => {
             <AdminLayout>
               <PageTransition>
                 <AdminSettings />
+              </PageTransition>
+            </AdminLayout>
+          </AdminProtectedRoute>
+        } />
+        <Route path="/admin/reversals" element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <PageTransition>
+                <AdminReversals />
               </PageTransition>
             </AdminLayout>
           </AdminProtectedRoute>

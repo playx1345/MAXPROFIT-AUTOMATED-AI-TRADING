@@ -19,6 +19,7 @@ import {
   Activity,
   ArrowLeftRight,
   BarChart3,
+  RotateCcw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { path: "/admin/transactions", label: "Transactions", icon: ArrowLeftRight },
     { path: "/admin/deposits", label: "Deposits", icon: ArrowDownLeft },
     { path: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpRight },
+    { path: "/admin/reversals", label: "Reversals", icon: RotateCcw },
     { path: "/admin/investments", label: "Investments", icon: TrendingUp },
     { path: "/admin/trading-bot", label: "Trading Bot", icon: Bot },
     { path: "/admin/activity-log", label: "Activity Log", icon: Activity },

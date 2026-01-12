@@ -25,16 +25,18 @@ interface RecentWithdrawal {
   wallet_address: string | null;
   transaction_hash: string | null;
   admin_notes: string | null;
+  memo_tag: string | null;
 }
 
 const Withdraw = () => {
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
   const [walletAddress, setWalletAddress] = useState("");
+  const [memoTag, setMemoTag] = useState("");
   const [balance, setBalance] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [recentWithdrawals, setRecentWithdrawals] = useState<RecentWithdrawal[]>([]);
-  const [errors, setErrors] = useState<{ amount?: string; wallet?: string }>({});
+  const [errors, setErrors] = useState<{ amount?: string; wallet?: string; memoTag?: string }>({});
   const [feePaymentDialogOpen, setFeePaymentDialogOpen] = useState(false);
   const [pendingWithdrawalId, setPendingWithdrawalId] = useState<string | null>(null);
   const [pendingWithdrawalCurrency, setPendingWithdrawalCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
@@ -87,7 +89,7 @@ const Withdraw = () => {
 
       const { data, error } = await supabase
         .from("transactions")
-        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash, admin_notes")
+        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash, admin_notes, memo_tag")
         .eq("user_id", user.id)
         .eq("type", "withdrawal")
         .order("created_at", { ascending: false })
@@ -120,7 +122,7 @@ const Withdraw = () => {
   const netAmount = calculateNetAmount(parseFloat(amount || "0"));
 
   const validateForm = (): boolean => {
-    const newErrors: { amount?: string; wallet?: string } = {};
+    const newErrors: { amount?: string; wallet?: string; memoTag?: string } = {};
 
     const amountValidation = validateField(amountSchema, amount);
     if (!amountValidation.isValid) {
@@ -138,6 +140,11 @@ const Withdraw = () => {
     const walletValidation = validateField(walletSchema, walletAddress);
     if (!walletValidation.isValid) {
       newErrors.wallet = walletValidation.error;
+    }
+
+    // Validate memo tag for XRP (optional but should be numeric if provided)
+    if (currency === 'xrp' && memoTag.trim() && !/^\d+$/.test(memoTag.trim())) {
+      newErrors.memoTag = "Memo tag must be a numeric value";
     }
 
     setErrors(newErrors);
@@ -169,6 +176,7 @@ const Withdraw = () => {
         currency: currency,
         status: "pending",
         wallet_address: walletAddress.trim(),
+        memo_tag: currency === 'xrp' && memoTag.trim() ? memoTag.trim() : null,
       }).select().single();
 
       if (error) throw error;
@@ -186,6 +194,7 @@ const Withdraw = () => {
 
       setAmount("");
       setWalletAddress("");
+      setMemoTag("");
       setErrors({});
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
@@ -422,6 +431,34 @@ const Withdraw = () => {
                 </p>
               )}
             </div>
+
+            {/* Memo Tag field for XRP */}
+            {currency === 'xrp' && (
+              <div className="space-y-2">
+                <Label htmlFor="memoTag">Memo Tag (Destination Tag)</Label>
+                <Input
+                  id="memoTag"
+                  placeholder="Enter memo/destination tag (optional)"
+                  value={memoTag}
+                  onChange={(e) => {
+                    setMemoTag(e.target.value);
+                    if (errors.memoTag) {
+                      if (!e.target.value.trim() || /^\d+$/.test(e.target.value.trim())) {
+                        setErrors((prev) => ({ ...prev, memoTag: undefined }));
+                      }
+                    }
+                  }}
+                  className={errors.memoTag ? "border-destructive" : ""}
+                />
+                {errors.memoTag ? (
+                  <p className="text-xs text-destructive">{errors.memoTag}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Required by some exchanges. Enter the numeric destination tag if applicable.
+                  </p>
+                )}
+              </div>
+            )}
 
             {parseFloat(amount) > 0 && (
               <div className="p-3 bg-muted rounded-lg space-y-1 text-sm">
@@ -669,6 +706,11 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
           <p className="text-xs text-muted-foreground truncate max-w-[300px]">
             To: {withdrawal.wallet_address || "N/A"}
           </p>
+          {withdrawal.currency === 'xrp' && withdrawal.memo_tag && (
+            <p className="text-xs text-muted-foreground">
+              Memo Tag: {withdrawal.memo_tag}
+            </p>
+          )}
           <p className="text-xs text-muted-foreground">
             {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
           </p>

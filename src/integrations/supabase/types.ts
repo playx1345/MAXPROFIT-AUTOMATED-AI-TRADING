@@ -374,6 +374,7 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          memo_tag: string | null
           processed_at: string | null
           processed_by: string | null
           status: Database["public"]["Enums"]["transaction_status"]
@@ -388,6 +389,7 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          memo_tag?: string | null
           processed_at?: string | null
           processed_by?: string | null
           status?: Database["public"]["Enums"]["transaction_status"]
@@ -402,6 +404,7 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          memo_tag?: string | null
           processed_at?: string | null
           processed_by?: string | null
           status?: Database["public"]["Enums"]["transaction_status"]

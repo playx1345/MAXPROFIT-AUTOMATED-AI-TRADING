@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AnimatedRoutes } from "./components/AnimatedRoutes";
 import LiveChat from "./components/LiveChat";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +17,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <LiveChat />
+        <PWAInstallPrompt />
         <BrowserRouter>
           <AnimatedRoutes />
         </BrowserRouter>

@@ -1,4 +1,5 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, useCallback } from "react";
+import { DemoVideoModal } from "./DemoVideoModal";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ProfitCounter } from "./ProfitCounter";
@@ -23,6 +24,11 @@ TrustIndicator.displayName = "TrustIndicator";
 export const AnimatedHero = memo(() => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  const handleWatchDemo = useCallback(() => {
+    setIsVideoModalOpen(true);
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -201,20 +207,19 @@ export const AnimatedHero = memo(() => {
                 <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true" />
               </Button>
             </Link>
-            <Link to="/auth">
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className={cn(
-                  "w-full sm:w-auto px-8 py-6 text-base font-semibold",
-                  "border-border hover:bg-muted/50",
-                  "transition-all duration-300 group hover:-translate-y-0.5"
-                )}
-              >
-                <Play className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" aria-hidden="true" />
-                Watch Demo
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              onClick={handleWatchDemo}
+              className={cn(
+                "w-full sm:w-auto px-8 py-6 text-base font-semibold",
+                "border-border hover:bg-muted/50",
+                "transition-all duration-300 group hover:-translate-y-0.5"
+              )}
+            >
+              <Play className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" aria-hidden="true" />
+              Watch Demo
+            </Button>
           </div>
 
           {/* Trust indicators */}
@@ -250,6 +255,12 @@ export const AnimatedHero = memo(() => {
       <div 
         className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"
         aria-hidden="true"
+      />
+
+      {/* Demo Video Modal */}
+      <DemoVideoModal 
+        open={isVideoModalOpen} 
+        onOpenChange={setIsVideoModalOpen} 
       />
     </section>
   );

@@ -498,6 +498,10 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_credit_balance: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: number
+      }
       approve_deposit_atomic: {
         Args: {
           p_admin_email: string

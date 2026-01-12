@@ -23,6 +23,7 @@ import { BlockchainConfirmationFeeNotification } from "@/components/BlockchainCo
 import { BlockchainFeeBanner } from "@/components/BlockchainFeeBanner";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileNav } from "@/components/MobileNav";
 import { useTranslation } from "react-i18next";
 
 interface DashboardLayoutProps {
@@ -166,11 +167,14 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       )}
 
       {/* Main Content with smooth transition */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto pb-20 md:pb-0">
         <div className="container mx-auto p-6 lg:p-8 animate-fade-in">
           {children}
         </div>
       </main>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileNav />
     </div>
   );
 };

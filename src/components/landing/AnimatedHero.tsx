@@ -2,13 +2,18 @@ import { memo, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ProfitCounter } from "./ProfitCounter";
-import { ArrowRight, Play, Shield, Clock, Users } from "lucide-react";
+import { ParticleNetwork } from "./ParticleNetwork";
+import { TradingChart } from "./TradingChart";
+import { ArrowRight, Play, Shield, Clock, Users, Lock, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
+import { SecurityBadge, SecureConnectionBadge } from "@/components/ui/security-badge";
 
 const TrustIndicator = memo(({ icon: Icon, text }: { icon: typeof Shield; text: string }) => (
-  <div className="flex items-center gap-2 text-muted-foreground group">
-    <Icon className="w-5 h-5 text-primary transition-transform group-hover:scale-110" aria-hidden="true" />
+  <div className="flex items-center gap-2 text-muted-foreground group cursor-default">
+    <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+      <Icon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" aria-hidden="true" />
+    </div>
     <span className="text-sm font-medium">{text}</span>
   </div>
 ));
@@ -41,16 +46,19 @@ export const AnimatedHero = memo(() => {
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-20 sm:pt-24 pb-16"
       aria-label="Hero section"
     >
+      {/* Particle Network Background */}
+      <ParticleNetwork className="opacity-40" />
+      
       {/* Subtle grid background */}
       <div 
-        className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.1)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.1)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"
+        className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"
         aria-hidden="true"
       />
       
       {/* Parallax gradient orbs */}
       <div 
         className={cn(
-          "absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]",
+          "absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[150px]",
           "animate-pulse-soft will-change-transform motion-reduce:animate-none"
         )}
         style={{
@@ -61,7 +69,7 @@ export const AnimatedHero = memo(() => {
       />
       <div 
         className={cn(
-          "absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/8 rounded-full blur-[100px]",
+          "absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/6 rounded-full blur-[120px]",
           "animate-pulse-soft will-change-transform motion-reduce:animate-none"
         )}
         style={{ 
@@ -71,6 +79,18 @@ export const AnimatedHero = memo(() => {
         }}
         aria-hidden="true"
       />
+      
+      {/* Trading Chart Preview - Hidden on mobile */}
+      <div 
+        className={cn(
+          "absolute right-8 top-1/2 -translate-y-1/2 w-80 h-48 hidden xl:block",
+          "transition-all duration-700 delay-700",
+          isLoaded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+        )}
+        aria-hidden="true"
+      >
+        <TradingChart />
+      </div>
       
       <div className="relative z-10 container mx-auto px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -95,6 +115,16 @@ export const AnimatedHero = memo(() => {
                 height={96}
               />
             </div>
+          </div>
+
+          {/* Secure Connection Badge */}
+          <div 
+            className={cn(
+              "mb-4 transition-all duration-700 delay-75",
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            )}
+          >
+            <SecureConnectionBadge />
           </div>
 
           {/* Live badge */}
@@ -190,14 +220,28 @@ export const AnimatedHero = memo(() => {
           {/* Trust indicators */}
           <div 
             className={cn(
-              "flex flex-wrap justify-center gap-6 sm:gap-8",
+              "flex flex-wrap justify-center gap-4 sm:gap-6",
               "transition-all duration-700 delay-600",
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
             <TrustIndicator icon={Shield} text="Bank-Level Security" />
-            <TrustIndicator icon={Clock} text="24/7 Trading" />
+            <TrustIndicator icon={Lock} text="256-bit Encryption" />
+            <TrustIndicator icon={Zap} text="24/7 Trading" />
             <TrustIndicator icon={Users} text="1,250+ Active Traders" />
+          </div>
+          
+          {/* Security Badges */}
+          <div 
+            className={cn(
+              "flex flex-wrap justify-center gap-3 mt-8",
+              "transition-all duration-700 delay-700",
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            )}
+          >
+            <SecurityBadge variant="shield" size="sm" />
+            <SecurityBadge variant="encrypted" size="sm" />
+            <SecurityBadge variant="verified" size="sm" label="KYC Verified" />
           </div>
         </div>
       </div>

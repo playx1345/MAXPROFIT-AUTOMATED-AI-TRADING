@@ -168,19 +168,19 @@ const Deposit = () => {
   const walletAddress = PLATFORM_WALLETS[currency];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-6">
       <div>
-        <h1 className="text-3xl font-bold">{t("deposit.title")}</h1>
-        <p className="text-muted-foreground">{t("deposit.subtitle")}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold">{t("deposit.title")}</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">{t("deposit.subtitle")}</p>
       </div>
 
       <Alert>
-        <AlertDescription>
+        <AlertDescription className="text-sm">
           <strong>{t("deposit.important")}:</strong> {t("deposit.processingNote", { currency: currency.toUpperCase() })}
         </AlertDescription>
       </Alert>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{t("deposit.platformWallet")}</CardTitle>
@@ -188,10 +188,12 @@ const Deposit = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="currency">{t("deposit.selectCurrency")}</Label>
+              <Label htmlFor="currency" className="text-sm">{t("deposit.selectCurrency")}</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <Button
                   variant={currency === "usdt" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                   onClick={() => {
                     setCurrency("usdt");
                     clearResult();
@@ -201,6 +203,8 @@ const Deposit = () => {
                 </Button>
                 <Button
                   variant={currency === "btc" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                   onClick={() => {
                     setCurrency("btc");
                     clearResult();
@@ -210,6 +214,8 @@ const Deposit = () => {
                 </Button>
                 <Button
                   variant={currency === "eth" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                   onClick={() => {
                     setCurrency("eth");
                     clearResult();
@@ -219,6 +225,8 @@ const Deposit = () => {
                 </Button>
                 <Button
                   variant={currency === "usdc" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                   onClick={() => {
                     setCurrency("usdc");
                     clearResult();
@@ -228,11 +236,12 @@ const Deposit = () => {
                 </Button>
                 <Button
                   variant={currency === "xrp" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm col-span-2"
                   onClick={() => {
                     setCurrency("xrp");
                     clearResult();
                   }}
-                  className="col-span-2"
                 >
                   XRP (Ripple)
                 </Button>

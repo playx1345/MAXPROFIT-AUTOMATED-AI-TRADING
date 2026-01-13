@@ -213,55 +213,25 @@ const Landing = () => {
 
       {/* Footer */}
       <footer 
-        className="border-t border-border py-12 sm:py-16 bg-muted/30"
+        className="border-t border-border py-6 bg-muted/30"
         role="contentinfo"
       >
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
-            <div className="sm:col-span-2 lg:col-span-1">
-              <h3 className="font-bold text-xl mb-4">Live Win Trade</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Professional cryptocurrency investment platform with AI-powered automated trading.
-              </p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-foreground">Live Win Trade</span>
+              <span>© {new Date().getFullYear()}</span>
             </div>
-            <nav aria-label="Platform links">
-              <h4 className="font-semibold mb-4">Platform</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/auth" className="hover:text-foreground transition-colors">Sign Up</Link></li>
-                <li><Link to="/auth" className="hover:text-foreground transition-colors">Sign In</Link></li>
-                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-              </ul>
-            </nav>
-            <nav aria-label="Legal links">
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#terms" className="hover:text-foreground transition-colors">Terms of Service</a></li>
-                <li><a href="#privacy" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
-                <li><a href="#risk" className="hover:text-foreground transition-colors">Risk Disclosure</a></li>
-              </ul>
-            </nav>
-            <nav aria-label="Support links">
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#faq" className="hover:text-foreground transition-colors">FAQ</a></li>
-                <li><a href="#contact" className="hover:text-foreground transition-colors">Contact Us</a></li>
-                <li><Link to="/admin/login" className="hover:text-foreground transition-colors text-xs opacity-50 hover:opacity-100">Admin Portal</Link></li>
-              </ul>
+            <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-6" aria-label="Footer links">
+              <Link to="/auth" className="hover:text-foreground transition-colors">Sign In</Link>
+              <a href="#features" className="hover:text-foreground transition-colors">Features</a>
+              <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+              <Link to="/admin/login" className="text-xs opacity-50 hover:opacity-100 hover:text-foreground transition-colors">Admin</Link>
             </nav>
           </div>
-          
-          <div className="border-t border-border pt-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Live Win Trade Investment. All rights reserved.
-            </p>
-          </div>
-
-          <Alert className="mt-8 bg-destructive/10 border-destructive/30" role="alert">
-            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-            <AlertDescription className="text-sm">
-              <strong>Risk Warning:</strong> Cryptocurrency investments carry significant risk. Past performance does not guarantee future results.
-            </AlertDescription>
-          </Alert>
+          <p className="text-xs text-muted-foreground/70 text-center mt-4">
+            ⚠️ Risk Warning: Cryptocurrency investments carry significant risk. Past performance does not guarantee future results.
+          </p>
         </div>
       </footer>
     </div>

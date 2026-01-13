@@ -38,15 +38,28 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: t("common.error", "Error signing out"),
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: t("common.success", "Signed out"),
+          description: t("common.signOutSuccess", "You have been signed out successfully."),
+        });
+        navigate("/", { replace: true });
+      }
+    } catch (err) {
+      console.error("Sign out error:", err);
       toast({
-        title: t("common.error", "Error signing out"),
-        description: error.message,
+        title: t("common.error", "Error"),
+        description: t("common.signOutError", "An unexpected error occurred while signing out."),
         variant: "destructive",
       });
-    } else {
-      navigate("/");
     }
   };
 
@@ -61,7 +74,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   ];
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="min-h-screen flex flex-col lg:flex-row w-full bg-background">
       {/* Blockchain Fee Banner - Top of screen */}
       <BlockchainFeeBanner />
       
@@ -70,16 +83,29 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       
       {/* Blockchain Confirmation Fee Notification */}
       <BlockchainConfirmationFeeNotification />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden transition-all duration-300 hover:scale-110 active:scale-95 glass-card border border-primary/20 hover:border-primary/40 hover:shadow-glow backdrop-blur-lg"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        <div className={`transition-transform duration-300 ${sidebarOpen ? 'rotate-90' : 'rotate-0'}`}>
-          {sidebarOpen ? <X className="text-primary" /> : <Menu className="text-primary" />}
+      
+      {/* Mobile Header with Menu Toggle */}
+      <div className="fixed top-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 safe-area-top">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="transition-all duration-300 hover:scale-110 active:scale-95"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <div className={`transition-transform duration-300 ${sidebarOpen ? 'rotate-90' : 'rotate-0'}`}>
+              {sidebarOpen ? <X className="h-5 w-5 text-primary" /> : <Menu className="h-5 w-5 text-primary" />}
+            </div>
+          </Button>
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="Live Win Trade" className="h-8 w-8 rounded-lg object-cover" />
+            <span className="text-gradient-premium font-display text-lg font-bold">Live Win Trade</span>
+          </Link>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+          </div>
         </div>
-      </Button>
+      </div>
 
       {/* Sidebar with Glass Effect */}
       <aside
@@ -167,8 +193,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       )}
 
       {/* Main Content with smooth transition */}
-      <main className="flex-1 overflow-auto pb-20 md:pb-0">
-        <div className="container mx-auto p-6 lg:p-8 animate-fade-in">
+      <main className="flex-1 overflow-auto pt-16 pb-24 lg:pt-0 lg:pb-0">
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
           {children}
         </div>
       </main>

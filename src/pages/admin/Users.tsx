@@ -28,6 +28,7 @@ interface User {
   wallet_btc: string | null;
   wallet_usdt: string | null;
   upgrade_fee_paid: boolean;
+  fee_exempt: boolean;
 }
 
 interface UserFormData {
@@ -664,6 +665,56 @@ const AdminUsers = () => {
                   <Badge className={selectedUser.upgrade_fee_paid ? "bg-green-500" : "bg-orange-500"}>
                     {selectedUser.upgrade_fee_paid ? "Paid" : "Not Paid"}
                   </Badge>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Fee Exempt</Label>
+                  <div className="flex items-center gap-2">
+                    <Badge className={selectedUser.fee_exempt ? "bg-green-500" : "bg-muted"}>
+                      {selectedUser.fee_exempt ? "Exempt" : "Not Exempt"}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={async () => {
+                        try {
+                          const { error } = await supabase
+                            .from("profiles")
+                            .update({ fee_exempt: !selectedUser.fee_exempt })
+                            .eq("id", selectedUser.id);
+                          if (error) throw error;
+                          
+                          // Log admin action
+                          const { data: { user: adminUser } } = await supabase.auth.getUser();
+                          if (adminUser) {
+                            await supabase.from("admin_activity_logs").insert({
+                              admin_id: adminUser.id,
+                              admin_email: adminUser.email || "",
+                              action: selectedUser.fee_exempt ? "remove_fee_exemption" : "grant_fee_exemption",
+                              target_type: "user",
+                              target_id: selectedUser.id,
+                              target_email: selectedUser.email,
+                            });
+                          }
+
+                          setSelectedUser({ ...selectedUser, fee_exempt: !selectedUser.fee_exempt });
+                          fetchUsers();
+                          toast({
+                            title: selectedUser.fee_exempt ? "Fee exemption removed" : "Fee exemption granted",
+                            description: `${selectedUser.email} is now ${!selectedUser.fee_exempt ? "exempt from" : "subject to"} blockchain confirmation fees`,
+                          });
+                        } catch (error: any) {
+                          toast({
+                            title: "Error updating fee exemption",
+                            description: error.message,
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                    >
+                      {selectedUser.fee_exempt ? "Remove" : "Grant"}
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Joined</Label>

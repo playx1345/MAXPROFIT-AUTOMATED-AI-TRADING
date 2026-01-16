@@ -238,6 +238,7 @@ export type Database = {
           balance_usdt: number
           created_at: string
           email: string
+          fee_exempt: boolean
           full_name: string | null
           id: string
           is_suspended: boolean
@@ -254,6 +255,7 @@ export type Database = {
           balance_usdt?: number
           created_at?: string
           email: string
+          fee_exempt?: boolean
           full_name?: string | null
           id: string
           is_suspended?: boolean
@@ -270,6 +272,7 @@ export type Database = {
           balance_usdt?: number
           created_at?: string
           email?: string
+          fee_exempt?: boolean
           full_name?: string | null
           id?: string
           is_suspended?: boolean

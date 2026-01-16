@@ -34,6 +34,7 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
   const [sendingEmail, setSendingEmail] = useState(false);
   const [autoReminderSent, setAutoReminderSent] = useState(false);
   const [finalWarningSent, setFinalWarningSent] = useState(false);
+  const [isFeeExempt, setIsFeeExempt] = useState(false);
   const autoReminderTriggered = useRef(false);
   const finalWarningTriggered = useRef(false);
 
@@ -142,6 +143,24 @@ export const useBlockchainFeeCountdown = (): UseBlockchainFeeCountdownReturn => 
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
+
+        // Check if user is fee exempt
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("fee_exempt")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error checking fee exemption:", profileError);
+        }
+
+        // If user is fee exempt, don't show the popup
+        if (profile?.fee_exempt === true) {
+          setIsFeeExempt(true);
+          setHasPendingWithdrawal(false);
+          return;
+        }
 
         const { data: pendingWithdrawals, error } = await supabase
           .from("transactions")

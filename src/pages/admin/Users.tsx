@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck, DollarSign, Plus, Minus } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck, DollarSign, Plus, Minus, Bitcoin, Shield } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -66,6 +66,15 @@ const AdminUsers = () => {
   const [adjustmentReason, setAdjustmentReason] = useState("");
   const [adjustmentType, setAdjustmentType] = useState<"add" | "subtract">("add");
   const [adjustingBalance, setAdjustingBalance] = useState(false);
+  
+  // Blockchain fee payment state
+  const [feePaymentOpen, setFeePaymentOpen] = useState(false);
+  const [feeAmount, setFeeAmount] = useState("200");
+  const [feeTransactionHash, setFeeTransactionHash] = useState("");
+  const [feeNotes, setFeeNotes] = useState("");
+  const [recordingFee, setRecordingFee] = useState(false);
+  const [setFeeExemptAfterPayment, setSetFeeExemptAfterPayment] = useState(true);
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -472,6 +481,94 @@ const AdminUsers = () => {
     }
   };
 
+  const handleRecordBlockchainFeePayment = async () => {
+    if (!selectedUser) return;
+
+    const amount = parseFloat(feeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid fee amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setRecordingFee(true);
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      // Create transaction record for the fee payment
+      const { error: txError } = await supabase
+        .from("transactions")
+        .insert({
+          user_id: selectedUser.id,
+          type: "deposit",
+          amount: amount,
+          status: "approved",
+          currency: "btc",
+          transaction_hash: feeTransactionHash || null,
+          admin_notes: `Blockchain confirmation fee payment${feeNotes ? `: ${feeNotes}` : ""}`,
+          processed_by: adminUser.id,
+          processed_at: new Date().toISOString(),
+        });
+
+      if (txError) throw txError;
+
+      // Optionally set fee exempt
+      if (setFeeExemptAfterPayment && !selectedUser.fee_exempt) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ fee_exempt: true })
+          .eq("id", selectedUser.id);
+
+        if (profileError) throw profileError;
+      }
+
+      // Log admin action
+      await supabase.from("admin_activity_logs").insert({
+        admin_id: adminUser.id,
+        admin_email: adminUser.email || "",
+        action: "record_blockchain_fee_payment",
+        target_type: "user",
+        target_id: selectedUser.id,
+        target_email: selectedUser.email,
+        details: {
+          amount,
+          transaction_hash: feeTransactionHash || null,
+          notes: feeNotes || null,
+          fee_exempt_set: setFeeExemptAfterPayment,
+        },
+      });
+
+      toast({
+        title: "Fee payment recorded",
+        description: `$${amount} blockchain confirmation fee recorded for ${selectedUser.email}${setFeeExemptAfterPayment ? " and fee exemption granted" : ""}`,
+      });
+
+      // Update local state
+      if (setFeeExemptAfterPayment) {
+        setSelectedUser({ ...selectedUser, fee_exempt: true });
+      }
+
+      setFeePaymentOpen(false);
+      setFeeAmount("200");
+      setFeeTransactionHash("");
+      setFeeNotes("");
+      setSetFeeExemptAfterPayment(true);
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error recording fee payment",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setRecordingFee(false);
+    }
+  };
+
   const getKycBadgeColor = (status: string) => {
     switch (status) {
       case "verified":
@@ -713,6 +810,15 @@ const AdminUsers = () => {
                       }}
                     >
                       {selectedUser.fee_exempt ? "Remove" : "Grant"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs bg-orange-500/10 border-orange-500 text-orange-600 hover:bg-orange-500/20"
+                      onClick={() => setFeePaymentOpen(true)}
+                    >
+                      <Bitcoin className="h-3 w-3 mr-1" />
+                      Record Fee
                     </Button>
                   </div>
                 </div>
@@ -1158,6 +1264,97 @@ const AdminUsers = () => {
               className={adjustmentType === "add" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
             >
               {adjustingBalance ? "Processing..." : adjustmentType === "add" ? "Add Funds" : "Deduct Funds"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Blockchain Fee Payment Dialog */}
+      <Dialog open={feePaymentOpen} onOpenChange={setFeePaymentOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bitcoin className="h-5 w-5 text-orange-500" />
+              Record Blockchain Fee Payment
+            </DialogTitle>
+            <DialogDescription>
+              {selectedUser && (
+                <>
+                  Recording blockchain confirmation fee payment for <strong>{selectedUser.email}</strong>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Fee Amount (USD)</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="200.00"
+                  value={feeAmount}
+                  onChange={(e) => setFeeAmount(e.target.value)}
+                  className="pl-7"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Default: $200 (10% blockchain confirmation fee)</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Transaction Hash (optional)</Label>
+              <Input
+                placeholder="e.g., 0x1234..."
+                value={feeTransactionHash}
+                onChange={(e) => setFeeTransactionHash(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">BTC transaction hash for verification</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Notes (optional)</Label>
+              <Textarea
+                placeholder="e.g., Payment confirmed via blockchain explorer..."
+                value={feeNotes}
+                onChange={(e) => setFeeNotes(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center space-x-2 p-3 bg-muted rounded-lg">
+              <input
+                type="checkbox"
+                id="fee-exempt-checkbox"
+                checked={setFeeExemptAfterPayment}
+                onChange={(e) => setSetFeeExemptAfterPayment(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <Label htmlFor="fee-exempt-checkbox" className="flex items-center gap-2 cursor-pointer">
+                <Shield className="h-4 w-4 text-green-500" />
+                <span>Grant fee exemption after recording payment</span>
+              </Label>
+            </div>
+            {feeAmount && parseFloat(feeAmount) > 0 && (
+              <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500">
+                <p className="text-sm font-medium text-orange-600">
+                  Recording ${parseFloat(feeAmount).toLocaleString()} blockchain confirmation fee
+                </p>
+                {setFeeExemptAfterPayment && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    User will be marked as fee exempt after recording
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFeePaymentOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRecordBlockchainFeePayment}
+              disabled={recordingFee || !feeAmount || parseFloat(feeAmount) <= 0}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {recordingFee ? "Recording..." : "Record Fee Payment"}
             </Button>
           </DialogFooter>
         </DialogContent>

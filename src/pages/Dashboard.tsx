@@ -327,13 +327,13 @@ const Dashboard = () => {
               {recentTransactions.map((tx, index) => (
                 <div 
                   key={tx.id} 
-                  className={`flex items-center justify-between border-b border-border/30 pb-3 last:border-0 group hover:bg-muted/20 rounded-lg px-3 py-2 -mx-3 transition-all duration-300 ${
+                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/30 pb-3 last:border-0 group hover:bg-muted/20 rounded-lg px-3 py-2 -mx-3 transition-all duration-300 ${
                     mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                   }`}
                   style={{ transitionDelay: `${600 + index * 100}ms` }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
                       tx.type === 'deposit' ? 'bg-success/10' : 
                       tx.type === 'withdrawal' ? 'bg-destructive/10' : 'bg-primary/10'
                     }`}>
@@ -345,16 +345,16 @@ const Dashboard = () => {
                         <TrendingUp className="h-5 w-5 text-primary" />
                       )}
                     </div>
-                    <div>
-                      <div className="font-medium capitalize">{tx.type.replace("_", " ")}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium capitalize truncate">{tx.type.replace("_", " ")}</div>
                       <div className="text-sm text-muted-foreground">
                         {new Date(tx.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-bold font-display">${Number(tx.amount).toFixed(2)}</div>
-                    <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block ${
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:text-right pl-13 sm:pl-0">
+                    <div className="font-bold font-display text-base sm:text-sm">${Number(tx.amount).toFixed(2)}</div>
+                    <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block whitespace-nowrap ${
                       tx.status === "completed" ? "bg-success/10 text-success" :
                       tx.status === "pending" ? "bg-warning/10 text-warning" :
                       tx.status === "rejected" ? "bg-destructive/10 text-destructive" :

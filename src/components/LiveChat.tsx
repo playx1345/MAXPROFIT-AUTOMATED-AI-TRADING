@@ -38,7 +38,7 @@ const LiveChat = () => {
       setTimeout(() => {
         const greeting: Message = {
           id: crypto.randomUUID(),
-          text: t('chat.welcomeMessage', `Hello! 👋 Welcome to Win Trade Invest support.\n\nHow can I help you today?\n\nYou can ask about:\n• Deposits & Withdrawals\n• Investment Plans\n• KYC Verification\n• Account Issues\n\nOr just type your question!`),
+          text: t('chat.welcomeMessage'),
           isUser: false,
           timestamp: new Date(),
         };
@@ -47,16 +47,18 @@ const LiveChat = () => {
     }
   }, [isOpen, isMinimized, messages.length, t]);
 
-  const findAutomatedResponse = (userMessage: string): { response: string; responseKey: string } => {
+  const findAutomatedResponse = (userMessage: string): string => {
     const lowerMessage = userMessage.toLowerCase();
     
     for (const autoResponse of AUTOMATED_RESPONSES) {
       if (autoResponse.keywords.some(keyword => lowerMessage.includes(keyword))) {
-        return { response: autoResponse.response, responseKey: autoResponse.responseKey };
+        // Use translated response based on responseKey
+        return t(`chat.responses.${autoResponse.responseKey}`);
       }
     }
     
-    return DEFAULT_RESPONSE;
+    // Return translated default response
+    return t(`chat.responses.${DEFAULT_RESPONSE.responseKey}`);
   };
 
   const handleSendMessage = async () => {
@@ -77,7 +79,7 @@ const LiveChat = () => {
     const typingDelay = Math.random() * 1000 + 500;
     
     setTimeout(() => {
-      const { response } = findAutomatedResponse(userMessage.text);
+      const response = findAutomatedResponse(userMessage.text);
       
       const botMessage: Message = {
         id: crypto.randomUUID(),
@@ -110,6 +112,13 @@ const LiveChat = () => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const quickActions = [
+    { key: 'Withdrawal', label: t('chat.quickWithdrawal') },
+    { key: 'Deposit', label: t('chat.quickDeposit') },
+    { key: 'Investment', label: t('chat.quickInvestment') },
+    { key: 'Support', label: t('chat.quickSupport') },
+  ];
+
   return (
     <>
       {/* Chat Button */}
@@ -120,7 +129,7 @@ const LiveChat = () => {
           "bg-primary text-primary-foreground",
           isOpen && !isMinimized && "scale-0 opacity-0"
         )}
-        aria-label={t('chat.openChat', 'Open chat')}
+        aria-label={t('chat.openChat')}
       >
         <MessageCircle className="h-6 w-6" />
         {messages.length === 0 && (
@@ -144,8 +153,8 @@ const LiveChat = () => {
                 <MessageCircle className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-sm">{t('chat.title', 'Live Support')}</h3>
-                <p className="text-xs opacity-80">{t('chat.online', 'Online')}</p>
+                <h3 className="font-semibold text-sm">{t('chat.title')}</h3>
+                <p className="text-xs opacity-80">{t('chat.online')}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -221,16 +230,16 @@ const LiveChat = () => {
               {/* Quick Actions */}
               <div className="px-4 pb-2">
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {['Withdrawal', 'Deposit', 'Investment', 'Support'].map((action) => (
+                  {quickActions.map((action) => (
                     <button
-                      key={action}
+                      key={action.key}
                       onClick={() => {
-                        setInputValue(action);
+                        setInputValue(action.key);
                         inputRef.current?.focus();
                       }}
                       className="px-3 py-1 text-xs bg-muted hover:bg-muted/80 rounded-full whitespace-nowrap transition-colors"
                     >
-                      {t(`chat.quick${action}`, action)}
+                      {action.label}
                     </button>
                   ))}
                 </div>
@@ -244,7 +253,7 @@ const LiveChat = () => {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={t('chat.placeholder', 'Type your message...')}
+                    placeholder={t('chat.placeholder')}
                     className="flex-1 rounded-full"
                   />
                   <Button
@@ -257,7 +266,7 @@ const LiveChat = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground text-center mt-2">
-                  {t('chat.emailNote', 'Email: ')}
+                  {t('chat.emailNote')}
                   <a href={`mailto:${PLATFORM_EMAILS.support}`} className="text-primary hover:underline">
                     {PLATFORM_EMAILS.support}
                   </a>

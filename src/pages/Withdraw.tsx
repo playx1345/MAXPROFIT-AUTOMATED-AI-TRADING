@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ interface RecentWithdrawal {
 }
 
 const Withdraw = () => {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
   const [walletAddress, setWalletAddress] = useState("");
@@ -130,9 +132,9 @@ const Withdraw = () => {
     } else {
       const withdrawalAmount = parseFloat(amount);
       if (withdrawalAmount > balance) {
-        newErrors.amount = `Insufficient balance. You have $${balance.toLocaleString()} available.`;
+        newErrors.amount = t("withdraw.insufficientBalance", { balance: balance.toLocaleString() });
       } else if (withdrawalAmount < MINIMUM_WITHDRAWAL_AMOUNT) {
-        newErrors.amount = `Minimum withdrawal amount is $${MINIMUM_WITHDRAWAL_AMOUNT}.`;
+        newErrors.amount = t("withdraw.minWithdrawal", { amount: MINIMUM_WITHDRAWAL_AMOUNT });
       }
     }
 
@@ -154,8 +156,8 @@ const Withdraw = () => {
   const handleSubmitWithdrawal = async () => {
     if (!validateForm()) {
       toast({
-        title: "Validation Error",
-        description: "Please fix the errors before submitting",
+        title: t("withdraw.validationError"),
+        description: t("withdraw.fixErrors"),
         variant: "destructive",
       });
       return;
@@ -188,8 +190,8 @@ const Withdraw = () => {
       setFeePaymentDialogOpen(true);
 
       toast({
-        title: "Withdrawal created!",
-        description: `Please submit your ${(getCurrentFeePercentage() * 100)}% confirmation fee payment ($${feeAmount.toFixed(2)}) to proceed.`,
+        title: t("withdraw.created"),
+        description: t("withdraw.createdDesc", { percent: (getCurrentFeePercentage() * 100), fee: feeAmount.toFixed(2) }),
       });
 
       setAmount("");
@@ -199,7 +201,7 @@ const Withdraw = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
-        title: "Error submitting withdrawal",
+        title: t("withdraw.errorSubmitting"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -211,8 +213,8 @@ const Withdraw = () => {
   const handleSubmitFeePayment = async () => {
     if (!feePaymentHash.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Please enter the fee payment transaction hash",
+        title: t("withdraw.validationError"),
+        description: t("withdraw.enterFeeHashError"),
         variant: "destructive",
       });
       return;
@@ -244,8 +246,8 @@ const Withdraw = () => {
       }).catch(err => console.error("Email notification failed:", err));
 
       toast({
-        title: "Fee payment submitted!",
-        description: "Your withdrawal will be processed within 24 hours.",
+        title: t("withdraw.feeSubmitted"),
+        description: t("withdraw.feeSubmittedDesc"),
       });
 
       setFeePaymentDialogOpen(false);
@@ -255,7 +257,7 @@ const Withdraw = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
-        title: "Error submitting fee payment",
+        title: t("withdraw.errorSubmittingFee"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -269,49 +271,48 @@ const Withdraw = () => {
     setCopiedAddress(true);
     setTimeout(() => setCopiedAddress(false), 2000);
     toast({
-      title: "Copied!",
-      description: "Wallet address copied to clipboard",
+      title: t("deposit.copied"),
+      description: t("deposit.walletCopied"),
     });
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Withdraw Funds</h1>
-        <p className="text-muted-foreground">Request a withdrawal from your account</p>
+        <h1 className="text-3xl font-bold">{t("withdraw.title")}</h1>
+        <p className="text-muted-foreground">{t("withdraw.subtitle")}</p>
       </div>
 
       <Alert>
         <Clock className="h-4 w-4" />
         <AlertDescription>
-          <strong>Processing:</strong> Withdrawals are reviewed and processed by admins. Make sure your wallet address is correct - transactions cannot be reversed.
+          <strong>{t("withdraw.autoProcessing")}:</strong> {t("withdraw.autoProcessNote")}
         </AlertDescription>
       </Alert>
 
-      <Alert className="border-yellow-500 bg-yellow-500/10">
-        <AlertTriangle className="h-4 w-4 text-yellow-600" />
-        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
-          <strong>⚠️ Important: Confirmation Fee Required</strong>
+      <Alert className="border-warning bg-warning/10">
+        <AlertTriangle className="h-4 w-4 text-warning" />
+        <AlertDescription>
+          <strong>⚠️ {t("withdraw.confirmationFeeRequired")}</strong>
           <p className="mt-2 text-sm">
-            Before your withdrawal can be approved, you must pay a <strong>{currency === 'xrp' ? '2%' : '10%'} confirmation fee in BTC</strong> to verify your transaction (regardless of withdrawal currency).
+            {t("withdraw.confirmationFeeNote")}
           </p>
-          <div className="mt-3 p-2 bg-background rounded border border-yellow-600">
-            <p className="text-xs font-semibold mb-1">Send BTC to:</p>
+          <div className="mt-3 p-2 bg-background rounded border border-warning">
+            <p className="text-xs font-semibold mb-1">{t("blockchainFee.sendTo")}</p>
             <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
           </div>
           <p className="mt-2 text-xs">
-            After submitting your withdrawal request, send the {currency === 'xrp' ? '2%' : '10%'} confirmation fee in BTC to the address above. 
-            Once the fee payment is confirmed on the blockchain (6+ confirmations), an admin will approve your withdrawal within 24 hours.
+            {t("withdraw.afterSubmitting")}
           </p>
         </AlertDescription>
       </Alert>
 
-      <Alert className="border-yellow-500 bg-yellow-500/10">
-        <AlertTriangle className="h-4 w-4 text-yellow-600" />
-        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
-          <strong>Important: Block Confirmation Fee</strong>
+      <Alert className="border-warning bg-warning/10">
+        <AlertTriangle className="h-4 w-4 text-warning" />
+        <AlertDescription>
+          <strong>{t("blockchainFee.blockFeeTitle")}</strong>
           <p className="mt-2 text-sm">
-            All withdrawal transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and confirmed on the blockchain. This fee ensures the security and verification of your transaction.
+            {t("blockchainFee.blockFeeDescription", { amount: BLOCK_CONFIRMATION_FEE })}
           </p>
         </AlertDescription>
       </Alert>
@@ -319,27 +320,27 @@ const Withdraw = () => {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Available Balance</CardTitle>
-            <CardDescription>Your current withdrawable balance</CardDescription>
+            <CardTitle>{t("withdraw.availableBalance")}</CardTitle>
+            <CardDescription>{t("withdraw.currentBalance")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-primary">
               ${balance.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              USDT equivalent
+              {t("withdraw.usdtEquivalent")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Withdrawal Request</CardTitle>
-            <CardDescription>Enter withdrawal details</CardDescription>
+            <CardTitle>{t("withdraw.withdrawalRequest")}</CardTitle>
+            <CardDescription>{t("withdraw.enterDetails")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="currency">Currency</Label>
+              <Label htmlFor="currency">{t("withdraw.currency")}</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <Button
                   variant={currency === "usdt" ? "default" : "outline"}
@@ -376,11 +377,11 @@ const Withdraw = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">{t("withdraw.amount")}</Label>
               <Input
                 id="amount"
                 type="number"
-                placeholder="Enter amount"
+                placeholder={t("withdraw.enterAmount")}
                 value={amount}
                 onChange={(e) => {
                   setAmount(e.target.value);
@@ -397,13 +398,13 @@ const Withdraw = () => {
                 <p className="text-xs text-destructive">{errors.amount}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  Available: ${balance.toLocaleString()}
+                  {t("withdraw.available")}: ${balance.toLocaleString()}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="wallet">Your Wallet Address</Label>
+              <Label htmlFor="wallet">{t("withdraw.yourWalletAddress")}</Label>
               <Input
                 id="wallet"
                 placeholder={currency === "usdt" ? "T..." : currency === "btc" ? "bc1..." : currency === "xrp" ? "r..." : "0x..."}
@@ -435,10 +436,10 @@ const Withdraw = () => {
             {/* Memo Tag field for XRP */}
             {currency === 'xrp' && (
               <div className="space-y-2">
-                <Label htmlFor="memoTag">Memo Tag (Destination Tag)</Label>
+                <Label htmlFor="memoTag">{t("withdraw.memoTag")}</Label>
                 <Input
                   id="memoTag"
-                  placeholder="Enter memo/destination tag (optional)"
+                  placeholder={t("withdraw.enterMemoTag")}
                   value={memoTag}
                   onChange={(e) => {
                     setMemoTag(e.target.value);
@@ -454,7 +455,7 @@ const Withdraw = () => {
                   <p className="text-xs text-destructive">{errors.memoTag}</p>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    Required by some exchanges. Enter the numeric destination tag if applicable.
+                    {t("withdraw.memoTagRequired")}
                   </p>
                 )}
               </div>
@@ -463,19 +464,19 @@ const Withdraw = () => {
             {parseFloat(amount) > 0 && (
               <div className="p-3 bg-muted rounded-lg space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span>Withdrawal amount:</span>
+                  <span>{t("withdraw.withdrawalAmount")}:</span>
                   <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-yellow-600 dark:text-yellow-500">
-                  <span>Confirmation fee ({(getCurrentFeePercentage() * 100)}%):</span>
-                  <span>${estimatedFees.toFixed(2)} (paid separately)</span>
+                <div className="flex justify-between text-warning">
+                  <span>{t("withdraw.networkFee")} ({(getCurrentFeePercentage() * 100)}%):</span>
+                  <span>${estimatedFees.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold pt-2 border-t">
-                  <span>You will receive:</span>
-                  <span className="text-green-600 dark:text-green-500">${netAmount.toFixed(2)}</span>
+                  <span>{t("withdraw.youWillReceive")}:</span>
+                  <span className="text-success">${netAmount.toFixed(2)}</span>
                 </div>
-                <div className="mt-3 p-2 bg-yellow-500/20 rounded text-xs text-yellow-900 dark:text-yellow-100">
-                  <strong>Important:</strong> You must pay a ${estimatedFees.toFixed(2)} confirmation fee separately to the {currency.toUpperCase()} address shown above before your withdrawal can be approved. This fee is NOT deducted from your withdrawal - you will receive the full ${parseFloat(amount).toLocaleString()} after approval.
+                <div className="mt-3 p-2 bg-warning/20 rounded text-xs">
+                  <strong>{t("deposit.important")}:</strong> {t("withdraw.confirmationFeeNote2", { fee: `$${estimatedFees.toFixed(2)}`, currency: currency.toUpperCase() })}
                 </div>
               </div>
             )}
@@ -485,7 +486,7 @@ const Withdraw = () => {
               disabled={submitting}
               className="w-full"
             >
-              {submitting ? "Submitting..." : "Submit Withdrawal Request"}
+              {submitting ? t("withdraw.submitting") : t("withdraw.submitRequest")}
             </Button>
           </CardContent>
         </Card>
@@ -494,8 +495,8 @@ const Withdraw = () => {
       {recentWithdrawals.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Recent Withdrawals</CardTitle>
-            <CardDescription>Your latest withdrawal requests with blockchain tracking</CardDescription>
+            <CardTitle>{t("withdraw.recentWithdrawals")}</CardTitle>
+            <CardDescription>{t("withdraw.latestRequests")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -515,21 +516,21 @@ const Withdraw = () => {
       <Dialog open={feePaymentDialogOpen} onOpenChange={setFeePaymentDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Submit Confirmation Fee Payment</DialogTitle>
+            <DialogTitle>{t("withdraw.submitFeePayment")}</DialogTitle>
             <DialogDescription>
-              Complete your withdrawal by paying the {pendingWithdrawalCurrency === 'xrp' ? '2%' : '10%'} confirmation fee
+              {t("withdraw.completeFeePayment", { percent: pendingWithdrawalCurrency === 'xrp' ? '2' : '10' })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Required:</strong> Pay the confirmation fee to the address below using {pendingWithdrawalCurrency.toUpperCase()} before your withdrawal can be processed.
+                <strong>{t("withdraw.requiredFee")}:</strong> {t("withdraw.payFeeNote", { currency: pendingWithdrawalCurrency.toUpperCase() })}
               </AlertDescription>
             </Alert>
 
             <div className="space-y-2">
-              <Label>Fee Amount (in USD equivalent)</Label>
+              <Label>{t("withdraw.feeAmount")}</Label>
               <div className="text-2xl font-bold text-primary">
                 ${calculateFee(pendingWithdrawalAmount, pendingWithdrawalCurrency).toFixed(2)}
               </div>
@@ -539,7 +540,7 @@ const Withdraw = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Send Fee To (BTC Only)</Label>
+              <Label>{t("withdraw.paymentAddress")}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   value={CONFIRMATION_FEE_WALLET_BTC}
@@ -561,15 +562,15 @@ const Withdraw = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="feeHash">Transaction Hash (After Payment)</Label>
+              <Label htmlFor="feeHash">{t("withdraw.feePaymentHash")}</Label>
               <Input
                 id="feeHash"
-                placeholder="Paste your transaction hash here after sending the fee..."
+                placeholder={t("withdraw.enterFeeHash")}
                 value={feePaymentHash}
                 onChange={(e) => setFeePaymentHash(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                After sending the fee, paste the blockchain transaction hash here to verify payment
+                {t("withdraw.enterFeeHash")}
               </p>
             </div>
 
@@ -583,14 +584,14 @@ const Withdraw = () => {
                 }}
                 className="flex-1"
               >
-                Submit Later
+                {t("withdraw.cancel")}
               </Button>
               <Button
                 onClick={handleSubmitFeePayment}
                 disabled={submittingFeeHash || !feePaymentHash.trim()}
                 className="flex-1"
               >
-                {submittingFeeHash ? "Submitting..." : "Submit Payment Hash"}
+                {submittingFeeHash ? t("withdraw.submittingFee") : t("withdraw.submitFeeHash")}
               </Button>
             </div>
           </div>

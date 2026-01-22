@@ -90,9 +90,9 @@ const Transactions = () => {
       <Alert className="border-yellow-500 bg-yellow-500/10">
         <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0" />
         <AlertDescription className="text-yellow-900 dark:text-yellow-100">
-          <strong>Important: Block Confirmation Fee</strong>
+          <strong>{t("blockchainFee.blockFeeTitle")}</strong>
           <p className="mt-2 text-sm">
-            All transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and confirmed on the blockchain.
+            {t("blockchainFee.blockFeeDescription", { amount: BLOCK_CONFIRMATION_FEE })}
           </p>
         </AlertDescription>
       </Alert>

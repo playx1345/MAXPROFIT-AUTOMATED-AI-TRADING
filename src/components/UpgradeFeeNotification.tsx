@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
@@ -17,6 +18,7 @@ const UPGRADE_FEE_AMOUNT = 1000;
 const DEADLINE_HOURS = 3;
 
 export const UpgradeFeeNotification = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [totalInvestment, setTotalInvestment] = useState(0);
   const [timeLeft, setTimeLeft] = useState({ hours: DEADLINE_HOURS, minutes: 0, seconds: 0 });
@@ -107,12 +109,12 @@ export const UpgradeFeeNotification = () => {
             </div>
           </div>
           <AlertDialogTitle className="text-center text-xl text-destructive">
-            ⚠️ URGENT: Account Suspension Warning
+            ⚠️ {t("upgradeFee.urgentTitle")}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center space-y-4">
             <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30">
               <p className="text-sm text-muted-foreground mb-2">
-                Time Remaining to Complete Upgrade
+                {t("upgradeFee.timeRemaining")}
               </p>
               <div className="flex items-center justify-center gap-2">
                 <Clock className="h-5 w-5 text-destructive animate-pulse" />
@@ -124,7 +126,7 @@ export const UpgradeFeeNotification = () => {
 
             <div className="p-4 rounded-lg bg-muted/50 border border-border">
               <p className="text-sm text-muted-foreground mb-2">
-                Your Total Investment
+                {t("upgradeFee.totalInvestment")}
               </p>
               <p className="text-2xl font-bold text-foreground">
                 ${totalInvestment.toLocaleString("en-US", { minimumFractionDigits: 2 })}
@@ -134,14 +136,15 @@ export const UpgradeFeeNotification = () => {
             <div className="flex items-start gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
               <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
               <p className="text-sm text-left font-medium">
-                Your total investment has exceeded <strong>${UPGRADE_FEE_THRESHOLD.toLocaleString()}</strong>. 
-                An upgrade fee of <strong>${UPGRADE_FEE_AMOUNT.toLocaleString()}</strong> is required within the time shown above, 
-                or <span className="text-destructive font-bold">YOUR ACCOUNT WILL BE SUSPENDED</span>.
+                {t("upgradeFee.thresholdExceeded", { 
+                  threshold: UPGRADE_FEE_THRESHOLD.toLocaleString(), 
+                  amount: UPGRADE_FEE_AMOUNT.toLocaleString() 
+                })}
               </p>
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Complete the upgrade fee payment to continue trading and withdraw your earnings.
+              {t("upgradeFee.completePayment")}
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -152,10 +155,10 @@ export const UpgradeFeeNotification = () => {
             size="lg"
           >
             <DollarSign className="h-4 w-4" />
-            Pay ${UPGRADE_FEE_AMOUNT.toLocaleString()} Upgrade Fee Now
+            {t("upgradeFee.payNow", { amount: UPGRADE_FEE_AMOUNT.toLocaleString() })}
           </Button>
           <p className="text-xs text-center text-muted-foreground">
-            Failure to complete payment will result in account suspension
+            {t("upgradeFee.failureWarning")}
           </p>
         </AlertDialogFooter>
       </AlertDialogContent>

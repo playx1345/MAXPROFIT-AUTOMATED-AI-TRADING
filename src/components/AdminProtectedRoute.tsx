@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 
@@ -8,6 +9,7 @@ interface AdminProtectedRouteProps {
 }
 
 const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
+  const { t } = useTranslation();
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,7 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">
-          Verifying admin access...
+          {t("admin.verifyingAccess")}
         </div>
       </div>
     );
@@ -77,12 +79,12 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-destructive">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-destructive">{t("admin.accessDenied")}</h1>
           <p className="text-muted-foreground">
-            You do not have admin privileges to access this area.
+            {t("admin.noPrivileges")}
           </p>
           <a href="/dashboard" className="text-primary hover:underline">
-            Return to Dashboard
+            {t("admin.returnToDashboard")}
           </a>
         </div>
       </div>

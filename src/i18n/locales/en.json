@@ -17,7 +17,9 @@
     "emailError": "Failed to send email. Please try again.",
     "emailAlreadySent": "✓ Email with payment instructions sent",
     "autoReminderSent": "⏰ Automatic reminder sent at 50% countdown",
-    "finalWarningSent": "🚨 FINAL WARNING sent at 6 minutes remaining"
+    "finalWarningSent": "🚨 FINAL WARNING sent at 6 minutes remaining",
+    "blockFeeTitle": "Important: Block Confirmation Fee",
+    "blockFeeDescription": "All transactions require a ${{amount}} blockchain confirmation fee to be processed and confirmed on the blockchain."
   },
   "nav": {
     "features": "Features",
@@ -136,19 +138,6 @@
       "profile": "Profile & KYC"
     }
   },
-  "blockchainFee": {
-    "urgentTitle": "URGENT: Blockchain Confirmation Required",
-    "paymentRequired": "Payment of ${{amount}} Required",
-    "description": "Your withdrawal requires a blockchain confirmation fee. Failure to pay within the time limit will result in the loss of your funds.",
-    "sendTo": "Send BTC to this address:",
-    "equivalentBtc": "(equivalent in BTC at current rate)",
-    "warning": "WARNING: If payment is not received within the countdown, you will lose ALL your funds!",
-    "payNow": "Pay ${{amount}} Now",
-    "singleTransaction": "Payment must be made in a single transaction",
-    "failed": "Transaction Failed",
-    "failedDescription": "Your withdrawal has failed due to non-payment of the blockchain confirmation fee. Please contact support.",
-    "addressCopied": "Wallet address copied to clipboard"
-  },
   "auth": {
     "signIn": "Sign In",
     "signUp": "Sign Up",
@@ -184,7 +173,8 @@
     "rejected": "Rejected",
     "completed": "Completed",
     "active": "Active",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "wallet": "Wallet"
   },
   "language": {
     "select": "Select Language",
@@ -277,7 +267,10 @@
     "feeSubmittedDesc": "Your withdrawal will be processed within 24 hours.",
     "errorSubmitting": "Error submitting withdrawal",
     "errorSubmittingFee": "Error submitting fee payment",
-    "enterFeeHashError": "Please enter the fee payment transaction hash"
+    "enterFeeHashError": "Please enter the fee payment transaction hash",
+    "memoTag": "Memo Tag / Destination Tag",
+    "memoTagRequired": "Required for XRP/XLM",
+    "enterMemoTag": "Enter memo/destination tag"
   },
   "investments": {
     "title": "Investments",
@@ -394,26 +387,60 @@
     "subtitle": "View all your deposit and withdrawal transactions",
     "allTransactions": "All Transactions",
     "completeHistory": "Complete history of your deposits and withdrawals",
-    "noTransactions": "No transactions yet",
     "date": "Date",
     "type": "Type",
     "amount": "Amount",
     "currency": "Currency",
     "status": "Status",
     "walletAddress": "Wallet Address",
+    "noTransactions": "No transactions found",
     "loading": "Loading transactions...",
     "errorFetching": "Error fetching transactions"
   },
   "chat": {
     "title": "Live Support",
     "online": "Online",
-    "openChat": "Open chat",
+    "openChat": "Open Chat",
     "placeholder": "Type your message...",
     "emailNote": "Email: ",
-    "welcomeMessage": "Hello! 👋 Welcome to Win Trade Invest support.\n\nHow can I help you today?\n\nYou can ask about:\n• Deposits & Withdrawals\n• Investment Plans\n• KYC Verification\n• Account Issues\n\nOr just type your question!",
+    "welcomeMessage": "Hello! 👋 Welcome to Win Trade Invest support.\n\nHow can I help you today?\n\nYou can ask about:\n• Deposits and withdrawals\n• Investment plans\n• KYC verification\n• Account issues\n\nOr just type your question!",
     "quickWithdrawal": "Withdrawal",
     "quickDeposit": "Deposit",
     "quickInvestment": "Investment",
-    "quickSupport": "Support"
+    "quickSupport": "Support",
+    "responses": {
+      "greeting": "Hello! 👋 Welcome to Win Trade Invest support. How can I help you today?",
+      "withdrawal": "For withdrawals:\n\n1. Go to Dashboard → Withdraw\n2. Enter amount and wallet address\n3. Pay the 10% confirmation fee\n4. Withdrawals are processed within 24 hours\n\nMinimum withdrawal: $50\n\nNeed more help? Email us at support@win-tradex.com",
+      "deposit": "To make a deposit:\n\n1. Go to Dashboard → Deposit\n2. Choose USDT (TRC20) or BTC\n3. Send crypto to the provided wallet address\n4. Submit deposit request with transaction hash\n\nMinimum deposit: $250\n\nDeposits are processed within 24 hours after blockchain confirmation.",
+      "investment": "We offer 3 investment plans:\n\n📈 Starter: $250-$4,999 (5-8% ROI)\n📊 Growth: $5,000-$24,999 (8-12% ROI)\n💎 Professional: $25,000-$100,000 (12-18% ROI)\n\nAll plans run for 30 days with our AI trading bot.\n\nGo to Dashboard → Investments to get started!",
+      "kyc": "KYC Verification:\n\n1. Go to Profile & KYC\n2. Fill in your personal details\n3. Upload a government-issued ID\n4. Submit for verification\n\nNote: A $400 verification fee applies upon approval.\n\nVerification takes 24-48 hours.",
+      "fees": "Platform Fees:\n\n• KYC Verification: $400 (one-time)\n• Withdrawal Confirmation: 10% of withdrawal amount\n• Platform Fee: 20% of profits\n\nAll fees are clearly shown before any transaction.",
+      "contact": "Contact us:\n\n📧 General Support: support@win-tradex.com\n📧 Live Support: live@win-tradex.com\n📧 Admin: admin@win-tradex.com\n\nOur team typically responds within 24 hours.",
+      "problem": "Sorry to hear you're having issues. Please:\n\n1. Try refreshing the page\n2. Clear your browser cache\n3. Check your internet connection\n\nIf the problem persists, email us at support@win-tradex.com with:\n• Your account email\n• Description of the issue\n• Screenshots if possible",
+      "account": "Account issues:\n\n• Forgot password? Use 'Forgot Password' on login page\n• Account locked? Contact support@win-tradex.com\n• Can't login? Clear browser cookies and try again\n\nNeed more help? We're here for you!",
+      "referral": "Referral Program:\n\n🎁 Earn 5% of your friend's first deposit!\n\n1. Go to Dashboard → Referrals\n2. Copy your unique referral link\n3. Share with friends\n4. Earn bonus when they deposit\n\nNo limit on referrals!",
+      "default": "Thank you for your message! Our support team will review it and get back to you within 24 hours.\n\nFor urgent matters, email us at:\n📧 support@win-tradex.com\n📧 live@win-tradex.com"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Oops! Page not found",
+    "returnHome": "Return to Home"
+  },
+  "upgradeFee": {
+    "urgentTitle": "URGENT: Account Suspension Warning",
+    "timeRemaining": "Time Remaining to Complete Upgrade",
+    "totalInvestment": "Your Total Investment",
+    "thresholdExceeded": "Your total investment has exceeded ${{threshold}}. An upgrade fee of ${{amount}} is required within the time shown above, or YOUR ACCOUNT WILL BE SUSPENDED.",
+    "completePayment": "Complete the upgrade fee payment to continue trading and withdraw your earnings.",
+    "payNow": "Pay ${{amount}} Upgrade Fee Now",
+    "failureWarning": "Failure to complete payment will result in account suspension"
+  },
+  "admin": {
+    "panel": "Admin Panel",
+    "accessDenied": "Access Denied",
+    "noPrivileges": "You do not have admin privileges to access this area.",
+    "returnToDashboard": "Return to Dashboard",
+    "verifyingAccess": "Verifying admin access..."
   }
 }

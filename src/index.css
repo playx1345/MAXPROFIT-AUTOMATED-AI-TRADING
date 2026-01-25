@@ -580,12 +580,62 @@
     animation: float 6s ease-in-out infinite;
   }
 
+  .animate-float {
+    animation: float-custom var(--float-duration, 4s) ease-in-out infinite;
+  }
+
   @keyframes float {
     0%, 100% {
       transform: translateY(0);
     }
     50% {
       transform: translateY(-20px);
+    }
+  }
+
+  @keyframes float-custom {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    25% {
+      transform: translateY(calc(var(--float-amplitude, 10px) * -0.5)) rotate(1deg);
+    }
+    50% {
+      transform: translateY(calc(var(--float-amplitude, 10px) * -1)) rotate(0deg);
+    }
+    75% {
+      transform: translateY(calc(var(--float-amplitude, 10px) * -0.5)) rotate(-1deg);
+    }
+  }
+
+  /* ========== Pulse Soft Animation ========== */
+  .animate-pulse-soft {
+    animation: pulse-soft 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  /* ========== Gradient Shift Animation ========== */
+  .animate-gradient-x {
+    animation: gradient-x 15s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  @keyframes gradient-x {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
     }
   }
 

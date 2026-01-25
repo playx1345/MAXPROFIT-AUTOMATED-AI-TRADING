@@ -1,12 +1,13 @@
 import { lazy, Suspense, memo } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, TrendingUp, Shield, Bot, Users } from "lucide-react";
+import { TrendingUp, Shield, Bot, Users } from "lucide-react";
 import { AnimatedHero } from "@/components/landing/AnimatedHero";
 import { CryptoTicker } from "@/components/landing/CryptoTicker";
 import { FeatureCard } from "@/components/landing/FeatureCard";
 import { InvestmentPlanCard } from "@/components/landing/InvestmentPlanCard";
 import { Section } from "@/components/landing/Section";
 import { Header } from "@/components/landing/Header";
+import { ScrollRevealWrapper } from "@/components/landing/ScrollRevealWrapper";
+import { ParallaxSection } from "@/components/landing/ParallaxSection";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -34,24 +35,43 @@ const SectionSkeleton = memo(() => (
 
 SectionSkeleton.displayName = "SectionSkeleton";
 
-// How it works step component
+// How it works step component with enhanced animations
 const HowItWorksStep = memo(({ step, index }: { step: { num: string; title: string; desc: string }; index: number }) => (
-  <div 
+  <ScrollRevealWrapper 
+    direction="up" 
+    delay={index * 150}
     className="text-center group"
-    style={{ animationDelay: `${index * 100}ms` }}
   >
-    <div 
-      className={cn(
-        "w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary text-primary-foreground",
-        "flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-4",
-        "transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/25"
+    <div className="relative">
+      {/* Connector line */}
+      {index < 3 && (
+        <div 
+          className="hidden md:block absolute top-10 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/30 to-primary/10"
+          aria-hidden="true"
+        />
       )}
-    >
-      {step.num}
+      <div 
+        className={cn(
+          "w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary text-primary-foreground",
+          "flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-4",
+          "transition-all duration-500 relative z-10",
+          "group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/30",
+          "group-hover:rotate-3"
+        )}
+      >
+        {step.num}
+        {/* Glow ring */}
+        <div 
+          className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
+          aria-hidden="true"
+        />
+      </div>
     </div>
-    <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+    <h3 className="text-lg font-semibold mb-2 transition-colors duration-300 group-hover:text-primary">
+      {step.title}
+    </h3>
     <p className="text-sm text-muted-foreground">{step.desc}</p>
-  </div>
+  </ScrollRevealWrapper>
 ));
 
 HowItWorksStep.displayName = "HowItWorksStep";
@@ -89,12 +109,13 @@ const Landing = () => {
           <StatsCounter />
         </Suspense>
 
-        {/* Features Section */}
+        {/* Features Section with Parallax */}
         <Section 
           id="features" 
           title="Why Choose Live Win Trade?"
           subtitle="Advanced technology meets professional trading expertise"
           variant="muted"
+          parallaxBackground
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             <FeatureCard 
@@ -133,56 +154,65 @@ const Landing = () => {
           id="plans"
           title="Investment Plans"
           subtitle="Choose a plan that matches your investment goals"
+          parallaxBackground
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <InvestmentPlanCard 
-              title="Starter Plan" 
-              risk="Low Risk" 
-              minInvestment="$100" 
-              maxInvestment="$999" 
-              expectedROI="5% - 15%" 
-              features={[
-                "Conservative trading strategies", 
-                "Lower volatility exposure", 
-                "Ideal for beginners", 
-                "24/7 customer support", 
-                "Monthly performance reports"
-              ]} 
-            />
-            <InvestmentPlanCard 
-              title="Growth Plan" 
-              risk="Medium Risk" 
-              minInvestment="$1,000" 
-              maxInvestment="$4,999" 
-              expectedROI="10% - 25%" 
-              features={[
-                "Balanced risk/reward ratio", 
-                "Multiple trading strategies", 
-                "Advanced market analysis", 
-                "Priority customer support", 
-                "Weekly performance reports"
-              ]} 
-              popular={true} 
-            />
-            <InvestmentPlanCard 
-              title="Professional" 
-              risk="High Risk" 
-              minInvestment="$5,000" 
-              maxInvestment="$50,000" 
-              expectedROI="15% - 40%" 
-              features={[
-                "Aggressive trading strategies", 
-                "Maximum potential returns", 
-                "Dedicated account manager", 
-                "VIP support 24/7", 
-                "Daily performance reports"
-              ]} 
-            />
+            <ScrollRevealWrapper direction="up" delay={0}>
+              <InvestmentPlanCard 
+                title="Starter Plan" 
+                risk="Low Risk" 
+                minInvestment="$100" 
+                maxInvestment="$999" 
+                expectedROI="5% - 15%" 
+                features={[
+                  "Conservative trading strategies", 
+                  "Lower volatility exposure", 
+                  "Ideal for beginners", 
+                  "24/7 customer support", 
+                  "Monthly performance reports"
+                ]} 
+              />
+            </ScrollRevealWrapper>
+            <ScrollRevealWrapper direction="up" delay={150}>
+              <InvestmentPlanCard 
+                title="Growth Plan" 
+                risk="Medium Risk" 
+                minInvestment="$1,000" 
+                maxInvestment="$4,999" 
+                expectedROI="10% - 25%" 
+                features={[
+                  "Balanced risk/reward ratio", 
+                  "Multiple trading strategies", 
+                  "Advanced market analysis", 
+                  "Priority customer support", 
+                  "Weekly performance reports"
+                ]} 
+                popular={true} 
+              />
+            </ScrollRevealWrapper>
+            <ScrollRevealWrapper direction="up" delay={300}>
+              <InvestmentPlanCard 
+                title="Professional" 
+                risk="High Risk" 
+                minInvestment="$5,000" 
+                maxInvestment="$50,000" 
+                expectedROI="15% - 40%" 
+                features={[
+                  "Aggressive trading strategies", 
+                  "Maximum potential returns", 
+                  "Dedicated account manager", 
+                  "VIP support 24/7", 
+                  "Daily performance reports"
+                ]} 
+              />
+            </ScrollRevealWrapper>
           </div>
 
-          <p className="text-center text-sm text-muted-foreground mt-10 max-w-3xl mx-auto">
-            * Expected ROI ranges are estimates based on historical market conditions and are not guaranteed.
-          </p>
+          <ScrollRevealWrapper direction="fade" delay={400}>
+            <p className="text-center text-sm text-muted-foreground mt-10 max-w-3xl mx-auto">
+              * Expected ROI ranges are estimates based on historical market conditions and are not guaranteed.
+            </p>
+          </ScrollRevealWrapper>
         </Section>
 
         {/* How It Works Section */}
@@ -204,6 +234,7 @@ const Landing = () => {
           id="faq"
           title="Frequently Asked Questions"
           subtitle="Find answers to common questions"
+          parallaxBackground
         >
           <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}>
             <FAQ />
@@ -211,27 +242,57 @@ const Landing = () => {
         </Section>
       </main>
 
-      {/* Footer */}
+      {/* Footer with reveal animation */}
       <footer 
-        className="border-t border-border py-6 bg-muted/30"
+        className="border-t border-border py-8 bg-muted/30 relative overflow-hidden"
         role="contentinfo"
       >
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-foreground">Live Win Trade</span>
-              <span>© {new Date().getFullYear()}</span>
+        {/* Decorative gradient */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+        
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <ScrollRevealWrapper direction="up">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">Live Win Trade</span>
+                <span>© {new Date().getFullYear()}</span>
+              </div>
+              <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-6" aria-label="Footer links">
+                <Link 
+                  to="/auth" 
+                  className="hover:text-foreground transition-colors duration-300 hover:-translate-y-0.5 inline-block"
+                >
+                  Sign In
+                </Link>
+                <a 
+                  href="#features" 
+                  className="hover:text-foreground transition-colors duration-300 hover:-translate-y-0.5 inline-block"
+                >
+                  Features
+                </a>
+                <a 
+                  href="#faq" 
+                  className="hover:text-foreground transition-colors duration-300 hover:-translate-y-0.5 inline-block"
+                >
+                  FAQ
+                </a>
+                <Link 
+                  to="/admin/login" 
+                  className="text-xs opacity-50 hover:opacity-100 hover:text-foreground transition-all duration-300"
+                >
+                  Admin
+                </Link>
+              </nav>
             </div>
-            <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-6" aria-label="Footer links">
-              <Link to="/auth" className="hover:text-foreground transition-colors">Sign In</Link>
-              <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-              <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
-              <Link to="/admin/login" className="text-xs opacity-50 hover:opacity-100 hover:text-foreground transition-colors">Admin</Link>
-            </nav>
-          </div>
-          <p className="text-xs text-muted-foreground/70 text-center mt-4">
-            ⚠️ Risk Warning: Cryptocurrency investments carry significant risk. Past performance does not guarantee future results.
-          </p>
+          </ScrollRevealWrapper>
+          <ScrollRevealWrapper direction="fade" delay={200}>
+            <p className="text-xs text-muted-foreground/70 text-center mt-6">
+              ⚠️ Risk Warning: Cryptocurrency investments carry significant risk. Past performance does not guarantee future results.
+            </p>
+          </ScrollRevealWrapper>
         </div>
       </footer>
     </div>

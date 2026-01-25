@@ -5,15 +5,21 @@ import { Link } from "react-router-dom";
 import { ProfitCounter } from "./ProfitCounter";
 import { ParticleNetwork } from "./ParticleNetwork";
 import { TradingChart } from "./TradingChart";
-import { ArrowRight, Play, Shield, Clock, Users, Lock, Zap } from "lucide-react";
+import { ArrowRight, Play, Shield, Lock, Zap, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
 import { SecurityBadge, SecureConnectionBadge } from "@/components/ui/security-badge";
 
-const TrustIndicator = memo(({ icon: Icon, text }: { icon: typeof Shield; text: string }) => (
-  <div className="flex items-center gap-2 text-muted-foreground group cursor-default">
-    <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-      <Icon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" aria-hidden="true" />
+const TrustIndicator = memo(({ icon: Icon, text, delay }: { icon: typeof Shield; text: string; delay: number }) => (
+  <div 
+    className={cn(
+      "flex items-center gap-2 text-muted-foreground group cursor-default",
+      "opacity-0 animate-fade-in"
+    )}
+    style={{ animationDelay: `${delay}ms`, animationFillMode: 'forwards' }}
+  >
+    <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-all duration-300 group-hover:scale-110">
+      <Icon className="w-4 h-4 text-primary transition-transform duration-300 group-hover:rotate-12" aria-hidden="true" />
     </div>
     <span className="text-sm font-medium">{text}</span>
   </div>
@@ -23,6 +29,7 @@ TrustIndicator.displayName = "TrustIndicator";
 
 export const AnimatedHero = memo(() => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [scrollY, setScrollY] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
@@ -34,7 +41,6 @@ export const AnimatedHero = memo(() => {
     setIsLoaded(true);
     
     const handleMouseMove = (e: MouseEvent) => {
-      // Only update if not reduced motion
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       
       setMousePosition({
@@ -43,8 +49,18 @@ export const AnimatedHero = memo(() => {
       });
     };
 
+    const handleScroll = () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      setScrollY(window.scrollY);
+    };
+
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
@@ -55,20 +71,23 @@ export const AnimatedHero = memo(() => {
       {/* Particle Network Background */}
       <ParticleNetwork className="opacity-40" />
       
-      {/* Subtle grid background */}
+      {/* Subtle grid background with parallax */}
       <div 
         className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"
+        style={{
+          transform: `translate3d(0, ${scrollY * 0.1}px, 0)`,
+        }}
         aria-hidden="true"
       />
       
-      {/* Parallax gradient orbs */}
+      {/* Parallax gradient orbs with enhanced movement */}
       <div 
         className={cn(
           "absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[150px]",
           "animate-pulse-soft will-change-transform motion-reduce:animate-none"
         )}
         style={{
-          transform: `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)`,
+          transform: `translate3d(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5 + scrollY * 0.15}px, 0)`,
           transition: 'transform 0.3s ease-out',
         }}
         aria-hidden="true"
@@ -80,19 +99,36 @@ export const AnimatedHero = memo(() => {
         )}
         style={{ 
           animationDelay: '2s',
-          transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px)`,
+          transform: `translate3d(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3 + scrollY * 0.2}px, 0)`,
+          transition: 'transform 0.3s ease-out',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Additional floating orb */}
+      <div 
+        className={cn(
+          "absolute top-1/2 right-1/3 w-[300px] h-[300px] bg-success/5 rounded-full blur-[100px]",
+          "animate-pulse-soft will-change-transform motion-reduce:animate-none"
+        )}
+        style={{ 
+          animationDelay: '4s',
+          transform: `translate3d(${mousePosition.x * 0.2}px, ${mousePosition.y * 0.2 + scrollY * 0.1}px, 0)`,
           transition: 'transform 0.3s ease-out',
         }}
         aria-hidden="true"
       />
       
-      {/* Trading Chart Preview - Hidden on mobile */}
+      {/* Trading Chart Preview - Hidden on mobile with parallax */}
       <div 
         className={cn(
-          "absolute right-8 top-1/2 -translate-y-1/2 w-80 h-48 hidden xl:block",
+          "absolute right-8 top-1/2 w-80 h-48 hidden xl:block",
           "transition-all duration-700 delay-700",
           isLoaded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
         )}
+        style={{
+          transform: `translate3d(0, ${-50 + scrollY * -0.1}%, 0)`,
+        }}
         aria-hidden="true"
       >
         <TradingChart />
@@ -230,10 +266,10 @@ export const AnimatedHero = memo(() => {
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            <TrustIndicator icon={Shield} text="Bank-Level Security" />
-            <TrustIndicator icon={Lock} text="256-bit Encryption" />
-            <TrustIndicator icon={Zap} text="24/7 Trading" />
-            <TrustIndicator icon={Users} text="1,250+ Active Traders" />
+            <TrustIndicator icon={Shield} text="Bank-Level Security" delay={700} />
+            <TrustIndicator icon={Lock} text="256-bit Encryption" delay={800} />
+            <TrustIndicator icon={Zap} text="24/7 Trading" delay={900} />
+            <TrustIndicator icon={Users} text="1,250+ Active Traders" delay={1000} />
           </div>
           
           {/* Security Badges */}

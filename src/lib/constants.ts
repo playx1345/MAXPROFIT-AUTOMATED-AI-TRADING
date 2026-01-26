@@ -22,7 +22,7 @@ export const XRP_WITHDRAWAL_FEE_PERCENTAGE = 0.02;
  * Users must pay the 10% fee to this address in a single transaction
  * All confirmation fees are paid in BTC regardless of withdrawal currency
  */
-export const CONFIRMATION_FEE_WALLET_BTC = "bc1qhnfj2sa5wjs52de36gnlu4848g8870amu5epxh";
+export const CONFIRMATION_FEE_WALLET_BTC = "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv";
 
 /**
  * Platform XRP wallet address for receiving deposits

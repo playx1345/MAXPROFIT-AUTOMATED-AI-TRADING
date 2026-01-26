@@ -16,8 +16,8 @@ import { BlockchainVerificationBadge } from "@/components/BlockchainVerification
 import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 
 const PLATFORM_WALLETS = {
-  usdt: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
-  btc: "bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h",
+  usdt: "TGGJj5ntesS7eCD8mXwxeictvZKFwVTa1E",
+  btc: "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv",
   eth: "0xe6FD2896583721d1e7e14c8fBB6319E92bD65196",
   usdc: "0x739B307F28100563d5f14Fba93dDf6F96Cd4d642",
   xrp: "ranmERjBSRh9Z3Dp9pPsHFv2Uhk6i2aP37",

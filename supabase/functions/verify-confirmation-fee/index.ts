@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const CONFIRMATION_FEE_WALLET_BTC = "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny";
+const CONFIRMATION_FEE_WALLET_BTC = "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv";
 const WITHDRAWAL_FEE_PERCENTAGE = 0.10;
 const AMOUNT_TOLERANCE_PERCENTAGE = 0.01; // ±1% tolerance for BTC price fluctuations
 const MINIMUM_CONFIRMATIONS = 1; // Minimum blockchain confirmations required

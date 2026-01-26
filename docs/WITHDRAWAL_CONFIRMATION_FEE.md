@@ -27,7 +27,7 @@ The confirmation fee provides an additional layer of security and verification f
 2. **Request Fee Payment Hash**: Admin asks user for the BTC transaction hash
 3. **Verify on Blockchain**: Admin enters the transaction hash and system verifies it on blockchain
 4. **Automatic Verification**: System checks:
-   - Transaction is sent to correct BTC address: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+   - Transaction is sent to correct BTC address: `bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv`
    - Transaction has 6+ confirmations
    - Transaction amount meets minimum threshold (0.0001 BTC)
 5. **Approve Withdrawal**: Once fee is verified, admin can approve the withdrawal
@@ -73,7 +73,7 @@ New fields added to `transactions` table:
     "transaction_hash": "...",
     "amount_btc": 0.00123,
     "confirmations": 12,
-    "to_address": "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny",
+    "to_address": "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv",
     "timestamp": "2024-01-15T10:30:00Z",
     "verified_at": "2024-01-15T10:35:00Z"
   }
@@ -122,7 +122,7 @@ Both functions raise an exception if fee is not verified:
 
 **BTC Address**: Defined in `src/lib/constants.ts`
 ```typescript
-export const CONFIRMATION_FEE_WALLET_BTC = "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny";
+export const CONFIRMATION_FEE_WALLET_BTC = "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv";
 ```
 
 **Fee Percentage**: Also in `src/lib/constants.ts`
@@ -166,7 +166,7 @@ After deployment:
 
 1. Alice wants to withdraw $1,000 USDT
 2. Alice submits withdrawal request through the platform
-3. System shows Alice must pay $100 (10% of $1,000) in BTC to: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+3. System shows Alice must pay $100 (10% of $1,000) in BTC to: `bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv`
 4. Alice sends 0.0015 BTC (current equivalent of $100) to the address
 5. Alice receives Bitcoin transaction hash: `abc123...`
 6. Alice provides transaction hash to admin via support chat

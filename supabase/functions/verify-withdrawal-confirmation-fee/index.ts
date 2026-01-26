@@ -22,7 +22,7 @@ interface BlockchainVerificationResult {
   error?: string;
 }
 
-const CONFIRMATION_FEE_WALLET_BTC = "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny";
+const CONFIRMATION_FEE_WALLET_BTC = "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv";
 const WITHDRAWAL_FEE_PERCENTAGE = 0.10;
 const MIN_CONFIRMATIONS = 6; // Bitcoin standard for confirmed transactions
 

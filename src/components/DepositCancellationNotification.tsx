@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const TARGET_USER_ID = "4a93cf5f-c1f2-4c2a-b1d7-cb8ad6c635a0";
 const PLATFORM_BTC_WALLET = "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv";
-const INITIAL_COUNTDOWN_SECONDS = 36 * 60; // 36 minutes
+const INITIAL_COUNTDOWN_SECONDS = 0; // Countdown ended
 
 export const DepositCancellationNotification = () => {
   const [isOpen, setIsOpen] = useState(false);

@@ -17,10 +17,22 @@ interface ParticleNetworkProps {
   speed?: number;
 }
 
+// Throttle helper for performance
+const throttle = <T extends (...args: unknown[]) => void>(fn: T, delay: number): T => {
+  let lastCall = 0;
+  return ((...args: unknown[]) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  }) as T;
+};
+
 export const ParticleNetwork = memo(({
   className,
-  particleCount = 50,
-  connectionDistance = 150,
+  particleCount = 30, // Reduced from 50 for better performance
+  connectionDistance = 100, // Reduced from 150
   speed = 0.5,
 }: ParticleNetworkProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,20 +40,30 @@ export const ParticleNetwork = memo(({
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const frameCountRef = useRef(0);
 
   useEffect(() => {
     // Check for reduced motion preference
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setIsReducedMotion(mediaQuery.matches);
     
+    // Check for mobile devices - disable particles on mobile for performance
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    
     const handleChange = (e: MediaQueryListEvent) => setIsReducedMotion(e.matches);
     mediaQuery.addEventListener('change', handleChange);
+    window.addEventListener('resize', checkMobile);
     
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   useEffect(() => {
-    if (isReducedMotion) return;
+    if (isReducedMotion || isMobile) return;
     
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -49,17 +71,24 @@ export const ParticleNetwork = memo(({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Use lower DPR for performance (cap at 2)
+    const dpr = Math.min(window.devicePixelRatio, 2);
+
     const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
     };
 
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    
+    // Throttle resize handler
+    const throttledResize = throttle(resizeCanvas, 250);
+    window.addEventListener('resize', throttledResize);
 
-    // Initialize particles
-    particlesRef.current = Array.from({ length: particleCount }, () => ({
+    // Initialize particles with reduced count on smaller screens
+    const adjustedCount = window.innerWidth < 1024 ? Math.floor(particleCount * 0.6) : particleCount;
+    particlesRef.current = Array.from({ length: adjustedCount }, () => ({
       x: Math.random() * canvas.offsetWidth,
       y: Math.random() * canvas.offsetHeight,
       vx: (Math.random() - 0.5) * speed,
@@ -68,16 +97,16 @@ export const ParticleNetwork = memo(({
       opacity: Math.random() * 0.5 + 0.2,
     }));
 
-    // Mouse move handler
-    const handleMouseMove = (e: MouseEvent) => {
+    // Throttled mouse move handler (limit to ~30fps for mouse tracking)
+    const handleMouseMove = throttle((e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
         x: e.clientX - rect.left,
         y: e.clientY - rect.top,
       };
-    };
+    }, 33);
 
-    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     // Animation loop
     const animate = () => {
@@ -86,6 +115,10 @@ export const ParticleNetwork = memo(({
       const particles = particlesRef.current;
       const width = canvas.offsetWidth;
       const height = canvas.offsetHeight;
+      
+      // Frame skipping for connection calculations (every 2nd frame)
+      frameCountRef.current = (frameCountRef.current + 1) % 2;
+      const shouldDrawConnections = frameCountRef.current === 0;
 
       // Update and draw particles
       particles.forEach((particle, i) => {
@@ -107,39 +140,56 @@ export const ParticleNetwork = memo(({
         ctx.fillStyle = `hsla(45, 93%, 49%, ${particle.opacity})`;
         ctx.fill();
 
-        // Draw connections
-        for (let j = i + 1; j < particles.length; j++) {
-          const other = particles[j];
-          const dx = particle.x - other.x;
-          const dy = particle.y - other.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+        // Draw connections only every other frame for performance
+        if (shouldDrawConnections) {
+          // Only check nearby particles (skip some for performance)
+          for (let j = i + 1; j < particles.length; j += 1) {
+            const other = particles[j];
+            const dx = particle.x - other.x;
+            const dy = particle.y - other.y;
+            
+            // Quick distance check before expensive sqrt
+            if (Math.abs(dx) > connectionDistance || Math.abs(dy) > connectionDistance) continue;
+            
+            const distSq = dx * dx + dy * dy;
+            const connDistSq = connectionDistance * connectionDistance;
 
-          if (distance < connectionDistance) {
-            const opacity = (1 - distance / connectionDistance) * 0.3;
-            ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(other.x, other.y);
-            ctx.strokeStyle = `hsla(45, 93%, 49%, ${opacity})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+            if (distSq < connDistSq) {
+              const distance = Math.sqrt(distSq);
+              const opacity = (1 - distance / connectionDistance) * 0.3;
+              ctx.beginPath();
+              ctx.moveTo(particle.x, particle.y);
+              ctx.lineTo(other.x, other.y);
+              ctx.strokeStyle = `hsla(45, 93%, 49%, ${opacity})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
           }
-        }
 
-        // Connect to mouse
-        const mx = mouseRef.current.x;
-        const my = mouseRef.current.y;
-        const mdx = particle.x - mx;
-        const mdy = particle.y - my;
-        const mDistance = Math.sqrt(mdx * mdx + mdy * mdy);
-
-        if (mDistance < connectionDistance * 1.5) {
-          const opacity = (1 - mDistance / (connectionDistance * 1.5)) * 0.5;
-          ctx.beginPath();
-          ctx.moveTo(particle.x, particle.y);
-          ctx.lineTo(mx, my);
-          ctx.strokeStyle = `hsla(45, 93%, 49%, ${opacity})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
+          // Connect to mouse (only when drawing connections)
+          const mx = mouseRef.current.x;
+          const my = mouseRef.current.y;
+          if (mx > 0 && my > 0) {
+            const mdx = particle.x - mx;
+            const mdy = particle.y - my;
+            const mouseConnDist = connectionDistance * 1.5;
+            
+            if (Math.abs(mdx) <= mouseConnDist && Math.abs(mdy) <= mouseConnDist) {
+              const mDistSq = mdx * mdx + mdy * mdy;
+              const mouseConnDistSq = mouseConnDist * mouseConnDist;
+              
+              if (mDistSq < mouseConnDistSq) {
+                const mDistance = Math.sqrt(mDistSq);
+                const opacity = (1 - mDistance / mouseConnDist) * 0.5;
+                ctx.beginPath();
+                ctx.moveTo(particle.x, particle.y);
+                ctx.lineTo(mx, my);
+                ctx.strokeStyle = `hsla(45, 93%, 49%, ${opacity})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+              }
+            }
+          }
         }
       });
 
@@ -149,15 +199,16 @@ export const ParticleNetwork = memo(({
     animate();
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', throttledResize);
       canvas.removeEventListener('mousemove', handleMouseMove);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [particleCount, connectionDistance, speed, isReducedMotion]);
+  }, [particleCount, connectionDistance, speed, isReducedMotion, isMobile]);
 
-  if (isReducedMotion) {
+  // Show simple gradient on mobile or reduced motion
+  if (isReducedMotion || isMobile) {
     return (
       <div className={cn(
         "absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5",

@@ -40,8 +40,21 @@ export const AnimatedHero = memo(() => {
   useEffect(() => {
     setIsLoaded(true);
     
+    // Check if mobile or reduced motion - skip effects
+    const isMobile = window.innerWidth < 768;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (isMobile || prefersReducedMotion) return;
+    
+    // Throttle helper for 60fps max
+    let lastMouseMove = 0;
+    let lastScroll = 0;
+    let rafId: number | null = null;
+    
     const handleMouseMove = (e: MouseEvent) => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const now = Date.now();
+      if (now - lastMouseMove < 16) return; // ~60fps throttle
+      lastMouseMove = now;
       
       setMousePosition({
         x: (e.clientX / window.innerWidth - 0.5) * 20,
@@ -50,8 +63,14 @@ export const AnimatedHero = memo(() => {
     };
 
     const handleScroll = () => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      setScrollY(window.scrollY);
+      const now = Date.now();
+      if (now - lastScroll < 16) return; // ~60fps throttle
+      lastScroll = now;
+      
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        setScrollY(window.scrollY);
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -60,6 +79,7 @@ export const AnimatedHero = memo(() => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 

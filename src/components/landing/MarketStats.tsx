@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef, memo } from "react";
 import { TrendingUp, TrendingDown, DollarSign, Activity, BarChart3 } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -9,39 +9,63 @@ interface MarketData {
   market_cap_change_percentage_24h: number;
 }
 
-export const MarketStats = () => {
-  const [marketData, setMarketData] = useState<MarketData | null>(null);
-  const { ref, isVisible } = useScrollAnimation(0.2);
+// Fallback data to show immediately
+const FALLBACK_MARKET_DATA: MarketData = {
+  total_market_cap: 2450000000000, // ~2.45T
+  total_volume: 85000000000, // ~85B
+  market_cap_change_percentage_24h: 1.5,
+};
 
-  useEffect(() => {
-    const fetchMarketData = async () => {
-      try {
-        const response = await fetch('https://api.coingecko.com/api/v3/global');
-        const data = await response.json();
-        setMarketData({
-          total_market_cap: data.data.total_market_cap.usd,
-          total_volume: data.data.total_volume.usd,
-          market_cap_change_percentage_24h: data.data.market_cap_change_percentage_24h_usd
-        });
-      } catch (error) {
-        console.error('Failed to fetch market data:', error);
-      }
-    };
-    fetchMarketData();
-    const interval = setInterval(fetchMarketData, 300000);
-    return () => clearInterval(interval);
+export const MarketStats = memo(() => {
+  // Start with fallback data to prevent loading state
+  const [marketData, setMarketData] = useState<MarketData>(FALLBACK_MARKET_DATA);
+  const { ref, isVisible } = useScrollAnimation(0.2);
+  const fetchedRef = useRef(false);
+
+  const fetchMarketData = useCallback(async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch('https://api.coingecko.com/api/v3/global', {
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      const data = await response.json();
+      setMarketData({
+        total_market_cap: data.data.total_market_cap.usd,
+        total_volume: data.data.total_volume.usd,
+        market_cap_change_percentage_24h: data.data.market_cap_change_percentage_24h_usd
+      });
+      fetchedRef.current = true;
+    } catch (error) {
+      // Silently fail - we already have fallback data
+      console.error('Failed to fetch market data:', error);
+    }
   }, []);
 
-  const marketCap = useCountUp(marketData ? Math.floor(marketData.total_market_cap / 1e9) : 0, 2000, 0, isVisible);
-  const volume = useCountUp(marketData ? Math.floor(marketData.total_volume / 1e9) : 0, 2000, 0, isVisible);
-  const isPositive = marketData && marketData.market_cap_change_percentage_24h >= 0;
+  useEffect(() => {
+    // Delay fetch to prioritize initial render
+    const timeoutId = setTimeout(fetchMarketData, 200);
+    const interval = setInterval(fetchMarketData, 300000);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+    };
+  }, [fetchMarketData]);
+
+  const marketCap = useCountUp(Math.floor(marketData.total_market_cap / 1e9), 2000, 0, isVisible);
+  const volume = useCountUp(Math.floor(marketData.total_volume / 1e9), 2000, 0, isVisible);
+  const isPositive = marketData.market_cap_change_percentage_24h >= 0;
 
   const stats = [
     {
       icon: DollarSign,
       label: 'Global Market Cap',
       value: `$${marketCap}B+`,
-      change: marketData ? `${isPositive ? '+' : ''}${marketData.market_cap_change_percentage_24h.toFixed(2)}%` : null,
+      change: `${isPositive ? '+' : ''}${marketData.market_cap_change_percentage_24h.toFixed(2)}%`,
       isPositive,
     },
     {
@@ -97,4 +121,6 @@ export const MarketStats = () => {
       </div>
     </section>
   );
-};
+});
+
+MarketStats.displayName = "MarketStats";

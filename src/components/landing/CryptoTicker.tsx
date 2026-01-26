@@ -1,4 +1,4 @@
-import { useEffect, useState, memo, useCallback } from "react";
+import { useEffect, useState, memo, useCallback, useRef } from "react";
 import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -57,21 +57,26 @@ const CryptoItem = memo(({ crypto, index }: { crypto: CryptoPrice; index: number
 CryptoItem.displayName = "CryptoItem";
 
 export const CryptoTicker = memo(() => {
-  const [cryptos, setCryptos] = useState<CryptoPrice[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Start with fallback data immediately to prevent loading state from blocking render
+  const [cryptos, setCryptos] = useState<CryptoPrice[]>(FALLBACK_DATA);
+  const [isLoading, setIsLoading] = useState(false); // Start as false since we have fallback data
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const retryCountRef = useRef(0);
 
   const fetchCryptoPrices = useCallback(async () => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+      
       const response = await fetch(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether,binancecoin,solana,ripple,cardano,dogecoin&order=market_cap_desc&sparkline=false',
         {
-          headers: {
-            'Accept': 'application/json',
-          },
+          headers: { 'Accept': 'application/json' },
+          signal: controller.signal,
         }
       );
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -82,55 +87,35 @@ export const CryptoTicker = memo(() => {
       if (Array.isArray(data) && data.length > 0) {
         setCryptos(data);
         setError(null);
-        setRetryCount(0);
+        retryCountRef.current = 0;
       } else {
         throw new Error('Invalid data format');
       }
     } catch (err) {
-      console.error('Failed to fetch crypto prices:', err);
-      
-      // Use fallback data if no cached data
-      if (cryptos.length === 0) {
-        setCryptos(FALLBACK_DATA);
-      }
-      
-      // Retry logic with exponential backoff
-      if (retryCount < MAX_RETRIES) {
-        setRetryCount(prev => prev + 1);
-        setTimeout(fetchCryptoPrices, RETRY_DELAY * Math.pow(2, retryCount));
+      // Silently fail - we already have fallback data showing
+      if (retryCountRef.current < MAX_RETRIES) {
+        retryCountRef.current += 1;
+        // Non-blocking retry in background
+        setTimeout(fetchCryptoPrices, RETRY_DELAY * Math.pow(2, retryCountRef.current));
       } else {
-        setError('Unable to fetch live prices. Showing cached data.');
+        setError('Using cached data');
       }
     } finally {
       setIsLoading(false);
     }
-  }, [cryptos.length, retryCount]);
+  }, []);
 
   useEffect(() => {
-    fetchCryptoPrices();
+    // Fetch in background without blocking render
+    const timeoutId = setTimeout(fetchCryptoPrices, 100); // Small delay to prioritize initial render
     const interval = setInterval(fetchCryptoPrices, 60000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+    };
   }, [fetchCryptoPrices]);
 
-  if (isLoading) {
-    return (
-      <div 
-        className="bg-muted/30 border-y border-border/50 py-4 overflow-hidden"
-        role="status"
-        aria-label="Loading cryptocurrency prices"
-      >
-        <div className="animate-pulse flex space-x-8 px-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3 min-w-[180px]">
-              <div className="h-4 w-12 bg-muted rounded" />
-              <div className="h-4 w-20 bg-muted rounded" />
-              <div className="h-4 w-16 bg-muted rounded" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  // No loading state - we always have data (fallback or real)
 
   const displayCryptos = cryptos.length > 0 ? cryptos : FALLBACK_DATA;
   const duplicatedCryptos = [...displayCryptos, ...displayCryptos];

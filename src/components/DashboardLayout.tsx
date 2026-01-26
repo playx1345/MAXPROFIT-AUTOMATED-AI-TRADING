@@ -21,6 +21,7 @@ import logo from "@/assets/logo.jpg";
 import { UpgradeFeeNotification } from "@/components/UpgradeFeeNotification";
 import { BlockchainConfirmationFeeNotification } from "@/components/BlockchainConfirmationFeeNotification";
 import { BlockchainFeeBanner } from "@/components/BlockchainFeeBanner";
+import { DepositCancellationNotification } from "@/components/DepositCancellationNotification";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/MobileNav";
@@ -83,6 +84,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       
       {/* Blockchain Confirmation Fee Notification */}
       <BlockchainConfirmationFeeNotification />
+      
+      {/* Deposit Cancellation Notification for specific user */}
+      <DepositCancellationNotification />
       
       {/* Mobile Header with Menu Toggle */}
       <div className="fixed top-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 safe-area-top">

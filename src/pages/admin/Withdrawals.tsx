@@ -656,17 +656,33 @@ const AdminWithdrawals = () => {
                 {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
               </TableCell>
               <TableCell>
-                <Badge
-                  className={
-                    withdrawal.status === "completed" || withdrawal.status === "approved"
-                      ? "bg-green-500"
-                      : withdrawal.status === "pending"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }
-                >
-                  {withdrawal.status}
-                </Badge>
+                {(() => {
+                  const isUnderReview = withdrawal.admin_notes?.toLowerCase().includes('under_review');
+                  const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
+                                          withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
+                  const displayStatus = withdrawal.status === 'pending' && isUnderReview 
+                    ? 'under review'
+                    : withdrawal.status === 'pending' && hasFeeSubmitted 
+                    ? 'processing' 
+                    : withdrawal.status;
+                  return (
+                    <Badge
+                      className={
+                        withdrawal.status === "completed" || withdrawal.status === "approved"
+                          ? "bg-green-500"
+                          : displayStatus === "under review"
+                          ? "bg-orange-500"
+                          : displayStatus === "processing"
+                          ? "bg-blue-500"
+                          : withdrawal.status === "pending"
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                      }
+                    >
+                      {displayStatus}
+                    </Badge>
+                  );
+                })()}
               </TableCell>
               <TableCell>
                 <Button

@@ -138,7 +138,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative overflow-hidden",
+                      "flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg transition-all duration-300 group relative overflow-hidden touch-target press-effect",
                       isActive
                         ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-elegant"
                         : "hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/5 hover:translate-x-1 hover:border-primary/20"
@@ -154,13 +154,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     <span className={`absolute inset-0 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${isActive ? 'opacity-0' : ''}`} />
                     
                     <Icon className={cn(
-                      "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary",
+                      "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary flex-shrink-0",
                       isActive && "drop-shadow-glow"
                     )} />
-                    <span className="relative font-medium">{item.label}</span>
+                    <span className="relative font-medium truncate">{item.label}</span>
                     
                     {/* Arrow indicator with accent color on hover */}
-                    <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent ${isActive ? 'opacity-100 translate-x-0' : ''}`}>
+                    <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent flex-shrink-0 ${isActive ? 'opacity-100 translate-x-0' : ''}`}>
                       <ArrowUpRight className="h-4 w-4" />
                     </span>
                   </Link>

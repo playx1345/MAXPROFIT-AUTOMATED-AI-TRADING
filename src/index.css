@@ -128,6 +128,17 @@
 
     /* ========== 3D Perspective ========== */
     --perspective: 1200px;
+
+    /* ========== NEW: Mobile & Crypto Enhancement Tokens ========== */
+    --touch-target-min: 44px;
+    --mobile-padding: clamp(1rem, 4vw, 1.5rem);
+    --card-padding-mobile: clamp(0.75rem, 3vw, 1.25rem);
+    
+    /* Crypto Data Colors */
+    --crypto-green: 142 71% 45%;
+    --crypto-red: 0 84% 60%;
+    --holographic-gradient: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary-glow)), hsl(var(--primary)));
+    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.5);
   }
 
   /* ========== Dark Mode Overrides ========== */
@@ -652,6 +663,184 @@
   .reveal-container.visible .reveal-text {
     transform: translateY(0);
   }
+
+
+  /* ========== NEW: Touch Target Utility ========== */
+  .touch-target {
+    min-height: var(--touch-target-min, 44px);
+    min-width: var(--touch-target-min, 44px);
+  }
+
+  /* ========== NEW: Fluid Typography ========== */
+  .fluid-text-xs {
+    font-size: clamp(0.625rem, 0.5rem + 0.5vw, 0.75rem);
+  }
+
+  .fluid-text-sm {
+    font-size: clamp(0.75rem, 0.625rem + 0.5vw, 0.875rem);
+  }
+
+  .fluid-text-base {
+    font-size: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  }
+
+  .fluid-text-lg {
+    font-size: clamp(1rem, 0.875rem + 0.5vw, 1.125rem);
+  }
+
+  .fluid-text-xl {
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.25rem);
+  }
+
+  .fluid-text-2xl {
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+  }
+
+  .fluid-text-3xl {
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+  }
+
+  .fluid-text-4xl {
+    font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.25rem);
+  }
+
+  /* ========== NEW: Mobile Stack ========== */
+  .mobile-stack {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4;
+  }
+
+  /* ========== NEW: Crypto Card Styles ========== */
+  .crypto-card {
+    position: relative;
+    background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .crypto-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--holographic-gradient);
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+  }
+
+  .crypto-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.05), transparent 50%, hsl(var(--accent) / 0.05));
+    pointer-events: none;
+  }
+
+  /* ========== NEW: Data Glow Effect ========== */
+  .data-glow {
+    animation: data-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes data-pulse {
+    0%, 100% {
+      box-shadow: 0 0 10px hsl(var(--crypto-green) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 25px hsl(var(--crypto-green) / 0.6);
+    }
+  }
+
+  /* ========== NEW: Price Ticker Styles ========== */
+  .price-up {
+    color: hsl(var(--crypto-green));
+    animation: price-flash-green 0.3s ease-out;
+  }
+
+  .price-down {
+    color: hsl(var(--crypto-red));
+    animation: price-flash-red 0.3s ease-out;
+  }
+
+  @keyframes price-flash-green {
+    0% { background-color: hsl(var(--crypto-green) / 0.3); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes price-flash-red {
+    0% { background-color: hsl(var(--crypto-red) / 0.3); }
+    100% { background-color: transparent; }
+  }
+
+  /* ========== NEW: Enhanced Glass Card ========== */
+  .glass-card-crypto {
+    backdrop-filter: blur(24px) saturate(180%);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card) / 0.8) 0%,
+      hsl(var(--card) / 0.6) 50%,
+      hsl(var(--card) / 0.4) 100%
+    );
+    border: 1px solid hsl(var(--primary) / 0.2);
+    box-shadow: 
+      0 8px 32px hsl(0 0% 0% / 0.4),
+      inset 0 1px 0 hsl(var(--primary) / 0.1),
+      inset 0 0 0 1px hsl(var(--primary) / 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card-crypto:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 
+      0 12px 48px hsl(0 0% 0% / 0.5),
+      0 0 40px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--primary) / 0.15);
+  }
+
+  /* ========== NEW: Circuit Board Pattern ========== */
+  .circuit-bg {
+    background-image: 
+      radial-gradient(circle at 1px 1px, hsl(var(--primary) / 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+
+  /* ========== NEW: Neon Text Glow ========== */
+  .neon-text {
+    text-shadow: 
+      0 0 10px hsl(var(--primary) / 0.5),
+      0 0 20px hsl(var(--primary) / 0.3),
+      0 0 40px hsl(var(--primary) / 0.2);
+  }
+
+  /* ========== NEW: Press/Active States for Mobile ========== */
+  .press-effect {
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .press-effect:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  /* ========== NEW: Scroll Snap Container ========== */
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .scroll-snap-x::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-snap-item {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
 }
 
 /* ============================================
@@ -697,4 +886,32 @@
 
 [dir="rtl"] .text-right {
   text-align: left;
+}
+
+/* ============================================
+   MOBILE-FIRST RESPONSIVE OVERRIDES
+   ============================================ */
+
+@media (max-width: 640px) {
+  /* Reduce animation complexity on mobile */
+  .neon-card:hover,
+  .card-3d:hover,
+  .micro-interact:hover {
+    transform: none;
+  }
+
+  /* Faster animations on mobile */
+  .scroll-fade-up,
+  .scroll-fade-left,
+  .scroll-fade-right,
+  .scroll-scale {
+    transition-duration: 0.5s;
+  }
+
+  /* Better touch feedback */
+  .glass-card-enhanced:active,
+  .glass-card-crypto:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
 }

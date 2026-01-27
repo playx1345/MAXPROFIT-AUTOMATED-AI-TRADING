@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { depositAmountSchema, transactionHashSchema, validateField } from "@/lib
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const PLATFORM_WALLETS = {
   usdt: "TGGJj5ntesS7eCD8mXwxeictvZKFwVTa1E",
@@ -43,27 +44,7 @@ const Deposit = () => {
   const { toast } = useToast();
   const { verifying, result, verifyTransaction, clearResult } = useBlockchainVerification();
 
-  useEffect(() => {
-    fetchRecentDeposits();
-  }, []);
-
-  // Auto-verify when transaction hash changes (debounced)
-  useEffect(() => {
-    if (!transactionHash.trim()) {
-      clearResult();
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      if (transactionHash.trim().length >= 10) {
-        verifyTransaction(transactionHash, currency);
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [transactionHash, currency]);
-
-  const fetchRecentDeposits = async () => {
+  const fetchRecentDeposits = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -81,7 +62,27 @@ const Deposit = () => {
     } catch (error: unknown) {
       console.error("Error fetching deposits:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRecentDeposits();
+  }, [fetchRecentDeposits]);
+
+  // Auto-verify when transaction hash changes (debounced)
+  useEffect(() => {
+    if (!transactionHash.trim()) {
+      clearResult();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (transactionHash.trim().length >= 10) {
+        verifyTransaction(transactionHash, currency);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [transactionHash, currency]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -168,6 +169,7 @@ const Deposit = () => {
   const walletAddress = PLATFORM_WALLETS[currency];
 
   return (
+    <PullToRefresh onRefresh={fetchRecentDeposits}>
     <div className="space-y-6 pb-6">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">{t("deposit.title")}</h1>
@@ -452,6 +454,7 @@ const Deposit = () => {
         </Card>
       )}
     </div>
+    </PullToRefresh>
   );
 };
 

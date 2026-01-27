@@ -915,3 +915,35 @@
     transition-duration: 0.1s;
   }
 }
+
+/* ============================================
+   PULL-TO-REFRESH STYLES
+   ============================================ */
+
+.pull-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: none;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.pull-content {
+  will-change: transform;
+}
+
+/* Reduced motion support for pull-to-refresh */
+@media (prefers-reduced-motion: reduce) {
+  .pull-indicator,
+  .pull-content {
+    transition: none !important;
+  }
+  
+  .pull-indicator .animate-spin {
+    animation: none !important;
+  }
+}

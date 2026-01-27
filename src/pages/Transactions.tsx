@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 interface Transaction {
   id: string;
@@ -32,8 +33,9 @@ const Transactions = () => {
     fetchTransactions();
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -54,7 +56,7 @@ const Transactions = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast, t]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -82,6 +84,7 @@ const Transactions = () => {
   }
 
   return (
+    <PullToRefresh onRefresh={fetchTransactions}>
     <div className="space-y-6 pb-6">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">{t("transactions.title")}</h1>
@@ -197,6 +200,7 @@ const Transactions = () => {
         </CardContent>
       </Card>
     </div>
+    </PullToRefresh>
   );
 };
 

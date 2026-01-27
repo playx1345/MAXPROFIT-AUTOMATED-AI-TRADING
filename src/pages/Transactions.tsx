@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 interface Transaction {
   id: string;
@@ -153,38 +154,39 @@ const Transactions = () => {
                 </Table>
               </div>
 
-              {/* Mobile Card View */}
+              {/* Mobile Card View - Enhanced */}
               <div className="md:hidden space-y-3">
-                {transactions.map((transaction) => (
+                {transactions.map((transaction, index) => (
                   <div
                     key={transaction.id}
-                    className="p-4 rounded-lg border border-border bg-card/50 space-y-3"
+                    className="p-4 rounded-xl border border-border/50 bg-card/80 space-y-3 press-effect glass-card-crypto animate-fade-in"
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge className={getTypeColor(transaction.type)}>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge className={cn(getTypeColor(transaction.type), "text-xs px-2 py-0.5")}>
                           {transaction.type}
                         </Badge>
-                        <Badge className={getStatusColor(transaction.status)}>
+                        <Badge className={cn(getStatusColor(transaction.status), "text-xs px-2 py-0.5")}>
                           {transaction.status}
                         </Badge>
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
                         {format(new Date(transaction.created_at), "MMM dd, HH:mm")}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="fluid-text-2xl font-bold font-display">
                         ${transaction.amount.toLocaleString()}
                       </span>
-                      <span className="text-sm text-muted-foreground uppercase">
+                      <span className="text-sm text-muted-foreground uppercase font-medium px-2 py-1 bg-muted/50 rounded-md">
                         {transaction.currency}
                       </span>
                     </div>
                     {transaction.wallet_address && (
-                      <div className="text-xs text-muted-foreground truncate">
-                        <span className="font-medium">Wallet: </span>
-                        {transaction.wallet_address}
+                      <div className="text-xs text-muted-foreground truncate bg-muted/30 rounded-lg px-3 py-2">
+                        <span className="font-medium text-foreground/70">Wallet: </span>
+                        <span className="font-mono">{transaction.wallet_address}</span>
                       </div>
                     )}
                   </div>

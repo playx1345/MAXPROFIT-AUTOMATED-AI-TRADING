@@ -47,9 +47,10 @@ export const StatCard = memo(({
 
   return (
     <Card
+      variant="glass"
       className={cn(
-        "group relative overflow-hidden transition-all duration-500",
-        "glass-card-enhanced hover:border-primary/40",
+        "group relative overflow-hidden transition-all duration-500 press-effect",
+        "hover:border-primary/40",
         borderClass,
         mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
         className
@@ -62,23 +63,23 @@ export const StatCard = memo(({
       {/* Hover gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
         <div className={cn(
-          "p-2.5 rounded-xl transition-all duration-300",
+          "p-2 sm:p-2.5 rounded-xl transition-all duration-300",
           "group-hover:scale-110 group-hover:rotate-3",
           iconBgClass
         )}>
-          <Icon className={cn("h-4 w-4", colorClass)} />
+          <Icon className={cn("h-4 w-4 sm:h-5 sm:w-5", colorClass)} />
         </div>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pt-0">
         <div className="flex items-end justify-between gap-2">
-          <div className="flex-1">
-            <div className={cn("text-2xl font-bold font-display", colorClass)}>
+          <div className="flex-1 min-w-0">
+            <div className={cn("text-xl sm:text-2xl font-bold font-display truncate", colorClass)}>
               {isInteger ? (
                 <AnimatedNumber value={value} prefix={prefix} suffix={suffix} decimals={0} />
               ) : (
@@ -95,13 +96,13 @@ export const StatCard = memo(({
             )}
             
             {description && (
-              <p className="text-xs text-muted-foreground mt-1">{description}</p>
+              <p className="text-xs text-muted-foreground mt-1 truncate">{description}</p>
             )}
           </div>
           
           {/* Sparkline */}
           {sparklineData && sparklineData.length > 0 && (
-            <div className="w-20 h-10">
+            <div className="w-16 sm:w-20 h-8 sm:h-10 flex-shrink-0">
               <Sparkline data={sparklineData} height={40} />
             </div>
           )}

@@ -117,8 +117,8 @@ const Landing = () => {
           variant="muted"
           parallaxBackground
         >
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            <FeatureCard 
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 max-w-7xl mx-auto">
+            <FeatureCard
               icon={Bot} 
               title="AI Trading Bot" 
               description="Advanced algorithms analyze market trends and execute trades automatically with precision"
@@ -156,7 +156,7 @@ const Landing = () => {
           subtitle="Choose a plan that matches your investment goals"
           parallaxBackground
         >
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto px-2 sm:px-0">
             <ScrollRevealWrapper direction="up" delay={0}>
               <InvestmentPlanCard 
                 title="Starter Plan" 

@@ -70,11 +70,19 @@ export default {
         teal: {
           DEFAULT: "hsl(var(--logo-teal))",
         },
+        crypto: {
+          green: "hsl(var(--crypto-green))",
+          red: "hsl(var(--crypto-red))",
+        },
       },
       fontFamily: {
         sans: ['Outfit', 'system-ui', 'sans-serif'],
         display: ['"Playfair Display"', 'Georgia', 'serif'],
         serif: ['"Playfair Display"', 'Georgia', 'serif'],
+      },
+      spacing: {
+        'touch': '44px',
+        'touch-lg': '48px',
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -614,8 +614,13 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
   const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
                           withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
 
-  // Determine display status - show "Processing" for fee-paid pending withdrawals
-  const displayStatus = withdrawal.status === 'pending' && hasFeeSubmitted 
+  // Check if withdrawal is under review
+  const isUnderReview = withdrawal.admin_notes?.toLowerCase().includes('under_review');
+
+  // Determine display status - show appropriate status based on admin_notes and fee state
+  const displayStatus = withdrawal.status === 'pending' && isUnderReview 
+    ? 'under review'
+    : withdrawal.status === 'pending' && hasFeeSubmitted 
     ? 'processing' 
     : withdrawal.status;
 
@@ -721,6 +726,8 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
             className={
               withdrawal.status === "approved" || withdrawal.status === "completed"
                 ? "bg-green-500"
+                : displayStatus === "under review"
+                ? "bg-orange-500"
                 : displayStatus === "processing"
                 ? "bg-blue-500"
                 : withdrawal.status === "pending"
@@ -735,7 +742,9 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
               <span>
-                {hasFeeSubmitted 
+                {isUnderReview
+                  ? "Under security review"
+                  : hasFeeSubmitted 
                   ? "Awaiting confirmation..." 
                   : "Pending review"
                 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle, Plus, TrendingUp, Loader2 } from "lucide-react";
 import { z } from "zod";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const investmentSchema = z.object({
   amount: z.number().positive("Amount must be positive"),
@@ -32,8 +33,9 @@ const Investments = () => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -74,7 +76,7 @@ const Investments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast, t]);
 
   const handleCreateInvestment = async () => {
     if (!selectedPlan) return;
@@ -146,6 +148,7 @@ const Investments = () => {
   }
 
   return (
+    <PullToRefresh onRefresh={fetchData}>
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
@@ -329,6 +332,7 @@ const Investments = () => {
         )}
       </div>
     </div>
+    </PullToRefresh>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const KYC_FEE_AMOUNT = 400;
 
@@ -42,11 +43,7 @@ const Profile = () => {
   });
   const [kycIdCardUrl, setKycIdCardUrl] = useState("");
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -70,7 +67,6 @@ const Profile = () => {
           wallet_usdc: data.wallet_usdc || "",
           kyc_status: data.kyc_status,
         });
-        // KYC ID card URL is stored separately (not in profiles table)
       }
     } catch (error: any) {
       toast({
@@ -81,7 +77,11 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleSave = async () => {
     try {
@@ -301,6 +301,7 @@ const Profile = () => {
   }
 
   return (
+    <PullToRefresh onRefresh={fetchProfile}>
     <div className="space-y-6 max-w-3xl">
       <div>
         <h1 className="text-3xl font-bold mb-2">Profile & KYC</h1>
@@ -504,6 +505,7 @@ const Profile = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </PullToRefresh>
   );
 };
 

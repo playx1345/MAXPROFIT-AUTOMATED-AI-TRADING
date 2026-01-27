@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { WITHDRAWAL_FEE_PERCENTAGE, XRP_WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 
 interface RecentWithdrawal {
@@ -48,10 +49,13 @@ const Withdraw = () => {
   const [copiedAddress, setCopiedAddress] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchBalance();
-    fetchRecentWithdrawals();
+  const fetchAllData = useCallback(async () => {
+    await Promise.all([fetchBalance(), fetchRecentWithdrawals()]);
   }, []);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
 
   // Clear wallet error when currency changes
   useEffect(() => {
@@ -277,6 +281,7 @@ const Withdraw = () => {
   };
 
   return (
+    <PullToRefresh onRefresh={fetchAllData}>
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t("withdraw.title")}</h1>
@@ -598,6 +603,7 @@ const Withdraw = () => {
         </DialogContent>
       </Dialog>
     </div>
+    </PullToRefresh>
   );
 };
 

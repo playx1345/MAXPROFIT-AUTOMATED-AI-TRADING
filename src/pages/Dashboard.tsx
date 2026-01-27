@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { StatCard } from "@/components/ui/stat-card";
@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SecurityBadge } from "@/components/ui/security-badge";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 interface DashboardStats {
   balance: number;
@@ -44,65 +45,65 @@ const Dashboard = () => {
   const [mounted, setMounted] = useState(false);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+  const fetchData = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-        // Fetch profile
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("balance_usdt, kyc_status, full_name, phone")
-          .eq("id", user.id)
-          .single();
+      // Fetch profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("balance_usdt, kyc_status, full_name, phone")
+        .eq("id", user.id)
+        .single();
 
-        // Fetch investments
-        const { data: investments } = await supabase
-          .from("investments")
-          .select("amount_usdt, current_value, status")
-          .eq("user_id", user.id);
+      // Fetch investments
+      const { data: investments } = await supabase
+        .from("investments")
+        .select("amount_usdt, current_value, status")
+        .eq("user_id", user.id);
 
-        // Fetch recent transactions
-        const { data: transactions } = await supabase
-          .from("transactions")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(5);
+      // Fetch recent transactions
+      const { data: transactions } = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(5);
 
-        const totalInvested = investments?.reduce((sum, inv) => sum + Number(inv.amount_usdt), 0) || 0;
-        const totalValue = investments?.reduce((sum, inv) => sum + Number(inv.current_value), 0) || 0;
-        const activeCount = investments?.filter(inv => inv.status === "active").length || 0;
+      const totalInvested = investments?.reduce((sum, inv) => sum + Number(inv.amount_usdt), 0) || 0;
+      const totalValue = investments?.reduce((sum, inv) => sum + Number(inv.current_value), 0) || 0;
+      const activeCount = investments?.filter(inv => inv.status === "active").length || 0;
 
-        setStats({
-          balance: Number(profileData?.balance_usdt) || 0,
-          totalInvested,
-          totalProfit: totalValue - totalInvested,
-          activeInvestments: activeCount,
-        });
+      setStats({
+        balance: Number(profileData?.balance_usdt) || 0,
+        totalInvested,
+        totalProfit: totalValue - totalInvested,
+        activeInvestments: activeCount,
+      });
 
-        setProfile({
-          kyc_status: profileData?.kyc_status || "pending",
-          full_name: profileData?.full_name || null,
-          phone: profileData?.phone || null,
-        });
+      setProfile({
+        kyc_status: profileData?.kyc_status || "pending",
+        full_name: profileData?.full_name || null,
+        phone: profileData?.phone || null,
+      });
 
-        setRecentTransactions(transactions || []);
-      } catch (error: any) {
-        toast({
-          title: "Error loading dashboard",
-          description: error.message,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-        setTimeout(() => setMounted(true), 100);
-      }
-    };
-
-    fetchData();
+      setRecentTransactions(transactions || []);
+    } catch (error: any) {
+      toast({
+        title: "Error loading dashboard",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMounted(true), 100);
+    }
   }, [toast]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
 
 
@@ -176,6 +177,7 @@ const Dashboard = () => {
   }
 
   return (
+    <PullToRefresh onRefresh={fetchData}>
     <div className="space-y-6 pb-20 md:pb-6">
       {/* Header with fade-in animation */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -370,6 +372,7 @@ const Dashboard = () => {
         </CardContent>
       </Card>
     </div>
+    </PullToRefresh>
   );
 };
 

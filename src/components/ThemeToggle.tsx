@@ -1,16 +1,26 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const isDark = resolvedTheme === "dark";
+
+  const toggleTheme = useCallback(() => {
+    // Haptic feedback on mobile
+    if ("vibrate" in navigator) {
+      navigator.vibrate(10);
+    }
+    setTheme(isDark ? "light" : "dark");
+  }, [isDark, setTheme]);
 
   if (!mounted) {
     return (
@@ -25,14 +35,12 @@ export function ThemeToggle() {
     );
   }
 
-  const isDark = resolvedTheme === "dark";
-
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative w-10 h-10 rounded-xl bg-muted/50 border border-border hover:bg-muted hover:border-primary/30 transition-all duration-300 overflow-hidden"
+      onClick={toggleTheme}
+      className="relative w-10 h-10 rounded-xl bg-muted/50 border border-border hover:bg-muted hover:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background overflow-hidden no-theme-transition"
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
       <Sun 

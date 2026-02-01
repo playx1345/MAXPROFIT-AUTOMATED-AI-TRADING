@@ -42,94 +42,92 @@
    ============================================ */
 
 @layer base {
+  /* ========== LIGHT MODE (Default) ========== */
   :root {
-    /* ========== Background Colors - Navy Blue Theme ========== */
-    /* Deep navy backgrounds inspired by the logo */
-    --background: 215 55% 8%;
-    --foreground: 210 20% 95%;
+    /* ========== Background Colors - Clean Light Theme ========== */
+    --background: 220 25% 97%;
+    --foreground: 220 40% 13%;
 
     /* ========== Component Colors ========== */
-    --card: 215 50% 11%;
-    --card-foreground: 210 20% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 40% 13%;
 
-    --popover: 215 50% 11%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 40% 13%;
 
     /* ========== Brand Colors ========== */
-    /* Binance Yellow - Primary Brand Color */
-    --primary: 45 93% 49%;
-    --primary-foreground: 215 55% 8%;
-    --primary-glow: 45 95% 55%;
+    /* Gold - Primary Brand Color (adjusted for light bg) */
+    --primary: 45 93% 47%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 45 95% 52%;
 
-    /* Gold/Amber Accent */
-    --accent: 38 92% 50%;
-    --accent-foreground: 215 55% 8%;
+    /* Amber Accent */
+    --accent: 38 92% 48%;
+    --accent-foreground: 0 0% 100%;
 
-    /* Logo Teal - Secondary accent from chart lines */
-    --logo-teal: 185 100% 38%;
+    /* Teal accent from logo */
+    --logo-teal: 185 100% 32%;
 
     /* ========== Semantic Colors ========== */
-    --secondary: 215 48% 12%;
-    --secondary-foreground: 210 20% 95%;
+    --secondary: 220 25% 94%;
+    --secondary-foreground: 220 40% 13%;
 
-    --muted: 215 45% 14%;
-    --muted-foreground: 210 15% 55%;
+    --muted: 220 20% 92%;
+    --muted-foreground: 220 15% 45%;
 
-    /* Binance Red for Destructive Actions */
-    --destructive: 355 90% 62%;
-    --destructive-foreground: 210 20% 95%;
+    /* Destructive Red */
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Binance Green for Success States */
-    --success: 160 85% 43%;
-    --success-foreground: 210 20% 95%;
+    /* Success Green */
+    --success: 142 72% 35%;
+    --success-foreground: 0 0% 100%;
 
-    /* Warning Color */
-    --warning: 45 93% 49%;
-    --warning-foreground: 215 55% 8%;
+    /* Warning */
+    --warning: 45 93% 47%;
+    --warning-foreground: 220 40% 13%;
 
     /* ========== Border & Input ========== */
-    --border: 215 40% 18%;
-    --input: 215 40% 18%;
-    --ring: 45 93% 49%;
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: 45 93% 47%;
     --radius: 0.75rem;
 
     /* ========== Sidebar Colors ========== */
-    --sidebar-background: 215 55% 7%;
-    --sidebar-foreground: 210 20% 95%;
-    --sidebar-primary: 45 93% 49%;
-    --sidebar-primary-foreground: 215 55% 8%;
-    --sidebar-accent: 215 48% 12%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 215 40% 14%;
-    --sidebar-ring: 45 93% 49%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 40% 13%;
+    --sidebar-primary: 45 93% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 95%;
+    --sidebar-accent-foreground: 220 40% 13%;
+    --sidebar-border: 220 20% 90%;
+    --sidebar-ring: 45 93% 47%;
 
-    /* ========== Gradients ========== */
-    /* Navy Blue with Gold accents */
-    --gradient-primary: linear-gradient(135deg, hsl(45 93% 49%) 0%, hsl(38 92% 55%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(32 95% 52%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(215 55% 8%) 0%, hsl(215 50% 11%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(215 50% 11%) 0%, hsl(215 48% 14%) 100%);
-    --gradient-premium: linear-gradient(135deg, hsl(215 55% 7%) 0%, hsl(215 50% 10%) 40%, hsl(45 30% 12%) 100%);
-    --gradient-hero: linear-gradient(145deg, hsl(215 55% 8%) 0%, hsl(215 58% 5%) 50%, hsl(215 50% 10%) 100%);
-    --gradient-cyber: linear-gradient(135deg, hsl(45 93% 49% / 0.1) 0%, hsl(38 92% 50% / 0.1) 100%);
+    /* ========== Gradients (Light Mode) ========== */
+    --gradient-primary: linear-gradient(135deg, hsl(45 93% 47%) 0%, hsl(38 92% 52%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(38 92% 48%) 0%, hsl(32 95% 50%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(220 25% 97%) 0%, hsl(220 20% 95%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(220 20% 98%) 100%);
+    --gradient-premium: linear-gradient(135deg, hsl(220 25% 98%) 0%, hsl(220 20% 96%) 40%, hsl(45 30% 97%) 100%);
+    --gradient-hero: linear-gradient(145deg, hsl(220 25% 97%) 0%, hsl(45 30% 96%) 50%, hsl(220 25% 97%) 100%);
+    --gradient-cyber: linear-gradient(135deg, hsl(45 93% 47% / 0.08) 0%, hsl(38 92% 48% / 0.08) 100%);
 
-    /* ========== Shadows - Gold Glow Effects ========== */
-    --shadow-sm: 0 2px 8px hsl(215 60% 3% / 0.4);
-    --shadow-md: 0 4px 20px hsl(215 60% 3% / 0.5);
-    --shadow-lg: 0 8px 40px hsl(215 60% 3% / 0.6);
-    --shadow-elegant: 0 12px 50px -15px hsl(45 93% 49% / 0.4);
-    --shadow-glow: 0 0 60px hsl(45 93% 49% / 0.3);
-    --shadow-accent: 0 8px 30px -10px hsl(38 92% 50% / 0.5);
-    --shadow-neon: 0 0 20px hsl(45 93% 49% / 0.4), 0 0 40px hsl(45 93% 49% / 0.2);
+    /* ========== Shadows - Soft Light Mode ========== */
+    --shadow-sm: 0 2px 8px hsl(220 40% 13% / 0.06);
+    --shadow-md: 0 4px 20px hsl(220 40% 13% / 0.08);
+    --shadow-lg: 0 8px 40px hsl(220 40% 13% / 0.1);
+    --shadow-elegant: 0 12px 50px -15px hsl(45 93% 47% / 0.25);
+    --shadow-glow: 0 0 60px hsl(45 93% 47% / 0.15);
+    --shadow-accent: 0 8px 30px -10px hsl(38 92% 48% / 0.3);
+    --shadow-neon: 0 0 20px hsl(45 93% 47% / 0.2), 0 0 40px hsl(45 93% 47% / 0.1);
 
     /* ========== Legacy Support ========== */
-    /* Bitcoin/Crypto Brand Color - Now matches Binance Yellow */
-    --bitcoin-orange: 45 93% 49%;
+    --bitcoin-orange: 45 93% 47%;
 
     /* ========== 3D Perspective ========== */
     --perspective: 1200px;
 
-    /* ========== NEW: Mobile & Crypto Enhancement Tokens ========== */
+    /* ========== Mobile & Crypto Enhancement Tokens ========== */
     --touch-target-min: 44px;
     --mobile-padding: clamp(1rem, 4vw, 1.5rem);
     --card-padding-mobile: clamp(0.75rem, 3vw, 1.25rem);
@@ -138,10 +136,10 @@
     --crypto-green: 142 71% 45%;
     --crypto-red: 0 84% 60%;
     --holographic-gradient: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary-glow)), hsl(var(--primary)));
-    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.5);
+    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.3);
   }
 
-  /* ========== Dark Mode Overrides ========== */
+  /* ========== DARK MODE ========== */
   .dark {
     --background: 215 58% 5%;
     --foreground: 210 20% 95%;
@@ -168,6 +166,12 @@
     --destructive: 355 90% 62%;
     --destructive-foreground: 210 20% 95%;
 
+    --success: 160 85% 43%;
+    --success-foreground: 210 20% 95%;
+
+    --warning: 45 95% 52%;
+    --warning-foreground: 215 58% 5%;
+
     --border: 215 42% 15%;
     --input: 215 42% 15%;
     --ring: 45 95% 52%;
@@ -190,14 +194,62 @@
     --gradient-card: linear-gradient(135deg, hsl(215 52% 8%) 0%, hsl(215 50% 11%) 100%);
     --gradient-premium: linear-gradient(135deg, hsl(215 60% 4%) 0%, hsl(215 52% 7%) 40%, hsl(45 30% 10%) 100%);
     --gradient-hero: linear-gradient(145deg, hsl(215 58% 5%) 0%, hsl(215 60% 3%) 50%, hsl(215 52% 7%) 100%);
+    --gradient-cyber: linear-gradient(135deg, hsl(45 95% 52% / 0.1) 0%, hsl(38 94% 52% / 0.1) 100%);
 
-    /* Dark mode shadows - enhanced for better depth */
+    /* Dark mode shadows - enhanced glow effects */
     --shadow-sm: 0 2px 8px hsl(215 65% 2% / 0.6);
     --shadow-md: 0 4px 20px hsl(215 65% 2% / 0.7);
     --shadow-lg: 0 8px 40px hsl(215 65% 2% / 0.8);
     --shadow-elegant: 0 12px 50px -15px hsl(45 95% 52% / 0.45);
     --shadow-glow: 0 0 60px hsl(45 95% 52% / 0.35);
     --shadow-accent: 0 8px 30px -10px hsl(38 94% 52% / 0.5);
+    --shadow-neon: 0 0 20px hsl(45 95% 52% / 0.4), 0 0 40px hsl(45 95% 52% / 0.2);
+
+    /* Crypto data colors (brighter for dark bg) */
+    --crypto-green: 142 71% 50%;
+    --crypto-red: 0 84% 65%;
+    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.5);
+  }
+}
+
+/* ============================================
+   THEME TRANSITION SYSTEM
+   ============================================ */
+
+/* Smooth color transitions for theme switching */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-timing-function: ease;
+  transition-duration: 0.3s;
+}
+
+/* Faster text color transitions */
+p, span, h1, h2, h3, h4, h5, h6, a, label {
+  transition-duration: 0.15s;
+}
+
+/* Disable transitions for animated elements and performance-critical elements */
+[class*="animate-"],
+[class*="transition-"],
+.no-theme-transition,
+.pull-indicator,
+.pull-content {
+  transition-property: none;
+}
+
+/* Re-enable specific transitions for elements that need them */
+[class*="transition-"] {
+  transition-property: var(--tw-transition-property, all);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -251,17 +303,34 @@
 
   /* ========== Glass Morphism Effects ========== */
   .glass-card {
-    @apply backdrop-blur-lg bg-card/40 border border-primary/15;
+    @apply backdrop-blur-lg border;
+    background: hsl(var(--card) / 0.7);
+    border-color: hsl(var(--border));
+  }
+
+  .dark .glass-card {
+    background: hsl(var(--card) / 0.4);
+    border-color: hsl(var(--primary) / 0.15);
   }
 
   .glass-card-enhanced {
     backdrop-filter: blur(20px);
     background: linear-gradient(
       135deg,
+      hsl(var(--card) / 0.9) 0%,
+      hsl(var(--card) / 0.8) 100%
+    );
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-md);
+  }
+
+  .dark .glass-card-enhanced {
+    background: linear-gradient(
+      135deg,
       hsl(var(--card) / 0.7) 0%,
       hsl(var(--card) / 0.5) 100%
     );
-    border: 1px solid hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary) / 0.15);
     box-shadow: 0 8px 32px hsl(0 0% 0% / 0.4),
       inset 0 1px 0 hsl(var(--primary) / 0.08),
       inset 0 0 0 1px hsl(var(--primary) / 0.05);
@@ -352,21 +421,32 @@
 
   /* ========== Neon Glow Card ========== */
   .neon-card {
-    background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6));
-    border: 1px solid hsl(var(--primary) / 0.3);
-    box-shadow: 
-      0 0 20px hsl(var(--primary) / 0.15),
-      inset 0 1px 0 hsl(var(--primary) / 0.1);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-md);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .neon-card:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: var(--shadow-elegant);
+    transform: translateY(-4px);
+  }
+
+  .dark .neon-card {
+    background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6));
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: 
+      0 0 20px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--primary) / 0.1);
+  }
+
+  .dark .neon-card:hover {
     border-color: hsl(var(--primary) / 0.6);
     box-shadow: 
       0 0 30px hsl(var(--primary) / 0.3),
       0 0 60px hsl(var(--primary) / 0.15),
       inset 0 1px 0 hsl(var(--primary) / 0.2);
-    transform: translateY(-4px);
   }
 
   /* ========== 3D Card Effect ========== */

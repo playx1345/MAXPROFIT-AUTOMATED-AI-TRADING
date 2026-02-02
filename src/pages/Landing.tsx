@@ -1,5 +1,5 @@
 import { lazy, Suspense, memo } from "react";
-import { TrendingUp, Shield, Bot, Users } from "lucide-react";
+import { TrendingUp, Shield, Bot, Users, UserPlus, Wallet, Target, BarChart3 } from "lucide-react";
 import { AnimatedHero } from "@/components/landing/AnimatedHero";
 import { CryptoTicker } from "@/components/landing/CryptoTicker";
 import { FeatureCard } from "@/components/landing/FeatureCard";
@@ -7,26 +7,25 @@ import { InvestmentPlanCard } from "@/components/landing/InvestmentPlanCard";
 import { Section } from "@/components/landing/Section";
 import { Header } from "@/components/landing/Header";
 import { ScrollRevealWrapper } from "@/components/landing/ScrollRevealWrapper";
-import { ParallaxSection } from "@/components/landing/ParallaxSection";
-import { Link } from "react-router-dom";
+import { UnifiedStats } from "@/components/landing/UnifiedStats";
+import { CTASection } from "@/components/landing/CTASection";
+import { Footer } from "@/components/landing/Footer";
 import { cn } from "@/lib/utils";
 
 // Lazy load below-the-fold components for better performance
-const StatsCounter = lazy(() => import("@/components/landing/StatsCounter").then(m => ({ default: m.StatsCounter })));
-const MarketStats = lazy(() => import("@/components/landing/MarketStats").then(m => ({ default: m.MarketStats })));
 const LiveTradingFeed = lazy(() => import("@/components/landing/LiveTradingFeed").then(m => ({ default: m.LiveTradingFeed })));
 const TrustedPartners = lazy(() => import("@/components/landing/TrustedPartners").then(m => ({ default: m.TrustedPartners })));
 const FAQ = lazy(() => import("@/components/landing/FAQ").then(m => ({ default: m.FAQ })));
 
 // Loading skeleton component
 const SectionSkeleton = memo(() => (
-  <div className="py-20 animate-pulse">
+  <div className="py-16 sm:py-20 animate-pulse">
     <div className="container mx-auto px-4 sm:px-6">
-      <div className="h-10 bg-muted rounded w-1/3 mx-auto mb-4" />
-      <div className="h-6 bg-muted rounded w-1/2 mx-auto mb-16" />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-4" />
+      <div className="h-5 bg-muted rounded w-1/2 mx-auto mb-12" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-40 bg-muted rounded-2xl" />
+          <div key={i} className="h-32 bg-muted rounded-xl" />
         ))}
       </div>
     </div>
@@ -35,52 +34,53 @@ const SectionSkeleton = memo(() => (
 
 SectionSkeleton.displayName = "SectionSkeleton";
 
-// How it works step component with enhanced animations
-const HowItWorksStep = memo(({ step, index }: { step: { num: string; title: string; desc: string }; index: number }) => (
-  <ScrollRevealWrapper 
-    direction="up" 
-    delay={index * 150}
-    className="text-center group"
-  >
-    <div className="relative">
-      {/* Connector line */}
-      {index < 3 && (
-        <div 
-          className="hidden md:block absolute top-10 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/30 to-primary/10"
-          aria-hidden="true"
-        />
-      )}
-      <div 
-        className={cn(
-          "w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary text-primary-foreground",
-          "flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-4",
-          "transition-all duration-500 relative z-10",
-          "group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/30",
-          "group-hover:rotate-3"
+// How it works step component with icons
+const HowItWorksStep = memo(({ step, index }: { 
+  step: { num: string; title: string; desc: string; icon: typeof UserPlus }; 
+  index: number;
+}) => {
+  const Icon = step.icon;
+  return (
+    <ScrollRevealWrapper 
+      direction="up" 
+      delay={index * 100}
+      className="text-center group"
+    >
+      <div className="relative">
+        {/* Connector line - desktop only */}
+        {index < 3 && (
+          <div 
+            className="hidden lg:block absolute top-8 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/30 to-transparent"
+            aria-hidden="true"
+          />
         )}
-      >
-        {step.num}
-        {/* Glow ring */}
         <div 
-          className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
-          aria-hidden="true"
-        />
+          className={cn(
+            "w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-primary-foreground",
+            "flex items-center justify-center mx-auto mb-3 sm:mb-4",
+            "transition-all duration-300 relative z-10",
+            "group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
+          )}
+        >
+          <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
+        </div>
       </div>
-    </div>
-    <h3 className="text-lg font-semibold mb-2 transition-colors duration-300 group-hover:text-primary">
-      {step.title}
-    </h3>
-    <p className="text-sm text-muted-foreground">{step.desc}</p>
-  </ScrollRevealWrapper>
-));
+      <div className="text-xs font-bold text-primary mb-1">Step {step.num}</div>
+      <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2 transition-colors duration-300 group-hover:text-primary">
+        {step.title}
+      </h3>
+      <p className="text-xs sm:text-sm text-muted-foreground max-w-[200px] mx-auto">{step.desc}</p>
+    </ScrollRevealWrapper>
+  );
+});
 
 HowItWorksStep.displayName = "HowItWorksStep";
 
 const howItWorksSteps = [
-  { num: "1", title: "Sign Up", desc: "Create account & complete KYC" },
-  { num: "2", title: "Deposit", desc: "Add USDT securely" },
-  { num: "3", title: "Choose Plan", desc: "Select your strategy" },
-  { num: "4", title: "Earn", desc: "Track & withdraw profits" }
+  { num: "1", title: "Sign Up", desc: "Create your account & complete KYC verification", icon: UserPlus },
+  { num: "2", title: "Deposit", desc: "Add USDT securely to your wallet", icon: Wallet },
+  { num: "3", title: "Choose Plan", desc: "Select a strategy that fits your goals", icon: Target },
+  { num: "4", title: "Earn", desc: "Track performance & withdraw profits", icon: BarChart3 }
 ];
 
 const Landing = () => {
@@ -97,31 +97,21 @@ const Landing = () => {
         <AnimatedHero />
         <CryptoTicker />
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <MarketStats />
-        </Suspense>
+        {/* Unified Stats Banner */}
+        <UnifiedStats />
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <LiveTradingFeed />
-        </Suspense>
-        
-        <Suspense fallback={<SectionSkeleton />}>
-          <StatsCounter />
-        </Suspense>
-
-        {/* Features Section with Parallax */}
+        {/* Features Section - single column on mobile */}
         <Section 
           id="features" 
           title="Why Choose Live Win Trade?"
           subtitle="Advanced technology meets professional trading expertise"
           variant="muted"
-          parallaxBackground
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
             <FeatureCard
               icon={Bot} 
               title="AI Trading Bot" 
-              description="Advanced algorithms analyze market trends and execute trades automatically with precision"
+              description="Advanced algorithms analyze market trends and execute trades automatically"
               index={0}
             />
             <FeatureCard 
@@ -145,18 +135,27 @@ const Landing = () => {
           </div>
         </Section>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <TrustedPartners />
-        </Suspense>
+        {/* How It Works Section */}
+        <Section
+          id="how-it-works"
+          title="How It Works"
+          subtitle="Get started in four simple steps"
+        >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
+            {howItWorksSteps.map((step, index) => (
+              <HowItWorksStep key={index} step={step} index={index} />
+            ))}
+          </div>
+        </Section>
 
         {/* Investment Plans Section */}
         <Section
           id="plans"
           title="Investment Plans"
           subtitle="Choose a plan that matches your investment goals"
-          parallaxBackground
+          variant="muted"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto px-2 sm:px-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
             <ScrollRevealWrapper direction="up" delay={0}>
               <InvestmentPlanCard 
                 title="Starter Plan" 
@@ -168,12 +167,11 @@ const Landing = () => {
                   "Conservative trading strategies", 
                   "Lower volatility exposure", 
                   "Ideal for beginners", 
-                  "24/7 customer support", 
-                  "Monthly performance reports"
+                  "24/7 customer support"
                 ]} 
               />
             </ScrollRevealWrapper>
-            <ScrollRevealWrapper direction="up" delay={150}>
+            <ScrollRevealWrapper direction="up" delay={100}>
               <InvestmentPlanCard 
                 title="Growth Plan" 
                 risk="Medium Risk" 
@@ -184,13 +182,12 @@ const Landing = () => {
                   "Balanced risk/reward ratio", 
                   "Multiple trading strategies", 
                   "Advanced market analysis", 
-                  "Priority customer support", 
-                  "Weekly performance reports"
+                  "Priority support"
                 ]} 
                 popular={true} 
               />
             </ScrollRevealWrapper>
-            <ScrollRevealWrapper direction="up" delay={300}>
+            <ScrollRevealWrapper direction="up" delay={200}>
               <InvestmentPlanCard 
                 title="Professional" 
                 risk="High Risk" 
@@ -201,100 +198,44 @@ const Landing = () => {
                   "Aggressive trading strategies", 
                   "Maximum potential returns", 
                   "Dedicated account manager", 
-                  "VIP support 24/7", 
-                  "Daily performance reports"
+                  "VIP support 24/7"
                 ]} 
               />
             </ScrollRevealWrapper>
           </div>
 
-          <ScrollRevealWrapper direction="fade" delay={400}>
-            <p className="text-center text-sm text-muted-foreground mt-10 max-w-3xl mx-auto">
+          <ScrollRevealWrapper direction="fade" delay={300}>
+            <p className="text-center text-xs sm:text-sm text-muted-foreground mt-8 sm:mt-10 max-w-2xl mx-auto">
               * Expected ROI ranges are estimates based on historical market conditions and are not guaranteed.
             </p>
           </ScrollRevealWrapper>
         </Section>
 
-        {/* How It Works Section */}
-        <Section
-          id="how-it-works"
-          title="How It Works"
-          subtitle="Get started in four simple steps"
-          variant="muted"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto">
-            {howItWorksSteps.map((step, index) => (
-              <HowItWorksStep key={index} step={step} index={index} />
-            ))}
-          </div>
-        </Section>
+        <Suspense fallback={<SectionSkeleton />}>
+          <LiveTradingFeed />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <TrustedPartners />
+        </Suspense>
 
         {/* FAQ Section */}
         <Section
           id="faq"
           title="Frequently Asked Questions"
           subtitle="Find answers to common questions"
-          parallaxBackground
+          variant="muted"
         >
-          <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}>
+          <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded-lg" />}>
             <FAQ />
           </Suspense>
         </Section>
+
+        {/* CTA Section */}
+        <CTASection />
       </main>
 
-      {/* Footer with reveal animation */}
-      <footer 
-        className="border-t border-border py-8 bg-muted/30 relative overflow-hidden"
-        role="contentinfo"
-      >
-        {/* Decorative gradient */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none"
-          aria-hidden="true"
-        />
-        
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <ScrollRevealWrapper direction="up">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-foreground">Live Win Trade</span>
-                <span>© {new Date().getFullYear()}</span>
-              </div>
-              <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-6" aria-label="Footer links">
-                <Link 
-                  to="/auth" 
-                  className="hover:text-foreground transition-colors duration-300 hover:-translate-y-0.5 inline-block"
-                >
-                  Sign In
-                </Link>
-                <a 
-                  href="#features" 
-                  className="hover:text-foreground transition-colors duration-300 hover:-translate-y-0.5 inline-block"
-                >
-                  Features
-                </a>
-                <a 
-                  href="#faq" 
-                  className="hover:text-foreground transition-colors duration-300 hover:-translate-y-0.5 inline-block"
-                >
-                  FAQ
-                </a>
-                <Link 
-                  to="/admin/login" 
-                  className="text-xs opacity-50 hover:opacity-100 hover:text-foreground transition-all duration-300"
-                >
-                  Admin
-                </Link>
-              </nav>
-            </div>
-          </ScrollRevealWrapper>
-          <ScrollRevealWrapper direction="fade" delay={200}>
-            <p className="text-xs text-muted-foreground/70 text-center mt-6">
-              ⚠️ Risk Warning: Cryptocurrency investments carry significant risk. Past performance does not guarantee future results.
-            </p>
-          </ScrollRevealWrapper>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

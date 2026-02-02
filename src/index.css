@@ -44,85 +44,85 @@
 @layer base {
   /* ========== LIGHT MODE (Default) - Rich Warm Theme ========== */
   :root {
-    /* ========== Background Colors - Rich Cream/Ivory ========== */
-    --background: 38 45% 95%;
-    --foreground: 25 35% 12%;
+    /* ========== Background Colors - Refined Cream/Ivory ========== */
+    --background: 38 30% 96%;
+    --foreground: 25 25% 15%;
 
     /* ========== Component Colors ========== */
-    --card: 42 50% 98%;
-    --card-foreground: 25 35% 12%;
+    --card: 42 35% 98%;
+    --card-foreground: 25 25% 15%;
 
-    --popover: 42 50% 98%;
-    --popover-foreground: 25 35% 12%;
+    --popover: 42 35% 98%;
+    --popover-foreground: 25 25% 15%;
 
     /* ========== Brand Colors ========== */
-    /* Gold - Primary Brand Color (deep rich gold) */
-    --primary: 40 95% 42%;
-    --primary-foreground: 42 50% 98%;
-    --primary-glow: 38 100% 48%;
+    /* Gold - Primary Brand Color (balanced warm gold) */
+    --primary: 42 80% 45%;
+    --primary-foreground: 42 35% 98%;
+    --primary-glow: 40 85% 50%;
 
-    /* Amber Accent (deep warm amber) */
-    --accent: 32 95% 42%;
-    --accent-foreground: 42 50% 98%;
+    /* Amber Accent (refined warm amber) */
+    --accent: 35 75% 45%;
+    --accent-foreground: 42 35% 98%;
 
     /* Teal accent from logo */
     --logo-teal: 185 100% 32%;
 
     /* ========== Semantic Colors ========== */
-    --secondary: 35 35% 90%;
-    --secondary-foreground: 25 35% 12%;
+    --secondary: 35 25% 92%;
+    --secondary-foreground: 25 25% 15%;
 
-    --muted: 38 28% 88%;
-    --muted-foreground: 28 20% 38%;
+    --muted: 38 20% 90%;
+    --muted-foreground: 30 15% 42%;
 
-    /* Destructive Red (rich terracotta) */
-    --destructive: 8 80% 48%;
-    --destructive-foreground: 42 50% 98%;
+    /* Destructive Red (refined terracotta) */
+    --destructive: 5 65% 50%;
+    --destructive-foreground: 42 35% 98%;
 
-    /* Success Green (rich warm sage) */
-    --success: 140 60% 35%;
-    --success-foreground: 42 50% 98%;
+    /* Success Green (refined warm sage) */
+    --success: 145 50% 38%;
+    --success-foreground: 42 35% 98%;
 
     /* Warning */
-    --warning: 40 95% 42%;
-    --warning-foreground: 25 35% 12%;
+    --warning: 42 80% 45%;
+    --warning-foreground: 25 25% 15%;
 
     /* ========== Border & Input ========== */
-    --border: 35 30% 82%;
-    --input: 35 30% 82%;
-    --ring: 40 95% 42%;
+    --border: 35 20% 85%;
+    --input: 35 20% 85%;
+    --ring: 42 80% 45%;
     --radius: 0.75rem;
 
     /* ========== Sidebar Colors ========== */
-    --sidebar-background: 42 50% 98%;
-    --sidebar-foreground: 25 35% 12%;
-    --sidebar-primary: 40 95% 42%;
-    --sidebar-primary-foreground: 42 50% 98%;
-    --sidebar-accent: 38 35% 92%;
-    --sidebar-accent-foreground: 25 35% 12%;
-    --sidebar-border: 35 30% 85%;
-    --sidebar-ring: 40 95% 42%;
+    --sidebar-background: 42 35% 98%;
+    --sidebar-foreground: 25 25% 15%;
+    --sidebar-primary: 42 80% 45%;
+    --sidebar-primary-foreground: 42 35% 98%;
+    --sidebar-accent: 38 22% 94%;
+    --sidebar-accent-foreground: 25 25% 15%;
+    --sidebar-border: 35 20% 85%;
+    --sidebar-ring: 42 80% 45%;
 
-    /* ========== Gradients (Rich Warm Light Mode) ========== */
-    --gradient-primary: linear-gradient(135deg, hsl(40 95% 42%) 0%, hsl(32 95% 48%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(32 95% 42%) 0%, hsl(25 98% 45%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(38 45% 95%) 0%, hsl(38 35% 92%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(42 50% 98%) 0%, hsl(38 40% 96%) 100%);
-    --gradient-premium: linear-gradient(135deg, hsl(40 45% 96%) 0%, hsl(38 38% 94%) 40%, hsl(35 50% 95%) 100%);
-    --gradient-hero: linear-gradient(145deg, hsl(38 45% 95%) 0%, hsl(40 50% 93%) 50%, hsl(38 45% 95%) 100%);
-    --gradient-cyber: linear-gradient(135deg, hsl(40 95% 42% / 0.1) 0%, hsl(32 95% 42% / 0.1) 100%);
+    /* ========== Gradients (Refined Warm Light Mode) ========== */
+    --gradient-primary: linear-gradient(135deg, hsl(42 80% 45%) 0%, hsl(35 75% 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(35 75% 45%) 0%, hsl(28 70% 48%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(38 30% 96%) 0%, hsl(38 25% 94%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(42 35% 98%) 0%, hsl(38 30% 96%) 100%);
+    --gradient-premium: linear-gradient(135deg, hsl(40 30% 97%) 0%, hsl(38 25% 95%) 40%, hsl(35 35% 96%) 100%);
+    --gradient-hero: linear-gradient(145deg, hsl(38 30% 96%) 0%, hsl(40 35% 94%) 50%, hsl(38 30% 96%) 100%);
+    --gradient-cyber: linear-gradient(135deg, hsl(42 80% 45% / 0.1) 0%, hsl(35 75% 45% / 0.1) 100%);
 
-    /* ========== Shadows - Deep Warm Amber Tones ========== */
-    --shadow-sm: 0 2px 8px hsl(28 40% 18% / 0.08);
-    --shadow-md: 0 4px 20px hsl(28 40% 18% / 0.1);
-    --shadow-lg: 0 8px 40px hsl(28 40% 18% / 0.12);
-    --shadow-elegant: 0 12px 50px -15px hsl(40 95% 42% / 0.4);
-    --shadow-glow: 0 0 60px hsl(40 95% 42% / 0.25);
-    --shadow-accent: 0 8px 30px -10px hsl(32 95% 42% / 0.45);
-    --shadow-neon: 0 0 20px hsl(40 95% 42% / 0.3), 0 0 40px hsl(40 95% 42% / 0.15);
+    /* ========== Shadows - Refined Warm Tones ========== */
+    --shadow-sm: 0 2px 8px hsl(30 25% 18% / 0.06);
+    --shadow-md: 0 4px 20px hsl(30 25% 18% / 0.08);
+    --shadow-lg: 0 8px 40px hsl(30 25% 18% / 0.1);
+    --shadow-elegant: 0 12px 50px -15px hsl(42 80% 45% / 0.3);
+    --shadow-glow: 0 0 60px hsl(42 80% 45% / 0.2);
+    --shadow-accent: 0 8px 30px -10px hsl(35 75% 45% / 0.35);
+    --shadow-neon: 0 0 20px hsl(42 80% 45% / 0.25), 0 0 40px hsl(42 80% 45% / 0.12);
 
     /* ========== Legacy Support ========== */
-    --bitcoin-orange: 40 95% 42%;
+    --bitcoin-orange: 42 80% 45%;
 
     /* ========== 3D Perspective ========== */
     --perspective: 1200px;
@@ -132,11 +132,11 @@
     --mobile-padding: clamp(1rem, 4vw, 1.5rem);
     --card-padding-mobile: clamp(0.75rem, 3vw, 1.25rem);
     
-    /* Crypto Data Colors (rich warm tones) */
-    --crypto-green: 140 60% 40%;
-    --crypto-red: 8 80% 52%;
+    /* Crypto Data Colors (refined warm tones) */
+    --crypto-green: 145 50% 42%;
+    --crypto-red: 5 65% 54%;
     --holographic-gradient: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary-glow)), hsl(var(--primary)));
-    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.35);
+    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.3);
   }
 
   /* ========== DARK MODE ========== */

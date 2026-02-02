@@ -82,7 +82,7 @@ export const InvestmentPlanCard = memo(({
       
       <div 
         className={cn(
-          "relative h-full flex flex-col p-6 sm:p-8 rounded-2xl bg-card border",
+          "relative h-full flex flex-col p-5 sm:p-6 lg:p-8 rounded-2xl bg-card border",
           "transition-all duration-300",
           popular ? "border-transparent" : "border-border hover:border-primary/30",
           "hover:shadow-xl"
@@ -102,8 +102,8 @@ export const InvestmentPlanCard = memo(({
         )}
 
         {/* Header */}
-        <header className="mb-6">
-          <h3 className="text-2xl font-bold mb-2">{title}</h3>
+        <header className="mb-4 sm:mb-6">
+          <h3 className="text-xl sm:text-2xl font-bold mb-2">{title}</h3>
           <p className="text-sm">
             <span className="text-muted-foreground">Risk Level: </span>
             <span className={cn("font-semibold", getRiskColor(risk))}>{risk}</span>
@@ -113,49 +113,44 @@ export const InvestmentPlanCard = memo(({
         {/* ROI */}
         <div 
           className={cn(
-            "mb-6 p-4 rounded-xl bg-muted/50 border border-border",
+            "mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl bg-muted/50 border border-border",
             "transition-all duration-300",
             "group-hover:border-primary/30 group-hover:bg-muted/70"
           )}
         >
-          <p className="text-sm text-muted-foreground mb-1">Expected ROI</p>
-          <p className="text-3xl font-bold text-primary">{expectedROI}</p>
+          <p className="text-xs sm:text-sm text-muted-foreground mb-1">Expected ROI</p>
+          <p className="text-2xl sm:text-3xl font-bold text-primary">{expectedROI}</p>
         </div>
 
-        {/* Investment range */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="p-3 rounded-lg bg-muted/30 border border-border/50 transition-colors group-hover:border-border">
-            <p className="text-xs text-muted-foreground mb-1">Min</p>
-            <p className="text-lg font-bold">{minInvestment}</p>
+        {/* Investment range - stacked on mobile */}
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <div className="p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50 transition-colors group-hover:border-border">
+            <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Min</p>
+            <p className="text-base sm:text-lg font-bold">{minInvestment}</p>
           </div>
-          <div className="p-3 rounded-lg bg-muted/30 border border-border/50 transition-colors group-hover:border-border">
-            <p className="text-xs text-muted-foreground mb-1">Max</p>
-            <p className="text-lg font-bold">{maxInvestment}</p>
+          <div className="p-2 sm:p-3 rounded-lg bg-muted/30 border border-border/50 transition-colors group-hover:border-border">
+            <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Max</p>
+            <p className="text-base sm:text-lg font-bold">{maxInvestment}</p>
           </div>
         </div>
 
         {/* Features */}
-        <ul className="space-y-3 mb-8 flex-grow" role="list">
+        <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8 flex-grow" role="list">
           {features.map((feature, index) => (
             <li 
               key={index} 
-              className={cn(
-                "flex items-start gap-3",
-                "transition-all duration-300",
-                isHovered && `delay-[${index * 50}ms]`
-              )}
-              style={{ transitionDelay: isHovered ? `${index * 30}ms` : '0ms' }}
+              className="flex items-start gap-2 sm:gap-3"
             >
               <div 
                 className={cn(
-                  "w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5",
+                  "w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5",
                   "transition-all duration-300",
-                  "group-hover:bg-primary/20 group-hover:scale-110"
+                  "group-hover:bg-primary/20"
                 )}
               >
-                <Check className="w-3 h-3 text-primary" aria-hidden="true" />
+                <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary" aria-hidden="true" />
               </div>
-              <span className="text-sm text-muted-foreground">{feature}</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">{feature}</span>
             </li>
           ))}
         </ul>
@@ -164,7 +159,7 @@ export const InvestmentPlanCard = memo(({
         <Link to="/auth" className="block mt-auto">
           <Button 
             className={cn(
-              "w-full h-12 font-semibold transition-all duration-300",
+              "w-full min-h-[48px] sm:h-12 font-semibold transition-all duration-300",
               popular 
                 ? "bg-primary hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25" 
                 : "bg-muted hover:bg-muted/80 text-foreground hover:text-primary"

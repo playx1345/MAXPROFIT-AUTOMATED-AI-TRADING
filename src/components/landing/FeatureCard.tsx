@@ -51,10 +51,10 @@ export const FeatureCard = memo(({ icon: Icon, title, description, index = 0 }: 
       <article
         ref={cardRef}
         className={cn(
-          "group relative p-6 sm:p-8 rounded-2xl bg-card border border-border",
+          "group relative p-5 sm:p-6 lg:p-8 rounded-2xl bg-card border border-border",
           "transition-all duration-500 ease-out",
           "hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10",
-          "will-change-transform h-full"
+          "will-change-transform h-full min-h-[200px]"
         )}
         style={{
           transform: `perspective(1000px) rotateX(${transform.rotateX}deg) rotateY(${transform.rotateY}deg) ${isHovered ? 'translateY(-8px)' : 'translateY(0)'}`,
@@ -95,24 +95,23 @@ export const FeatureCard = memo(({ icon: Icon, title, description, index = 0 }: 
         <div className="relative z-10">
           <div 
             className={cn(
-              "w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5",
+              "w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4",
               "transition-all duration-500",
-              "group-hover:bg-primary/20 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30",
-              "group-hover:rotate-3"
+              "group-hover:bg-primary/20 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
             )}
           >
             <Icon 
               className={cn(
-                "w-7 h-7 text-primary transition-all duration-500",
-                "group-hover:scale-110 group-hover:rotate-[-3deg]"
+                "w-6 h-6 sm:w-7 sm:h-7 text-primary transition-all duration-500",
+                "group-hover:scale-110"
               )} 
               aria-hidden="true"
             />
           </div>
-          <h3 className="text-xl font-semibold mb-3 text-foreground transition-colors duration-300 group-hover:text-primary">
+          <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-foreground transition-colors duration-300 group-hover:text-primary">
             {title}
           </h3>
-          <p className="text-muted-foreground leading-relaxed">{description}</p>
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{description}</p>
         </div>
       </article>
     </div>

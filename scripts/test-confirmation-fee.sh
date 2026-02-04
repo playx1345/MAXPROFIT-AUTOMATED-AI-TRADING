@@ -31,6 +31,7 @@ curl -X POST "$SUPABASE_URL/functions/v1/verify-confirmation-fee" \
     \"transaction_id\": \"$TRANSACTION_ID\",
     \"confirmation_fee_tx_hash\": \"$BTC_TX_HASH\"
   }" \
+  
   | jq '.'
 
 echo ""

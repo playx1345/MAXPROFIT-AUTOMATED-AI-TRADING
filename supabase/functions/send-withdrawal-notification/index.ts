@@ -51,6 +51,8 @@
  
      const emailResponse = await resend.emails.send({
        from: "Win-Tradex <notifications@win-tradex.com>",
+       // NOTE: For production, verify win-tradex.com domain in Resend dashboard
+       // For testing, you can use: "Win-Tradex <onboarding@resend.dev>"
        to: [user_email],
        subject: `Withdrawal Request Received - Transaction #${transaction_id.slice(0, 8)}`,
        html: `

@@ -22,7 +22,7 @@ verify_jwt = true
 verify_jwt = true
  
  [functions.send-withdrawal-notification]
- verify_jwt = true
+ verify_jwt = false
  
  [functions.send-universal-notification]
- verify_jwt = true
+ verify_jwt = false

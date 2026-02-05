@@ -20,3 +20,9 @@ verify_jwt = true
 
 [functions.send-fee-submission-notification]
 verify_jwt = true
+ 
+ [functions.send-withdrawal-notification]
+ verify_jwt = true
+ 
+ [functions.send-universal-notification]
+ verify_jwt = true

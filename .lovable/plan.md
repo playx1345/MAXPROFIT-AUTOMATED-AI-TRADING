@@ -1,146 +1,116 @@
 
-# Landing Page Redesign - Modern, User-Friendly, Mobile-First
+# Add Spanish Language + Translate All Pages Including Admin Dashboard
 
 ## Overview
-A comprehensive redesign of the landing page to create a cleaner, more modern, and mobile-optimized experience. The focus is on improved readability, better visual hierarchy, smoother interactions, and a design language inspired by top fintech/crypto platforms (Coinbase, Binance, Revolut).
+Add Spanish (es) as the 7th supported language and ensure **all pages** -- including the entire admin dashboard -- are fully translatable using the existing i18n infrastructure. Currently, admin pages use hardcoded English strings everywhere.
 
 ---
 
-## Current Issues Identified
-1. **Hero section** is cluttered with particle network canvas, floating trading chart, and too many animated elements competing for attention
-2. **Mobile experience** has cramped spacing, small touch targets in some areas, and too-complex animations that hurt performance
-3. **Crypto Ticker** uses horizontal scroll animation that can feel janky on mobile
-4. **UnifiedStats** shows 6 stats in a dense grid that's hard to scan on small screens
-5. **Feature cards** have complex 3D tilt effects that don't translate well to touch devices
-6. **Investment Plan cards** have mouse-tracking shine effects useless on mobile
-7. **How It Works** uses a 2-column grid on mobile which is too cramped
-8. **Footer** newsletter form is small and hard to interact with on mobile
-9. **Overall spacing** between sections is inconsistent
+## Scope of Work
 
----
+### Part 1: Add Spanish Locale
+- Create `src/i18n/locales/es.json` with full Spanish translations for all keys (matching the ~446-line `en.json` structure plus new admin keys)
+- Register Spanish in `src/i18n/index.ts`:
+  - Import the new locale file
+  - Add `{ code: 'es', name: 'Espanol', flag: '\u{1F1EA}\u{1F1F8}', dir: 'ltr' }` to the `languages` array
+  - Add `es` to `resources` and `supportedLngs`
+- Update `src/i18n/locales/en.json` language section to include `"es": "Spanish"`
 
-## Design Changes
+### Part 2: Add Admin Translation Keys to `en.json`
+Extend the existing `admin` section in `en.json` with keys covering every admin page. New keys will include:
 
-### 1. Header (Header.tsx)
-- Add a subtle frosted-glass pill navigation on desktop with smooth active-state indicators
-- Increase mobile hamburger menu touch target to 48px
-- Add smooth slide-down animation for mobile menu instead of max-height hack
-- Improve mobile menu spacing with larger tap targets (min 48px height per item)
+```
+admin.dashboard.*       - Dashboard title, stats labels, quick actions, activity
+admin.users.*           - User management, KYC actions, balance adjustments
+admin.deposits.*        - Deposit management, bulk actions, verification
+admin.withdrawals.*     - Withdrawal management, approval flow, reversal
+admin.investments.*     - Investment overview, details
+admin.transactions.*    - Transaction history, filters
+admin.tradingBot.*      - Bot performance, trade recording
+admin.activityLog.*     - Log display, action labels
+admin.settings.*        - All settings sections (wallets, fees, system)
+admin.reversals.*       - Reversal history and details
+admin.analytics.*       - Chart labels, KPIs, time ranges
+admin.login.*           - Login form, password reset
+admin.sidebar.*         - Menu items, sign out
+admin.common.*          - Shared admin labels (approve, reject, bulk, search, etc.)
+```
 
-### 2. Hero Section (AnimatedHero.tsx)
-- Simplify background: remove ParticleNetwork canvas, replace with a clean gradient mesh using CSS only (much better performance)
-- Remove the floating TradingChart from the hero (it's hidden on most screens anyway)
-- Make the headline use modern fluid typography with `clamp()` for seamless scaling
-- Redesign the "Live Trading Active" badge with a cleaner pill style
-- Improve CTA button group: make both buttons full-width on mobile with proper 56px min-height
-- Replace ProfitCounter with a cleaner, more subtle social proof element
-- Add a subtle gradient border glow around the hero content area on desktop
-- Remove mouse-tracking parallax effects (they add complexity with minimal value)
+### Part 3: Translate Admin Pages (11 files)
+Each admin page will be updated to:
+1. Import `useTranslation` from `react-i18next`
+2. Call `const { t } = useTranslation()`
+3. Replace all hardcoded strings with `t('admin.xxx.yyy')` calls
 
-### 3. Crypto Ticker (CryptoTicker.tsx)
-- Redesign as a cleaner horizontal strip with better contrast
-- Add subtle separators between items
-- Improve font sizing and spacing for mobile readability
-- Add pause-on-hover for accessibility
+**Files to modify:**
 
-### 4. Unified Stats (UnifiedStats.tsx)
-- Reduce from 6 stats to 4 most impactful stats for cleaner layout
-- Redesign stat cards with larger numbers, bolder typography
-- Use a 2x2 grid on mobile instead of 2x3 for better readability
-- Add subtle gradient backgrounds to each card
+| File | Hardcoded Strings Count (approx) |
+|------|----------------------------------|
+| `src/components/AdminLayout.tsx` | ~15 (sidebar menu labels, title, sign out) |
+| `src/pages/admin/Dashboard.tsx` | ~25 (stats, quick actions, activity) |
+| `src/pages/admin/Users.tsx` | ~60 (table headers, dialogs, forms, toasts) |
+| `src/pages/admin/Deposits.tsx` | ~40 (tabs, table, dialogs, bulk actions) |
+| `src/pages/admin/Withdrawals.tsx` | ~50 (tabs, table, approval flow, reversal) |
+| `src/pages/admin/Investments.tsx` | ~20 (table headers, details dialog) |
+| `src/pages/admin/Transactions.tsx` | ~15 (filters, table headers) |
+| `src/pages/admin/TradingBot.tsx` | ~25 (stats, form, table) |
+| `src/pages/admin/ActivityLog.tsx` | ~20 (action labels, table) |
+| `src/pages/admin/Settings.tsx` | ~40 (section titles, labels, descriptions) |
+| `src/pages/admin/Reversals.tsx` | ~20 (action labels, filters, table) |
+| `src/pages/admin/Login.tsx` | ~20 (login form, reset password) |
+| `src/pages/admin/Analytics.tsx` | ~15 (chart labels, KPIs, time ranges) |
 
-### 5. Features Section (Landing.tsx + FeatureCard.tsx)
-- Remove the complex 3D tilt mouse-tracking effect (not useful on mobile, adds JS overhead)
-- Redesign cards with a cleaner flat style: subtle border, icon badge, and hover lift
-- Use a clean 1-column on mobile, 2-column on tablet, 4-column on desktop grid
-- Add gradient icon backgrounds for visual interest
-- Increase card padding and text sizes for readability
+### Part 4: Add LanguageSelector to Admin Layout
+- Import `LanguageSelector` and `ThemeToggle` in `AdminLayout.tsx`
+- Add them to the sidebar footer area (above the Sign Out button), matching the user dashboard pattern
 
-### 6. How It Works Section (Landing.tsx)
-- Switch to single-column (1-col) layout on mobile instead of 2-col for clearer step flow
-- Add a vertical connector line between steps on mobile
-- Redesign step indicators with numbered circles and progress-style connector
-- Increase text size and spacing
-
-### 7. Investment Plan Cards (InvestmentPlanCard.tsx)
-- Remove mouse-tracking shine effect (useless on touch devices)
-- Redesign with cleaner card style: subtle gradient header, clear pricing, and prominent CTA
-- Make the "MOST POPULAR" badge more visually prominent with a gradient ribbon
-- Improve mobile card layout with better spacing between sections
-- Increase button size to 56px on mobile
-
-### 8. Live Trading Feed (LiveTradingFeed.tsx)
-- Redesign trade notification cards with cleaner, more compact layout
-- Improve animation timing for smoother mobile experience
-- Add a subtle card container background
-
-### 9. Trusted Partners (TrustedPartners.tsx)
-- Simplify to a clean logo strip without the carousel animation
-- Use a static grid on mobile, animated carousel on desktop
-- Remove redundant trust badges (already shown elsewhere)
-
-### 10. FAQ Section (FAQ.tsx)
-- Increase touch target for accordion triggers (min 56px)
-- Improve typography: larger question text, better line-height for answers
-- Add subtle left-border accent on open items
-- Remove serif font in favor of consistent sans-serif
-
-### 11. CTA Section (CTASection.tsx)
-- Redesign with a bold gradient background card
-- Larger, more prominent heading
-- Bigger buttons with better mobile sizing
-- Simplify trust badges
-
-### 12. Footer (Footer.tsx)
-- Redesign with cleaner column layout
-- Improve newsletter form with larger input and button on mobile
-- Better spacing and typography hierarchy
-- Add a subtle gradient top border
-
-### 13. Global CSS Updates (index.css)
-- Add new utility classes for the simplified card styles
-- Improve mobile-first media queries
-- Add new gradient mesh background utility
-- Optimize animation classes for mobile
+### Part 5: Mirror to All Other Locale Files
+Add the same new `admin.*` keys to all 6 other locale files:
+- `ar.json`, `ko.json`, `ro.json`, `ru.json`, `uk.json`
+- These will initially contain the English text as placeholders (the translation structure will be in place for future professional translation)
 
 ---
 
 ## Technical Details
 
-### Files to Modify
-1. `src/components/landing/AnimatedHero.tsx` - Simplified hero with CSS-only background
-2. `src/components/landing/Header.tsx` - Improved mobile menu and touch targets
-3. `src/components/landing/CryptoTicker.tsx` - Cleaner ticker strip
-4. `src/components/landing/UnifiedStats.tsx` - Reduced to 4 stats, better mobile grid
-5. `src/components/landing/FeatureCard.tsx` - Remove 3D effects, cleaner card
-6. `src/components/landing/InvestmentPlanCard.tsx` - Remove mouse tracking, cleaner design
-7. `src/components/landing/LiveTradingFeed.tsx` - Improved mobile layout
-8. `src/components/landing/TrustedPartners.tsx` - Simplified partner display
-9. `src/components/landing/FAQ.tsx` - Better touch targets, typography
-10. `src/components/landing/CTASection.tsx` - Bold gradient card redesign
-11. `src/components/landing/Footer.tsx` - Cleaner layout, better mobile UX
-12. `src/components/landing/ProfitCounter.tsx` - Simplified design
-13. `src/pages/Landing.tsx` - Updated section structure and How It Works layout
-14. `src/index.css` - New utility classes, mobile optimizations
+### Translation Key Convention
+Following the existing pattern:
+- Section-based nesting: `admin.dashboard.title`, `admin.users.searchPlaceholder`
+- Toast messages: `admin.users.createSuccess`, `admin.deposits.approveError`
+- Form labels: `admin.settings.walletAddresses`, `admin.settings.confirmationFee`
 
-### Performance Improvements
-- Remove canvas-based ParticleNetwork from hero (significant mobile performance gain)
-- Remove mouse-tracking state updates from FeatureCard and InvestmentPlanCard
-- Use CSS-only gradients and transitions instead of JS-driven effects
-- Reduce overall JavaScript bundle for landing page components
+### Files Modified (Total: ~20 files)
+1. `src/i18n/index.ts` -- register Spanish
+2. `src/i18n/locales/en.json` -- add ~300 admin translation keys
+3. `src/i18n/locales/es.json` -- new file with full Spanish translations
+4. `src/i18n/locales/ar.json` -- add admin keys (English placeholders)
+5. `src/i18n/locales/ko.json` -- add admin keys (English placeholders)
+6. `src/i18n/locales/ro.json` -- add admin keys (English placeholders)
+7. `src/i18n/locales/ru.json` -- add admin keys (English placeholders)
+8. `src/i18n/locales/uk.json` -- add admin keys (English placeholders)
+9. `src/components/AdminLayout.tsx` -- add `useTranslation`, translate sidebar
+10. `src/pages/admin/Dashboard.tsx` -- translate all strings
+11. `src/pages/admin/Users.tsx` -- translate all strings
+12. `src/pages/admin/Deposits.tsx` -- translate all strings
+13. `src/pages/admin/Withdrawals.tsx` -- translate all strings
+14. `src/pages/admin/Investments.tsx` -- translate all strings
+15. `src/pages/admin/Transactions.tsx` -- translate all strings
+16. `src/pages/admin/TradingBot.tsx` -- translate all strings
+17. `src/pages/admin/ActivityLog.tsx` -- translate all strings
+18. `src/pages/admin/Settings.tsx` -- translate all strings
+19. `src/pages/admin/Reversals.tsx` -- translate all strings
+20. `src/pages/admin/Login.tsx` -- translate all strings
+21. `src/pages/admin/Analytics.tsx` -- translate all strings
 
-### Mobile-First Approach
-- All touch targets will be minimum 48px
-- Single-column layouts on mobile with proper spacing
-- Larger, more readable typography with fluid `clamp()` sizing
-- Simplified animations that respect `prefers-reduced-motion`
-- Better use of vertical rhythm and whitespace
+### Implementation Order
+Due to the large number of files, implementation will be batched:
+1. First: Create `es.json` and update `i18n/index.ts` and `en.json` with all new admin keys
+2. Second: Update `AdminLayout.tsx` and all admin page components
+3. Third: Mirror admin keys to remaining locale files
 
-### Preserved Features
-- Dark/light theme switching
-- Language selector and i18n support
-- Scroll-reveal animations (simplified)
-- Demo video modal
-- Live trading feed
-- Lazy loading of below-fold components
-- Accessibility (skip link, ARIA labels, semantic HTML)
+### Preserved Behavior
+- All existing translations remain untouched
+- Fallback to English (`fallbackLng: 'en'`) ensures no broken strings
+- Language detection order (localStorage, navigator, htmlTag) is unchanged
+- RTL support for Arabic is unaffected
+- User-facing pages (Landing, Dashboard, Auth, etc.) already work with i18n and will automatically get Spanish support

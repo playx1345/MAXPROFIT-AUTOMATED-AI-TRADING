@@ -8,19 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { 
-  RotateCcw, 
-  ArrowDownLeft, 
-  ArrowUpRight, 
-  RefreshCw, 
-  Search,
-  Filter,
-  TrendingUp,
-  TrendingDown,
-  Clock,
-  User,
-  DollarSign
+  RotateCcw, ArrowDownLeft, ArrowUpRight, RefreshCw, Search, Filter,
+  TrendingUp, TrendingDown, Clock, User, DollarSign
 } from "lucide-react";
 import type { Json } from "@/integrations/supabase/types";
+import { useTranslation } from "react-i18next";
 
 interface ReversalLog {
   id: string;
@@ -37,40 +29,11 @@ interface ReversalLog {
 type ReversalType = 'all' | 'reverse_deposit' | 'reverse_withdrawal' | 'reopen_deposit' | 'reopen_withdrawal';
 
 const reversalActions = [
-  'reverse_deposit',
-  'reverse_withdrawal', 
-  'reopen_deposit',
-  'reopen_withdrawal'
+  'reverse_deposit', 'reverse_withdrawal', 'reopen_deposit', 'reopen_withdrawal'
 ];
 
-const actionConfig: Record<string, { label: string; icon: React.ReactNode; color: string; description: string }> = {
-  reverse_deposit: { 
-    label: "Deposit Reversed", 
-    icon: <ArrowDownLeft className="h-4 w-4" />, 
-    color: "bg-destructive",
-    description: "Approved deposit was reversed (funds deducted)"
-  },
-  reverse_withdrawal: { 
-    label: "Withdrawal Reversed", 
-    icon: <ArrowUpRight className="h-4 w-4" />, 
-    color: "bg-amber-500",
-    description: "Approved withdrawal was reversed (funds refunded)"
-  },
-  reopen_deposit: { 
-    label: "Deposit Reopened", 
-    icon: <RefreshCw className="h-4 w-4" />, 
-    color: "bg-emerald-500",
-    description: "Rejected deposit was reopened and approved"
-  },
-  reopen_withdrawal: { 
-    label: "Withdrawal Reopened", 
-    icon: <RefreshCw className="h-4 w-4" />, 
-    color: "bg-blue-500",
-    description: "Rejected withdrawal was reopened and approved"
-  },
-};
-
 const AdminReversals = () => {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<ReversalLog[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<ReversalLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,12 +41,39 @@ const AdminReversals = () => {
   const [filterType, setFilterType] = useState<ReversalType>("all");
   const { toast } = useToast();
 
+  const actionConfig: Record<string, { label: string; icon: React.ReactNode; color: string; description: string }> = {
+    reverse_deposit: { 
+      label: t('admin.reversals.actions.depositReversed'), 
+      icon: <ArrowDownLeft className="h-4 w-4" />, 
+      color: "bg-destructive",
+      description: t('admin.reversals.actions.depositReversedDesc')
+    },
+    reverse_withdrawal: { 
+      label: t('admin.reversals.actions.withdrawalReversed'), 
+      icon: <ArrowUpRight className="h-4 w-4" />, 
+      color: "bg-amber-500",
+      description: t('admin.reversals.actions.withdrawalReversedDesc')
+    },
+    reopen_deposit: { 
+      label: t('admin.reversals.actions.depositReopened'), 
+      icon: <RefreshCw className="h-4 w-4" />, 
+      color: "bg-emerald-500",
+      description: t('admin.reversals.actions.depositReopenedDesc')
+    },
+    reopen_withdrawal: { 
+      label: t('admin.reversals.actions.withdrawalReopened'), 
+      icon: <RefreshCw className="h-4 w-4" />, 
+      color: "bg-blue-500",
+      description: t('admin.reversals.actions.withdrawalReopenedDesc')
+    },
+  };
+
   useEffect(() => {
     fetchReversalLogs();
   }, []);
 
   useEffect(() => {
-    filterLogs();
+    filterLogsFunc();
   }, [logs, searchTerm, filterType]);
 
   const fetchReversalLogs = async () => {
@@ -98,7 +88,7 @@ const AdminReversals = () => {
       setLogs(data || []);
     } catch (error: any) {
       toast({
-        title: "Error fetching reversal logs",
+        title: t('admin.reversals.errorFetching'),
         description: error.message,
         variant: "destructive",
       });
@@ -107,15 +97,11 @@ const AdminReversals = () => {
     }
   };
 
-  const filterLogs = () => {
+  const filterLogsFunc = () => {
     let filtered = [...logs];
-
-    // Filter by type
     if (filterType !== "all") {
       filtered = filtered.filter(log => log.action === filterType);
     }
-
-    // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(log => 
@@ -125,7 +111,6 @@ const AdminReversals = () => {
         JSON.stringify(log.details).toLowerCase().includes(term)
       );
     }
-
     setFilteredLogs(filtered);
   };
 
@@ -134,7 +119,7 @@ const AdminReversals = () => {
       label: action.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()), 
       icon: <RotateCcw className="h-4 w-4" />, 
       color: "bg-muted",
-      description: "Transaction status was modified"
+      description: ""
     };
   };
 
@@ -147,13 +132,9 @@ const AdminReversals = () => {
 
   const formatAmount = (amount: number | undefined) => {
     if (amount === undefined || amount === null) return "-";
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
   };
 
-  // Calculate statistics
   const stats = {
     total: logs.length,
     depositReversals: logs.filter(l => l.action === 'reverse_deposit').length,
@@ -169,24 +150,23 @@ const AdminReversals = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-muted-foreground">Loading reversal history...</div>
+        <div className="animate-pulse text-muted-foreground">{t('admin.reversals.loading')}</div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold font-display flex items-center gap-2">
             <RotateCcw className="h-8 w-8 text-primary" />
-            Reversal History
+            {t('admin.reversals.title')}
           </h1>
-          <p className="text-muted-foreground">Track all transaction reversals and reopens</p>
+          <p className="text-muted-foreground">{t('admin.reversals.subtitle')}</p>
         </div>
         <Badge variant="secondary" className="text-lg w-fit">
-          {filteredLogs.length} Reversals
+          {t('admin.reversals.reversalCount', { count: filteredLogs.length })}
         </Badge>
       </div>
 
@@ -196,57 +176,52 @@ const AdminReversals = () => {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <RotateCcw className="h-4 w-4" />
-              Total
+              {t('admin.reversals.total')}
             </div>
             <p className="text-2xl font-bold text-primary">{stats.total}</p>
           </CardContent>
         </Card>
-        
         <Card className="glass-card border-destructive/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <TrendingDown className="h-4 w-4 text-destructive" />
-              Deposit Rev.
+              {t('admin.reversals.depositReversals')}
             </div>
             <p className="text-2xl font-bold text-destructive">{stats.depositReversals}</p>
           </CardContent>
         </Card>
-
         <Card className="glass-card border-amber-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <TrendingUp className="h-4 w-4 text-amber-500" />
-              Withdrawal Rev.
+              {t('admin.reversals.withdrawalReversals')}
             </div>
             <p className="text-2xl font-bold text-amber-500">{stats.withdrawalReversals}</p>
           </CardContent>
         </Card>
-
         <Card className="glass-card border-emerald-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <RefreshCw className="h-4 w-4 text-emerald-500" />
-              Deposit Reopen
+              {t('admin.reversals.depositReopen')}
             </div>
             <p className="text-2xl font-bold text-emerald-500">{stats.depositReopens}</p>
           </CardContent>
         </Card>
-
         <Card className="glass-card border-blue-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <RefreshCw className="h-4 w-4 text-blue-500" />
-              Withdrawal Reopen
+              {t('admin.reversals.withdrawalReopen')}
             </div>
             <p className="text-2xl font-bold text-blue-500">{stats.withdrawalReopens}</p>
           </CardContent>
         </Card>
-
         <Card className="glass-card border-primary/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <DollarSign className="h-4 w-4" />
-              Total Amount
+              {t('admin.reversals.totalAmount')}
             </div>
             <p className="text-2xl font-bold text-gradient-premium">{formatAmount(stats.totalAmount)}</p>
           </CardContent>
@@ -260,7 +235,7 @@ const AdminReversals = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by admin, user, or transaction details..."
+                placeholder={t('admin.reversals.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -269,14 +244,14 @@ const AdminReversals = () => {
             <Select value={filterType} onValueChange={(v) => setFilterType(v as ReversalType)}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filter by type" />
+                <SelectValue placeholder={t('admin.reversals.filterByType')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="reverse_deposit">Deposit Reversals</SelectItem>
-                <SelectItem value="reverse_withdrawal">Withdrawal Reversals</SelectItem>
-                <SelectItem value="reopen_deposit">Deposit Reopens</SelectItem>
-                <SelectItem value="reopen_withdrawal">Withdrawal Reopens</SelectItem>
+                <SelectItem value="all">{t('admin.reversals.allTypes')}</SelectItem>
+                <SelectItem value="reverse_deposit">{t('admin.reversals.depositReversalsFilter')}</SelectItem>
+                <SelectItem value="reverse_withdrawal">{t('admin.reversals.withdrawalReversalsFilter')}</SelectItem>
+                <SelectItem value="reopen_deposit">{t('admin.reversals.depositReopensFilter')}</SelectItem>
+                <SelectItem value="reopen_withdrawal">{t('admin.reversals.withdrawalReopensFilter')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -288,30 +263,30 @@ const AdminReversals = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RotateCcw className="h-5 w-5 text-primary" />
-            Reversal Log
+            {t('admin.reversals.reversalLog')}
           </CardTitle>
-          <CardDescription>Complete history of all transaction reversals and reopens</CardDescription>
+          <CardDescription>{t('admin.reversals.reversalLogDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           {filteredLogs.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <RotateCcw className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium">No reversals found</p>
-              <p className="text-sm">Transaction reversals will appear here when admins reverse or reopen transactions.</p>
+              <p className="text-lg font-medium">{t('admin.reversals.noReversals')}</p>
+              <p className="text-sm">{t('admin.reversals.noReversalsDesc')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead>Type</TableHead>
-                    <TableHead>Admin</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>New Balance</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead>Transaction ID</TableHead>
-                    <TableHead>Date & Time</TableHead>
+                    <TableHead>{t('admin.reversals.type')}</TableHead>
+                    <TableHead>{t('admin.reversals.admin')}</TableHead>
+                    <TableHead>{t('admin.common.user')}</TableHead>
+                    <TableHead>{t('admin.common.amount')}</TableHead>
+                    <TableHead>{t('admin.reversals.newBalance')}</TableHead>
+                    <TableHead>{t('admin.common.reason')}</TableHead>
+                    <TableHead>{t('admin.reversals.transactionId')}</TableHead>
+                    <TableHead>{t('admin.reversals.dateTime')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

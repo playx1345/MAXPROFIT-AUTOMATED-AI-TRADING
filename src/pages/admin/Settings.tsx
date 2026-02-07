@@ -164,7 +164,7 @@ const AdminSettings = () => {
           </div>
           <div className="p-3 bg-muted rounded-lg">
             <p className="text-sm">
-              <span className="font-medium">{t('admin.settings.currentPolicy')}</span> {t('admin.settings.policyText', { threshold: parseFloat(settings.large_withdrawal_threshold).toLocaleString(), count: settings.required_approvals_count })}
+              <span className="font-medium">{t('admin.settings.currentPolicy')}</span> {(t as any)('admin.settings.policyText', { threshold: parseFloat(settings.large_withdrawal_threshold).toLocaleString(), count: settings.required_approvals_count })}
             </p>
           </div>
         </CardContent>

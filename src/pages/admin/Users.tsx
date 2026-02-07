@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getKycDocumentSignedUrl } from "@/lib/kyc-utils";
+import { useTranslation } from "react-i18next";
 
 interface User {
   id: string;
@@ -41,6 +42,7 @@ interface UserFormData {
 }
 
 const AdminUsers = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,7 +108,7 @@ const AdminUsers = () => {
       setFilteredUsers(data || []);
     } catch (error: any) {
       toast({
-        title: "Error fetching users",
+        title: t('admin.users.errorFetching'),
         description: error.message,
         variant: "destructive",
       });
@@ -137,8 +139,8 @@ const AdminUsers = () => {
 
         const result = data as { fee_amount: number; new_balance: number };
         toast({
-          title: "KYC verified",
-          description: `User KYC has been verified and $${result.fee_amount.toFixed(2)} fee has been deducted. New balance: $${result.new_balance.toFixed(2)}`,
+          title: t('admin.users.kycVerifiedMsg'),
+          description: (t as any)('admin.users.kycVerifiedDesc', { fee: result.fee_amount.toFixed(2), balance: result.new_balance.toFixed(2) }),
         });
       } else {
         // For rejection, just update the status
@@ -163,8 +165,8 @@ const AdminUsers = () => {
         });
 
         toast({
-          title: `KYC ${action}`,
-          description: `User KYC has been ${action}`,
+          title: action === "rejected" ? t('admin.users.kycRejectedMsg') : `KYC ${action}`,
+          description: action === "rejected" ? t('admin.users.kycRejectedDesc') : `User KYC has been ${action}`,
         });
       }
 
@@ -173,7 +175,7 @@ const AdminUsers = () => {
       setKycReason("");
     } catch (error: any) {
       toast({
-        title: "Error updating KYC",
+        title: t('admin.users.errorUpdatingKyc'),
         description: error.message,
         variant: "destructive",
       });
@@ -188,14 +190,14 @@ const AdminUsers = () => {
         window.open(signedUrl, '_blank');
       } else {
         toast({
-          title: "Error",
-          description: "Invalid file path",
+          title: t('common.error'),
+          description: t('admin.users.invalidFilePath'),
           variant: "destructive",
         });
       }
     } catch (error: any) {
       toast({
-        title: "Error viewing document",
+        title: t('admin.users.errorViewingDoc'),
         description: error.message,
         variant: "destructive",
       });
@@ -214,12 +216,12 @@ const AdminUsers = () => {
       if (data.error) throw new Error(data.error);
 
       toast({
-        title: "Password reset email sent",
-        description: `A password reset link has been sent to ${email}`,
+        title: t('admin.users.passwordResetSent'),
+        description: (t as any)('admin.users.passwordResetSentDesc', { email }),
       });
     } catch (error: any) {
       toast({
-        title: "Error sending reset email",
+        title: t('admin.users.errorSendingReset'),
         description: error.message,
         variant: "destructive",
       });
@@ -231,8 +233,8 @@ const AdminUsers = () => {
   const handleSetPassword = async (email: string) => {
     if (!newPassword || newPassword.length < 6) {
       toast({
-        title: "Invalid password",
-        description: "Password must be at least 6 characters",
+        title: t('admin.users.invalidPassword'),
+        description: t('admin.users.passwordMinChars'),
         variant: "destructive",
       });
       return;
@@ -249,13 +251,13 @@ const AdminUsers = () => {
       if (data.error) throw new Error(data.error);
 
       toast({
-        title: "Password set successfully",
-        description: `Password has been set for ${email}`,
+        title: t('admin.users.passwordSet'),
+        description: (t as any)('admin.users.passwordSetDesc', { email }),
       });
       setNewPassword("");
     } catch (error: any) {
       toast({
-        title: "Error setting password",
+        title: t('admin.users.errorSettingPassword'),
         description: error.message,
         variant: "destructive",
       });
@@ -267,8 +269,8 @@ const AdminUsers = () => {
   const handleCreateUser = async () => {
     if (!formData.email || !formData.password || formData.password.length < 6) {
       toast({
-        title: "Invalid input",
-        description: "Email and password (min 6 chars) are required",
+        title: t('admin.users.invalidInput'),
+        description: t('admin.users.emailPasswordRequired'),
         variant: "destructive",
       });
       return;
@@ -285,8 +287,8 @@ const AdminUsers = () => {
       if (data.error) throw new Error(data.error);
 
       toast({
-        title: "User created successfully",
-        description: `New user ${formData.email} has been created`,
+        title: t('admin.users.userCreated'),
+        description: (t as any)('admin.users.userCreatedDesc', { email: formData.email }),
       });
 
       // Reset form
@@ -302,7 +304,7 @@ const AdminUsers = () => {
       fetchUsers();
     } catch (error: any) {
       toast({
-        title: "Error creating user",
+        title: t('admin.users.errorCreating'),
         description: error.message,
         variant: "destructive",
       });
@@ -351,15 +353,15 @@ const AdminUsers = () => {
       }
 
       toast({
-        title: "User updated successfully",
-        description: `Changes to ${selectedUser.email} have been saved`,
+        title: t('admin.users.userUpdated'),
+        description: (t as any)('admin.users.userUpdatedDesc', { email: selectedUser.email }),
       });
 
       setEditDialogOpen(false);
       fetchUsers();
     } catch (error: any) {
       toast({
-        title: "Error updating user",
+        title: t('admin.users.errorUpdating'),
         description: error.message,
         variant: "destructive",
       });
@@ -378,14 +380,14 @@ const AdminUsers = () => {
       if (data.error) throw new Error(data.error);
 
       toast({
-        title: suspend ? "User suspended" : "User activated",
-        description: `${email} has been ${suspend ? "suspended" : "activated"}`,
+        title: suspend ? t('admin.users.userSuspended') : t('admin.users.userActivated'),
+        description: (t as any)('admin.users.userStatusDesc', { email, status: suspend ? t('admin.users.userSuspended').toLowerCase() : t('admin.users.userActivated').toLowerCase() }),
       });
 
       fetchUsers();
     } catch (error: any) {
       toast({
-        title: "Error updating user status",
+        title: t('admin.users.errorSuspending'),
         description: error.message,
         variant: "destructive",
       });
@@ -402,15 +404,15 @@ const AdminUsers = () => {
       if (data.error) throw new Error(data.error);
 
       toast({
-        title: "User deleted",
-        description: `${email} has been permanently deleted`,
+        title: t('admin.users.userDeleted'),
+        description: (t as any)('admin.users.userDeletedDesc', { email }),
       });
 
       setDetailsOpen(false);
       fetchUsers();
     } catch (error: any) {
       toast({
-        title: "Error deleting user",
+        title: t('admin.users.errorDeleting'),
         description: error.message,
         variant: "destructive",
       });
@@ -420,8 +422,8 @@ const AdminUsers = () => {
   const handleBalanceAdjustment = async () => {
     if (!selectedUser || !adjustmentAmount || !adjustmentReason.trim()) {
       toast({
-        title: "Missing information",
-        description: "Please enter an amount and reason for the adjustment",
+        title: t('admin.users.missingInfo'),
+        description: t('admin.users.enterAmountAndReason'),
         variant: "destructive",
       });
       return;
@@ -430,8 +432,8 @@ const AdminUsers = () => {
     const amount = parseFloat(adjustmentAmount);
     if (isNaN(amount) || amount <= 0) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid positive number",
+        title: t('admin.users.invalidAmount'),
+        description: t('admin.users.invalidAmountDesc'),
         variant: "destructive",
       });
       return;
@@ -456,8 +458,8 @@ const AdminUsers = () => {
 
       const result = data as { previous_balance: number; new_balance: number };
       toast({
-        title: "Balance adjusted",
-        description: `${adjustmentType === "add" ? "Added" : "Subtracted"} $${amount.toLocaleString()}. New balance: $${result.new_balance.toLocaleString()}`,
+        title: t('admin.users.balanceAdjusted'),
+        description: (t as any)('admin.users.balanceAdjustedDesc', { type: adjustmentType === "add" ? t('admin.users.added') : t('admin.users.subtracted'), amount: amount.toLocaleString(), newBalance: result.new_balance.toLocaleString() }),
       });
 
       setBalanceAdjustmentOpen(false);
@@ -472,7 +474,7 @@ const AdminUsers = () => {
       });
     } catch (error: any) {
       toast({
-        title: "Error adjusting balance",
+        title: t('admin.users.errorAdjusting'),
         description: error.message,
         variant: "destructive",
       });
@@ -487,8 +489,8 @@ const AdminUsers = () => {
     const amount = parseFloat(feeAmount);
     if (isNaN(amount) || amount <= 0) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid fee amount",
+        title: t('admin.users.invalidFeeAmount'),
+        description: t('admin.users.invalidFeeAmountDesc'),
         variant: "destructive",
       });
       return;
@@ -543,8 +545,8 @@ const AdminUsers = () => {
       });
 
       toast({
-        title: "Fee payment recorded",
-        description: `$${amount} blockchain confirmation fee recorded for ${selectedUser.email}${setFeeExemptAfterPayment ? " and fee exemption granted" : ""}`,
+        title: t('admin.users.feeRecorded'),
+        description: (t as any)('admin.users.feeRecordedDesc', { amount, email: selectedUser.email }),
       });
 
       // Update local state
@@ -560,7 +562,7 @@ const AdminUsers = () => {
       fetchUsers();
     } catch (error: any) {
       toast({
-        title: "Error recording fee payment",
+        title: t('admin.users.errorRecordingFee'),
         description: error.message,
         variant: "destructive",
       });
@@ -585,7 +587,7 @@ const AdminUsers = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-muted-foreground">Loading users...</div>
+        <div className="animate-pulse text-muted-foreground">{t('admin.users.loading')}</div>
       </div>
     );
   }
@@ -594,30 +596,30 @@ const AdminUsers = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="text-muted-foreground">Manage users and KYC verification</p>
+          <h1 className="text-3xl font-bold">{t('admin.users.title')}</h1>
+          <p className="text-muted-foreground">{t('admin.users.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="secondary" className="text-lg">
-            {users.length} Total Users
+            {(t as any)('admin.users.totalUsers', { count: users.length })}
           </Badge>
           <Button onClick={() => setCreateDialogOpen(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
-            Create User
+            {t('admin.users.createUser')}
           </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Users</CardTitle>
-          <CardDescription>Search and manage platform users</CardDescription>
+          <CardTitle>{t('admin.users.allUsers')}</CardTitle>
+          <CardDescription>{t('admin.users.allUsersDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by email or name..."
+              placeholder={t('admin.users.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
@@ -628,12 +630,12 @@ const AdminUsers = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Balance</TableHead>
-                  <TableHead>KYC Status</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t('admin.users.name')}</TableHead>
+                  <TableHead>{t('admin.users.email')}</TableHead>
+                  <TableHead>{t('admin.users.balance')}</TableHead>
+                  <TableHead>{t('admin.users.kycStatus')}</TableHead>
+                  <TableHead>{t('admin.users.joined')}</TableHead>
+                  <TableHead>{t('admin.common.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -665,7 +667,7 @@ const AdminUsers = () => {
                           }}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          View
+                          {t('admin.common.view')}
                         </Button>
                         <Button
                           size="sm"
@@ -684,7 +686,7 @@ const AdminUsers = () => {
                           }}
                         >
                           <Edit className="h-4 w-4 mr-1" />
-                          Edit
+                          {t('admin.common.edit')}
                         </Button>
                       </div>
                     </TableCell>
@@ -700,9 +702,9 @@ const AdminUsers = () => {
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>User Details</DialogTitle>
+            <DialogTitle>{t('admin.users.userDetails')}</DialogTitle>
             <DialogDescription>
-              View and manage user information
+              {t('admin.users.userDetailsDesc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -710,19 +712,19 @@ const AdminUsers = () => {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-muted-foreground">Full Name</Label>
+                  <Label className="text-muted-foreground">{t('admin.users.fullName')}</Label>
                   <p className="font-medium">{selectedUser.full_name || "N/A"}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Email</Label>
+                  <Label className="text-muted-foreground">{t('admin.users.email')}</Label>
                   <p className="font-medium">{selectedUser.email}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Phone</Label>
+                  <Label className="text-muted-foreground">{t('admin.users.phone')}</Label>
                   <p className="font-medium">{selectedUser.phone || "N/A"}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Balance</Label>
+                  <Label className="text-muted-foreground">{t('admin.users.balance')}</Label>
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-primary text-lg">
                       ${selectedUser.balance_usdt.toLocaleString()}
@@ -752,22 +754,22 @@ const AdminUsers = () => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">KYC Status</Label>
+                  <Label className="text-muted-foreground">{t('admin.users.kycStatus')}</Label>
                   <Badge className={getKycBadgeColor(selectedUser.kyc_status)}>
                     {selectedUser.kyc_status}
                   </Badge>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Upgrade Fee</Label>
+                   <Label className="text-muted-foreground">{t('admin.users.upgradeFee')}</Label>
                   <Badge className={selectedUser.upgrade_fee_paid ? "bg-green-500" : "bg-orange-500"}>
-                    {selectedUser.upgrade_fee_paid ? "Paid" : "Not Paid"}
+                    {selectedUser.upgrade_fee_paid ? t('admin.users.paid') : t('admin.users.notPaid')}
                   </Badge>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Fee Exempt</Label>
+                   <Label className="text-muted-foreground">{t('admin.users.feeExempt')}</Label>
                   <div className="flex items-center gap-2">
                     <Badge className={selectedUser.fee_exempt ? "bg-green-500" : "bg-muted"}>
-                      {selectedUser.fee_exempt ? "Exempt" : "Not Exempt"}
+                      {selectedUser.fee_exempt ? t('admin.users.exempt') : t('admin.users.notExempt')}
                     </Badge>
                     <Button
                       size="sm"
@@ -797,19 +799,19 @@ const AdminUsers = () => {
                           setSelectedUser({ ...selectedUser, fee_exempt: !selectedUser.fee_exempt });
                           fetchUsers();
                           toast({
-                            title: selectedUser.fee_exempt ? "Fee exemption removed" : "Fee exemption granted",
-                            description: `${selectedUser.email} is now ${!selectedUser.fee_exempt ? "exempt from" : "subject to"} blockchain confirmation fees`,
+                            title: selectedUser.fee_exempt ? t('admin.users.feeExemptionRemoved') : t('admin.users.feeExemptionGranted'),
+                            description: (t as any)('admin.users.feeExemptionDesc', { email: selectedUser.email, status: !selectedUser.fee_exempt ? t('admin.users.exemptFrom') : t('admin.users.subjectTo') }),
                           });
                         } catch (error: any) {
                           toast({
-                            title: "Error updating fee exemption",
+                            title: t('admin.users.errorUpdatingExemption'),
                             description: error.message,
                             variant: "destructive",
                           });
                         }
                       }}
                     >
-                      {selectedUser.fee_exempt ? "Remove" : "Grant"}
+                      {selectedUser.fee_exempt ? t('admin.users.remove') : t('admin.users.grant')}
                     </Button>
                     <Button
                       size="sm"
@@ -818,12 +820,12 @@ const AdminUsers = () => {
                       onClick={() => setFeePaymentOpen(true)}
                     >
                       <Bitcoin className="h-3 w-3 mr-1" />
-                      Record Fee
+                      {t('admin.users.recordFee')}
                     </Button>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Joined</Label>
+                  <Label className="text-muted-foreground">{t('admin.users.joined')}</Label>
                   <p className="font-medium">
                     {format(new Date(selectedUser.created_at), "MMM dd, yyyy")}
                   </p>
@@ -834,18 +836,18 @@ const AdminUsers = () => {
 
               {/* Password Reset Section */}
               <div className="border-t pt-4">
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <KeyRound className="h-4 w-4" />
-                  Password Management
+                 <h3 className="font-semibold mb-3 flex items-center gap-2">
+                   <KeyRound className="h-4 w-4" />
+                   {t('admin.users.passwordManagement')}
                 </h3>
                 <div className="space-y-4">
                   {/* Set Password Directly */}
-                  <div className="space-y-2">
-                    <Label>Set New Password</Label>
+                   <div className="space-y-2">
+                     <Label>{t('admin.users.setNewPassword')}</Label>
                     <div className="flex gap-2">
                       <Input
                         type="password"
-                        placeholder="Enter new password (min 6 chars)"
+                        placeholder={t('admin.users.enterNewPassword')}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         className="flex-1"
@@ -854,33 +856,33 @@ const AdminUsers = () => {
                         onClick={() => handleSetPassword(selectedUser.email)}
                         disabled={setPasswordLoading || !newPassword}
                       >
-                        {setPasswordLoading ? "Setting..." : "Set Password"}
+                        {setPasswordLoading ? t('admin.users.settingPassword') : t('admin.users.setPassword')}
                       </Button>
                     </div>
                   </div>
 
                   {/* Or Send Reset Email */}
-                  <div className="text-center text-sm text-muted-foreground">or</div>
+                  <div className="text-center text-sm text-muted-foreground">{t('admin.users.or')}</div>
                   
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="outline" className="w-full" disabled={resetLoading}>
-                        <Mail className="h-4 w-4 mr-2" />
-                        {resetLoading ? "Sending..." : "Send Password Reset Email"}
+                         <Mail className="h-4 w-4 mr-2" />
+                         {resetLoading ? t('admin.users.sendingEmail') : t('admin.users.sendResetEmail')}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Send Password Reset Email</AlertDialogTitle>
-                        <AlertDialogDescription>
+                         <AlertDialogTitle>{t('admin.users.resetEmailTitle')}</AlertDialogTitle>
+                         <AlertDialogDescription>
                           This will send a password reset link to <strong>{selectedUser.email}</strong>. 
                           The user will be able to set a new password using that link.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handlePasswordReset(selectedUser.email)}>
-                          Send Reset Email
+                         <AlertDialogCancel>{t('admin.common.cancel')}</AlertDialogCancel>
+                         <AlertDialogAction onClick={() => handlePasswordReset(selectedUser.email)}>
+                           {t('admin.users.sendResetEmailBtn')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -890,15 +892,15 @@ const AdminUsers = () => {
 
               {selectedUser.kyc_status === "pending" && selectedUser.kyc_submitted_at && (
                 <div className="border-t pt-4">
-                  <h3 className="font-semibold mb-3">KYC Verification</h3>
+                  <h3 className="font-semibold mb-3">{t('admin.users.kycVerification')}</h3>
                   <div className="space-y-3">
                     <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                      User has submitted KYC for verification on {format(new Date(selectedUser.kyc_submitted_at), "MMM dd, yyyy")}
+                      {(t as any)('admin.users.kycSubmittedOn', { date: format(new Date(selectedUser.kyc_submitted_at), "MMM dd, yyyy") })}
                     </div>
                     <div>
-                      <Label>Admin Notes (Optional)</Label>
-                      <Textarea
-                        placeholder="Add notes about verification..."
+                       <Label>{t('admin.users.adminNotesOptional')}</Label>
+                       <Textarea
+                         placeholder={t('admin.users.addVerificationNotes')}
                         value={kycReason}
                         onChange={(e) => setKycReason(e.target.value)}
                       />
@@ -908,16 +910,16 @@ const AdminUsers = () => {
                         className="flex-1 bg-green-600 hover:bg-green-700"
                         onClick={() => handleKycAction(selectedUser.id, "verified")}
                       >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approve KYC
+                         <CheckCircle className="h-4 w-4 mr-2" />
+                         {t('admin.users.approveKyc')}
                       </Button>
                       <Button
                         variant="destructive"
                         className="flex-1"
                         onClick={() => handleKycAction(selectedUser.id, "rejected")}
                       >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Reject KYC
+                         <XCircle className="h-4 w-4 mr-2" />
+                         {t('admin.users.rejectKyc')}
                       </Button>
                     </div>
                   </div>
@@ -926,7 +928,7 @@ const AdminUsers = () => {
 
               {/* Account Management Actions */}
               <div className="border-t pt-4">
-                <h3 className="font-semibold mb-3">Account Management</h3>
+                <h3 className="font-semibold mb-3">{t('admin.users.accountManagement')}</h3>
                 <div className="flex flex-col gap-3">
                   {/* Upgrade Fee Toggle */}
                   {selectedUser.kyc_status === "verified" && (
@@ -972,7 +974,7 @@ const AdminUsers = () => {
                       }}
                     >
                       <DollarSign className="h-4 w-4 mr-2" />
-                      {selectedUser.upgrade_fee_paid ? "Revoke Upgrade Fee" : "Mark Upgrade Fee as Paid"}
+                      {selectedUser.upgrade_fee_paid ? t('admin.users.upgradeFee') + " ✕" : t('admin.users.upgradeFee') + " ✓"}
                     </Button>
                   )}
 
@@ -983,41 +985,41 @@ const AdminUsers = () => {
                         className="flex-1"
                         onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, false)}
                       >
-                        <CheckCheck className="h-4 w-4 mr-2" />
-                        Activate Account
-                      </Button>
+                         <CheckCheck className="h-4 w-4 mr-2" />
+                         {t('admin.users.activateUser')}
+                       </Button>
                     ) : (
                       <Button
                         variant="outline"
                         className="flex-1"
                         onClick={() => handleSuspendUser(selectedUser.id, selectedUser.email, true)}
                       >
-                        <Ban className="h-4 w-4 mr-2" />
-                        Suspend Account
-                      </Button>
+                         <Ban className="h-4 w-4 mr-2" />
+                         {t('admin.users.suspendUser')}
+                       </Button>
                     )}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="destructive" className="flex-1">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete User
-                        </Button>
+                           <Trash2 className="h-4 w-4 mr-2" />
+                           {t('admin.users.deleteUser')}
+                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogTitle>{t('admin.users.confirmDelete')}</AlertDialogTitle>
                           <AlertDialogDescription>
                             This action cannot be undone. This will permanently delete the user account
                             for <strong>{selectedUser.email}</strong> and remove all associated data.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>{t('admin.common.cancel')}</AlertDialogCancel>
                           <AlertDialogAction 
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             onClick={() => handleDeleteUser(selectedUser.id, selectedUser.email)}
                           >
-                            Delete Permanently
+                            {t('admin.common.delete')}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -1034,7 +1036,7 @@ const AdminUsers = () => {
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Create New User</DialogTitle>
+            <DialogTitle>{t('admin.users.createUser')}</DialogTitle>
             <DialogDescription>
               Add a new client account to the platform
             </DialogDescription>
@@ -1109,12 +1111,12 @@ const AdminUsers = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreateUser} disabled={loading}>
-              {loading ? "Creating..." : "Create User"}
-            </Button>
+             <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+               {t('admin.common.cancel')}
+             </Button>
+             <Button onClick={handleCreateUser} disabled={loading}>
+               {loading ? t('admin.common.loading') : t('admin.users.createUser')}
+             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1123,7 +1125,7 @@ const AdminUsers = () => {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>{t('admin.users.editUser')}</DialogTitle>
             <DialogDescription>
               Update user information and settings
             </DialogDescription>
@@ -1183,12 +1185,12 @@ const AdminUsers = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdateUser} disabled={loading}>
-              {loading ? "Saving..." : "Save Changes"}
-            </Button>
+             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+               {t('admin.common.cancel')}
+             </Button>
+             <Button onClick={handleUpdateUser} disabled={loading}>
+               {loading ? t('admin.common.loading') : t('admin.common.save')}
+             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1255,15 +1257,15 @@ const AdminUsers = () => {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setBalanceAdjustmentOpen(false)}>
-              Cancel
-            </Button>
+             <Button variant="outline" onClick={() => setBalanceAdjustmentOpen(false)}>
+               {t('admin.common.cancel')}
+             </Button>
             <Button 
               onClick={handleBalanceAdjustment} 
               disabled={adjustingBalance || !adjustmentAmount || !adjustmentReason.trim()}
               className={adjustmentType === "add" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
             >
-              {adjustingBalance ? "Processing..." : adjustmentType === "add" ? "Add Funds" : "Deduct Funds"}
+              {adjustingBalance ? t('admin.common.processing') : adjustmentType === "add" ? t('admin.users.addFunds') : t('admin.users.subtractFunds')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1274,8 +1276,8 @@ const AdminUsers = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Bitcoin className="h-5 w-5 text-orange-500" />
-              Record Blockchain Fee Payment
+               <Bitcoin className="h-5 w-5 text-orange-500" />
+               {t('admin.users.blockchainFeePayment')}
             </DialogTitle>
             <DialogDescription>
               {selectedUser && (

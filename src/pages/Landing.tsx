@@ -11,6 +11,7 @@ import { UnifiedStats } from "@/components/landing/UnifiedStats";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { StructuredData } from "@/components/landing/StructuredData";
+import { useDynamicMeta } from "@/hooks/useDynamicMeta";
 import { cn } from "@/lib/utils";
 
 // Lazy load below-the-fold components
@@ -100,6 +101,11 @@ const howItWorksSteps = [
 ];
 
 const Landing = () => {
+  useDynamicMeta({
+    page: "home",
+    ogImageUrl: "/og-default.png",
+  });
+
   return (
     <div className="min-h-[100dvh] bg-background overflow-x-hidden">
       {/* Skip to main content link */}

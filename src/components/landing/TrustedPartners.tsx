@@ -15,14 +15,14 @@ export const TrustedPartners = memo(() => {
   return (
     <section className="py-14 sm:py-20 border-y border-border/40 bg-muted/15">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10">
-          <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+        <header className="text-center mb-10">
+          <h2 className="text-lg font-semibold text-muted-foreground mb-2">
             Trusted & Supported Networks
-          </h3>
+          </h2>
           <p className="text-sm text-muted-foreground/70">
             Trade across multiple blockchain networks
           </p>
-        </div>
+        </header>
 
         {/* Static grid on all screens - clean, no carousel jank */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 sm:gap-6 max-w-4xl mx-auto">

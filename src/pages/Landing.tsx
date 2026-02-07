@@ -10,6 +10,7 @@ import { ScrollRevealWrapper } from "@/components/landing/ScrollRevealWrapper";
 import { UnifiedStats } from "@/components/landing/UnifiedStats";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
+import { StructuredData } from "@/components/landing/StructuredData";
 import { cn } from "@/lib/utils";
 
 // Lazy load below-the-fold components
@@ -106,6 +107,7 @@ const Landing = () => {
         Skip to main content
       </a>
       
+      <StructuredData />
       <Header />
       
       <main id="main-content">

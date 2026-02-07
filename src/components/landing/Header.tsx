@@ -73,7 +73,9 @@ export const Header = () => {
               />
               <img 
                 src={logo} 
-                alt="Live Win Trade" 
+                alt="Live Win Trade Investment logo" 
+                width={40}
+                height={40}
                 className="relative w-10 h-10 rounded-xl object-cover border border-border/50 transition-all duration-300 group-hover:border-primary/50 group-hover:scale-105"
               />
             </div>

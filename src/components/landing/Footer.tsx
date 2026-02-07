@@ -58,7 +58,9 @@ export const Footer = memo(() => {
                 <div className="flex items-center gap-3 mb-5">
                   <img 
                     src={logo} 
-                    alt="Live Win Trade" 
+                    alt="Live Win Trade Investment logo" 
+                    width={40}
+                    height={40}
                     className="w-10 h-10 rounded-xl object-cover"
                     loading="lazy"
                   />

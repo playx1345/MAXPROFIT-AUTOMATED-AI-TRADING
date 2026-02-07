@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,6 +24,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -32,13 +35,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
-        title: "Error signing out",
+        title: t('admin.common.errorSigningOut'),
         description: error.message,
         variant: "destructive",
       });
@@ -48,17 +52,17 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   };
 
   const menuItems = [
-    { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { path: "/admin/users", label: "Users", icon: Users },
-    { path: "/admin/transactions", label: "Transactions", icon: ArrowLeftRight },
-    { path: "/admin/deposits", label: "Deposits", icon: ArrowDownLeft },
-    { path: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpRight },
-    { path: "/admin/reversals", label: "Reversals", icon: RotateCcw },
-    { path: "/admin/investments", label: "Investments", icon: TrendingUp },
-    { path: "/admin/trading-bot", label: "Trading Bot", icon: Bot },
-    { path: "/admin/activity-log", label: "Activity Log", icon: Activity },
-    { path: "/admin/settings", label: "Settings", icon: Settings },
+    { path: "/admin/dashboard", label: t('admin.sidebar.dashboard'), icon: LayoutDashboard },
+    { path: "/admin/analytics", label: t('admin.sidebar.analytics'), icon: BarChart3 },
+    { path: "/admin/users", label: t('admin.sidebar.users'), icon: Users },
+    { path: "/admin/transactions", label: t('admin.sidebar.transactions'), icon: ArrowLeftRight },
+    { path: "/admin/deposits", label: t('admin.sidebar.deposits'), icon: ArrowDownLeft },
+    { path: "/admin/withdrawals", label: t('admin.sidebar.withdrawals'), icon: ArrowUpRight },
+    { path: "/admin/reversals", label: t('admin.sidebar.reversals'), icon: RotateCcw },
+    { path: "/admin/investments", label: t('admin.sidebar.investments'), icon: TrendingUp },
+    { path: "/admin/trading-bot", label: t('admin.sidebar.tradingBot'), icon: Bot },
+    { path: "/admin/activity-log", label: t('admin.sidebar.activityLog'), icon: Activity },
+    { path: "/admin/settings", label: t('admin.sidebar.settings'), icon: Settings },
   ];
 
   return (
@@ -88,9 +92,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                 <Shield className="h-6 w-6 text-primary-foreground drop-shadow-glow" />
               </div>
               <div>
-                <h1 className="text-xl font-bold font-display text-gradient-premium">Admin Panel</h1>
+                <h1 className="text-xl font-bold font-display text-gradient-premium">{t('admin.panel')}</h1>
                 <Badge variant="secondary" className="text-xs bg-accent/20 text-accent border border-accent/30">
-                  Win Trade Invest
+                  {t('admin.brandName')}
                 </Badge>
               </div>
             </div>
@@ -113,14 +117,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                         : "hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/5 hover:translate-x-1 hover:border-primary/20"
                     )}
                   >
-                    {/* Active indicator with glow */}
                     {isActive && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-accent rounded-r-full shadow-accent" />
                     )}
-                    
-                    {/* Hover effect background with glass */}
                     <span className={`absolute inset-0 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${isActive ? 'opacity-0' : ''}`} />
-                    
                     <Icon className={cn(
                       "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary relative",
                       isActive && "drop-shadow-glow"
@@ -132,20 +132,23 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             </nav>
           </ScrollArea>
 
-          <div className="p-4 border-t border-primary/10 bg-gradient-to-t from-background/40 to-transparent">
+          <div className="p-4 border-t border-primary/10 bg-gradient-to-t from-background/40 to-transparent space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <LanguageSelector />
+              <ThemeToggle />
+            </div>
             <Button
               variant="ghost"
               className="w-full justify-start group hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:shadow-md border border-transparent hover:border-destructive/20"
               onClick={handleSignOut}
             >
               <LogOut className="h-5 w-5 mr-3 transition-transform duration-300 group-hover:-translate-x-1 group-hover:rotate-12" />
-              <span className="font-medium">Sign Out</span>
+              <span className="font-medium">{t('admin.sidebar.signOut')}</span>
             </Button>
           </div>
         </div>
       </aside>
 
-      {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden"
@@ -153,7 +156,6 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         />
       )}
 
-      {/* Main Content */}
       <main className="flex-1 overflow-auto">
         <div className="container mx-auto p-6 lg:p-8">
           {children}

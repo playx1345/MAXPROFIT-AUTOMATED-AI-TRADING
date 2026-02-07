@@ -8,9 +8,11 @@ import uk from './locales/uk.json';
 import ar from './locales/ar.json';
 import ko from './locales/ko.json';
 import ro from './locales/ro.json';
+import es from './locales/es.json';
 
 export const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸', dir: 'ltr' as const },
+  { code: 'es', name: 'Español', flag: '🇪🇸', dir: 'ltr' as const },
   { code: 'ru', name: 'Русский', flag: '🇷🇺', dir: 'ltr' as const },
   { code: 'uk', name: 'Українська', flag: '🇺🇦', dir: 'ltr' as const },
   { code: 'ar', name: 'العربية', flag: '🇸🇦', dir: 'rtl' as const },
@@ -20,6 +22,7 @@ export const languages = [
 
 const resources = {
   en: { translation: en },
+  es: { translation: es },
   ru: { translation: ru },
   uk: { translation: uk },
   ar: { translation: ar },
@@ -33,7 +36,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
-    supportedLngs: ['en', 'ru', 'uk', 'ar', 'ko', 'ro'],
+    supportedLngs: ['en', 'es', 'ru', 'uk', 'ar', 'ko', 'ro'],
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],

@@ -1,16 +1,14 @@
 import { memo } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useCountUp } from "@/hooks/useCountUp";
-import { DollarSign, Users, TrendingUp, Zap, BarChart3, Activity } from "lucide-react";
+import { DollarSign, Users, TrendingUp, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const stats = [
-  { icon: BarChart3, label: "Market Cap", value: 2.4, prefix: "$", suffix: "T", color: "text-primary" },
-  { icon: Activity, label: "24h Volume", value: 89, prefix: "$", suffix: "B", color: "text-accent" },
-  { icon: DollarSign, label: "Assets Managed", value: 5, prefix: "$", suffix: "M+", color: "text-success" },
-  { icon: Users, label: "Active Investors", value: 1250, suffix: "+", color: "text-primary" },
+  { icon: DollarSign, label: "Assets Managed", value: 5, prefix: "$", suffix: "M+", color: "text-primary" },
+  { icon: Users, label: "Active Investors", value: 1250, suffix: "+", color: "text-accent" },
   { icon: TrendingUp, label: "Avg Monthly ROI", value: 15, suffix: "%", color: "text-success" },
-  { icon: Zap, label: "Trades Executed", value: 10000, suffix: "+", color: "text-accent" },
+  { icon: Zap, label: "Trades Executed", value: 10000, suffix: "+", color: "text-primary" },
 ];
 
 const StatItem = memo(({ stat, isVisible, index }: { 
@@ -24,18 +22,24 @@ const StatItem = memo(({ stat, isVisible, index }: {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center p-4 sm:p-6 rounded-xl",
-        "bg-card/50 border border-border/50 backdrop-blur-sm",
+        "flex flex-col items-center justify-center p-5 sm:p-8 rounded-2xl",
+        "bg-card/60 border border-border/50 backdrop-blur-sm",
+        "hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
         "transition-all duration-500",
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
       )}
-      style={{ transitionDelay: `${index * 80}ms` }}
+      style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <Icon className={cn("w-5 h-5 sm:w-6 sm:h-6 mb-2", stat.color)} aria-hidden="true" />
-      <div className={cn("text-xl sm:text-2xl lg:text-3xl font-bold", stat.color)}>
+      <div className={cn(
+        "p-3 rounded-xl bg-primary/10 mb-3",
+        "transition-all duration-300"
+      )}>
+        <Icon className={cn("w-6 h-6", stat.color)} aria-hidden="true" />
+      </div>
+      <div className={cn("text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight", stat.color)}>
         {stat.prefix}{count.toLocaleString()}{stat.suffix}
       </div>
-      <div className="text-xs sm:text-sm text-muted-foreground mt-1 text-center">{stat.label}</div>
+      <div className="text-sm text-muted-foreground mt-1.5 text-center font-medium">{stat.label}</div>
     </div>
   );
 });
@@ -46,9 +50,9 @@ export const UnifiedStats = memo(() => {
   const { ref, isVisible } = useScrollAnimation(0.1);
 
   return (
-    <section ref={ref} className="py-8 sm:py-12 bg-muted/20">
+    <section ref={ref} className="py-12 sm:py-16 bg-muted/20">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {stats.map((stat, index) => (
             <StatItem key={stat.label} stat={stat} isVisible={isVisible} index={index} />
           ))}

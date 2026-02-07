@@ -19,12 +19,7 @@ const generateTrade = (id: number): TradeNotification => {
     trade: 100 + Math.floor(Math.random() * 3000),
   };
   
-  return {
-    id,
-    type,
-    amount: amounts[type],
-    user: `User***${Math.floor(Math.random() * 900 + 100)}`,
-  };
+  return { id, type, amount: amounts[type], user: `User***${Math.floor(Math.random() * 900 + 100)}` };
 };
 
 const TradeCard = memo(({ trade }: { trade: TradeNotification }) => {
@@ -32,45 +27,44 @@ const TradeCard = memo(({ trade }: { trade: TradeNotification }) => {
     profit: { 
       icon: TrendingUp, 
       message: `earned +$${trade.amount.toLocaleString()}`,
-      color: 'text-success bg-success/10 border-success/20'
+      color: 'text-success',
+      bg: 'bg-success/8 border-success/15'
     },
     withdrawal: { 
       icon: ArrowUpRight, 
       message: `withdrew $${trade.amount.toLocaleString()}`,
-      color: 'text-primary bg-primary/10 border-primary/20'
+      color: 'text-primary',
+      bg: 'bg-primary/8 border-primary/15'
     },
     trade: { 
       icon: DollarSign, 
       message: `placed $${trade.amount.toLocaleString()} trade`,
-      color: 'text-accent bg-accent/10 border-accent/20'
+      color: 'text-accent',
+      bg: 'bg-accent/8 border-accent/15'
     },
   };
 
-  const { icon: Icon, message, color } = config[trade.type];
+  const { icon: Icon, message, color, bg } = config[trade.type];
 
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 50, scale: 0.95 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, x: -50, scale: 0.95 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 25,
-        duration: 0.3 
-      }}
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30, duration: 0.25 }}
       className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-sm",
-        color
+        "flex items-center gap-3 px-4 py-3.5 rounded-xl border backdrop-blur-sm",
+        bg
       )}
       role="listitem"
     >
-      <div className="p-2 rounded-full bg-current/10">
-        <Icon className="w-4 h-4" aria-hidden="true" />
+      <div className={cn("p-2 rounded-full", bg)}>
+        <Icon className={cn("w-4 h-4", color)} aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">
-          <span className="opacity-70">{trade.user}</span> {message}
+          <span className="opacity-70">{trade.user}</span>{" "}
+          <span className={color}>{message}</span>
         </p>
       </div>
       <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" aria-hidden="true" />
@@ -81,14 +75,8 @@ const TradeCard = memo(({ trade }: { trade: TradeNotification }) => {
 TradeCard.displayName = "TradeCard";
 
 const StatCard = memo(({ value, label, color }: { value: string; label: string; color: string }) => (
-  <div className="text-center group">
-    <div 
-      className={cn(
-        "text-2xl sm:text-3xl font-bold mb-1 transition-transform duration-300",
-        "group-hover:scale-105",
-        color
-      )}
-    >
+  <div className="text-center p-4 sm:p-6 rounded-xl bg-card/50 border border-border/40">
+    <div className={cn("text-2xl sm:text-3xl font-bold mb-1", color)}>
       {value}
     </div>
     <p className="text-sm text-muted-foreground">{label}</p>
@@ -108,22 +96,20 @@ export const LiveTradingFeed = memo(() => {
   }, []);
 
   useEffect(() => {
-    // Initialize with trades
     const initialTrades = Array.from({ length: 3 }, (_, i) => generateTrade(i));
     setTrades(initialTrades);
-
     const interval = setInterval(addNewTrade, 4000);
     return () => clearInterval(interval);
   }, [addNewTrade]);
 
   return (
     <section 
-      className="py-16 sm:py-20"
+      className="py-16 sm:py-24"
       aria-labelledby="live-trading-title"
     >
       <div className="container mx-auto px-4 sm:px-6">
-        <header className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 mb-4">
+        <header className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 mb-5">
             <span className="relative flex h-2 w-2" aria-hidden="true">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
@@ -133,7 +119,7 @@ export const LiveTradingFeed = memo(() => {
           <h2 id="live-trading-title" className="text-3xl sm:text-4xl font-bold mb-3">
             Real-Time Trading
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg max-w-md mx-auto">
             Watch our traders profit in real-time
           </p>
         </header>
@@ -152,7 +138,7 @@ export const LiveTradingFeed = memo(() => {
 
         {/* Stats */}
         <div 
-          className="flex flex-wrap justify-center gap-8 sm:gap-12 mt-12 pt-8 border-t border-border"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 max-w-2xl mx-auto"
           role="region"
           aria-label="Trading statistics"
         >

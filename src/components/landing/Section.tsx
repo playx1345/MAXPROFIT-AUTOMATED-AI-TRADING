@@ -27,22 +27,22 @@ export const Section = memo(({
 }: SectionProps) => {
   const { ref: titleRef, style: titleStyle } = useScrollReveal({
     direction: 'up',
-    duration: 800,
-    threshold: 0.2,
+    duration: 900,
+    threshold: 0.15,
   });
   
   const { ref: subtitleRef, style: subtitleStyle } = useScrollReveal({
     direction: 'up',
-    delay: 100,
-    duration: 800,
-    threshold: 0.2,
+    delay: 120,
+    duration: 900,
+    threshold: 0.15,
   });
 
   const { ref: contentRef, style: contentStyle } = useScrollReveal({
-    direction: 'up',
-    delay: 200,
+    direction: 'fade',
+    delay: 250,
     duration: 800,
-    threshold: 0.1,
+    threshold: 0.08,
   });
 
   const variantClasses = {

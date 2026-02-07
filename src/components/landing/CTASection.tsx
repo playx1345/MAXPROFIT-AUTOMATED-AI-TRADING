@@ -7,9 +7,9 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 export const CTASection = memo(() => {
   const { ref, style } = useScrollReveal({
-    direction: 'up',
-    duration: 800,
-    threshold: 0.2,
+    direction: 'scale',
+    duration: 900,
+    threshold: 0.15,
   });
 
   return (

@@ -13,9 +13,9 @@ interface FeatureCardProps {
 export const FeatureCard = memo(({ icon: Icon, title, description, index = 0 }: FeatureCardProps) => {
   const { ref: revealRef, style: revealStyle } = useScrollReveal({
     direction: 'up',
-    delay: index * 100,
-    duration: 700,
-    threshold: 0.1,
+    delay: index * 80,
+    duration: 800,
+    threshold: 0.08,
   });
 
   return (
@@ -26,15 +26,15 @@ export const FeatureCard = memo(({ icon: Icon, title, description, index = 0 }: 
       <article
         className={cn(
           "group relative p-6 sm:p-8 rounded-2xl bg-card border border-border/60",
-          "transition-all duration-400 ease-out",
+          "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           "hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5",
-          "hover:-translate-y-1",
+          "hover:-translate-y-1.5",
           "h-full min-h-[200px]"
         )}
       >
         {/* Subtle gradient on hover */}
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.03] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.03] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-600 ease-out"
           aria-hidden="true"
         />
         
@@ -43,8 +43,8 @@ export const FeatureCard = memo(({ icon: Icon, title, description, index = 0 }: 
             className={cn(
               "w-14 h-14 rounded-2xl flex items-center justify-center mb-5",
               "bg-gradient-to-br from-primary/15 to-primary/5",
-              "transition-all duration-400",
-              "group-hover:from-primary/25 group-hover:to-primary/10 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-primary/20"
+              "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+              "group-hover:from-primary/25 group-hover:to-primary/10 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20"
             )}
           >
             <Icon 

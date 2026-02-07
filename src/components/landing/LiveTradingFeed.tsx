@@ -48,10 +48,10 @@ const TradeCard = memo(({ trade }: { trade: TradeNotification }) => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      initial={{ opacity: 0, y: 16, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30, duration: 0.25 }}
+      exit={{ opacity: 0, y: -12, scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 300, damping: 28, mass: 0.8 }}
       className={cn(
         "flex items-center gap-3 px-4 py-3.5 rounded-xl border backdrop-blur-sm",
         bg

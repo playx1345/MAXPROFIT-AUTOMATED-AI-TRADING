@@ -26,17 +26,17 @@ export const useScrollReveal = ({
   const getTransformOrigin = useCallback(() => {
     switch (direction) {
       case 'up':
-        return 'translateY(40px)';
+        return 'translateY(28px)';
       case 'down':
-        return 'translateY(-40px)';
+        return 'translateY(-28px)';
       case 'left':
-        return 'translateX(40px)';
+        return 'translateX(32px)';
       case 'right':
-        return 'translateX(-40px)';
+        return 'translateX(-32px)';
       case 'scale':
-        return 'scale(0.9)';
+        return 'scale(0.92)';
       case 'rotate':
-        return 'rotate(-5deg) scale(0.95)';
+        return 'rotate(-3deg) scale(0.96)';
       case 'fade':
       default:
         return 'none';
@@ -88,7 +88,7 @@ export const useScrollReveal = ({
   const style: React.CSSProperties = {
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? 'none' : getTransformOrigin(),
-    transition: `opacity ${duration}ms cubic-bezier(0.4, 0, 0.2, 1), transform ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+    transition: `opacity ${duration}ms cubic-bezier(0.16, 1, 0.3, 1), transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
     transitionDelay: `${delay}ms`,
     willChange: 'opacity, transform',
   };
@@ -144,8 +144,8 @@ export const useStaggeredReveal = (
 
     return {
       opacity: isContainerVisible ? 1 : 0,
-      transform: isContainerVisible ? 'none' : 'translateY(30px)',
-      transition: `opacity ${duration}ms cubic-bezier(0.4, 0, 0.2, 1), transform ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+      transform: isContainerVisible ? 'none' : 'translateY(24px)',
+      transition: `opacity ${duration}ms cubic-bezier(0.16, 1, 0.3, 1), transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
       transitionDelay: `${delay}ms`,
       willChange: 'opacity, transform',
     };

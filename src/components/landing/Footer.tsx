@@ -79,7 +79,7 @@ export const Footer = memo(() => {
                       className={cn(
                         "w-11 h-11 rounded-xl bg-muted/50 flex items-center justify-center",
                         "text-muted-foreground hover:text-foreground hover:bg-primary/10",
-                        "transition-all duration-300 hover:-translate-y-0.5"
+                        "transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1"
                       )}
                     >
                       <social.icon className="w-5 h-5" />

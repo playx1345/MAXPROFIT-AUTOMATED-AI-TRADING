@@ -43,7 +43,8 @@ const HowItWorksStep = memo(({ step, index, isLast }: {
   return (
     <ScrollRevealWrapper 
       direction="up" 
-      delay={index * 100}
+      delay={index * 120}
+      duration={800}
       className="relative"
     >
       <div className="flex flex-col items-center text-center group">
@@ -175,7 +176,7 @@ const Landing = () => {
           variant="muted"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
-            <ScrollRevealWrapper direction="up" delay={0}>
+            <ScrollRevealWrapper direction="up" delay={0} duration={800}>
               <InvestmentPlanCard 
                 title="Starter Plan" 
                 risk="Low Risk" 
@@ -190,7 +191,7 @@ const Landing = () => {
                 ]} 
               />
             </ScrollRevealWrapper>
-            <ScrollRevealWrapper direction="up" delay={100}>
+            <ScrollRevealWrapper direction="up" delay={120} duration={800}>
               <InvestmentPlanCard 
                 title="Growth Plan" 
                 risk="Medium Risk" 
@@ -206,7 +207,7 @@ const Landing = () => {
                 popular={true} 
               />
             </ScrollRevealWrapper>
-            <ScrollRevealWrapper direction="up" delay={200}>
+            <ScrollRevealWrapper direction="up" delay={240} duration={800}>
               <InvestmentPlanCard 
                 title="Professional" 
                 risk="High Risk" 
@@ -223,7 +224,7 @@ const Landing = () => {
             </ScrollRevealWrapper>
           </div>
 
-          <ScrollRevealWrapper direction="fade" delay={300}>
+          <ScrollRevealWrapper direction="fade" delay={350} duration={900}>
             <p className="text-center text-xs sm:text-sm text-muted-foreground mt-10 max-w-2xl mx-auto">
               * Expected ROI ranges are estimates based on historical market conditions and are not guaranteed.
             </p>

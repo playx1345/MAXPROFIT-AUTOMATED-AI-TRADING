@@ -25,10 +25,10 @@ const StatItem = memo(({ stat, isVisible, index }: {
         "flex flex-col items-center justify-center p-5 sm:p-8 rounded-2xl",
         "bg-card/60 border border-border/50 backdrop-blur-sm",
         "hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
-        "transition-all duration-500",
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+        "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
       )}
-      style={{ transitionDelay: `${index * 100}ms` }}
+      style={{ transitionDelay: `${index * 120}ms` }}
     >
       <div className={cn(
         "p-3 rounded-xl bg-primary/10 mb-3",

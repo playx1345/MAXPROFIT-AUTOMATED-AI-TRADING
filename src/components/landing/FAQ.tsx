@@ -61,7 +61,7 @@ export const FAQ = memo(() => {
             className={cn(
               "border border-border/60 rounded-xl px-5 sm:px-6 bg-card/60",
               "hover:border-primary/20 hover:shadow-md",
-              "transition-all duration-300",
+              "transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]",
               "data-[state=open]:border-primary/30 data-[state=open]:border-l-4 data-[state=open]:border-l-primary"
             )}
           >

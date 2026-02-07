@@ -61,8 +61,8 @@ export const AnimatedHero = memo(() => {
           <div 
             className={cn(
               "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 mb-8 sm:mb-10",
-              "transition-all duration-500",
-              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
             )}
           >
             <span className="relative flex h-2 w-2" aria-hidden="true">
@@ -78,8 +78,8 @@ export const AnimatedHero = memo(() => {
           <h1 
             className={cn(
               "text-[clamp(2.25rem,7vw,4.5rem)] font-bold mb-5 sm:mb-6 tracking-tight leading-[1.08]",
-              "transition-all duration-600 delay-100",
-              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-150",
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
             )}
           >
             <span className="text-foreground block">Trade Crypto with</span>
@@ -92,7 +92,7 @@ export const AnimatedHero = memo(() => {
           <p 
             className={cn(
               "text-base sm:text-lg lg:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed",
-              "transition-all duration-600 delay-200",
+              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-300",
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
@@ -102,7 +102,7 @@ export const AnimatedHero = memo(() => {
           {/* Profit Counter */}
           <div 
             className={cn(
-              "mb-10 sm:mb-12 transition-all duration-600 delay-300",
+              "mb-10 sm:mb-12 transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[450ms]",
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
@@ -113,7 +113,7 @@ export const AnimatedHero = memo(() => {
           <div 
             className={cn(
               "flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12 sm:mb-14",
-              "transition-all duration-600 delay-400",
+              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[550ms]",
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
@@ -150,8 +150,8 @@ export const AnimatedHero = memo(() => {
           <div 
             className={cn(
               "flex flex-wrap justify-center gap-3 sm:gap-4",
-              "transition-all duration-600 delay-500",
-              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[650ms]",
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
             )}
           >
             <TrustIndicator icon={Shield} text="Bank-Level Security" />

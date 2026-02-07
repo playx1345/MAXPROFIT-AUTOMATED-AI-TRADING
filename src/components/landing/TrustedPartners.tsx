@@ -34,8 +34,8 @@ export const TrustedPartners = memo(() => {
                 className={cn(
                   "flex flex-col items-center gap-3 p-4 sm:p-5 rounded-xl",
                   "border border-border/40 bg-card/40",
-                  "hover:border-primary/30 hover:bg-card/60",
-                  "transition-all duration-300"
+                  "hover:border-primary/30 hover:bg-card/60 hover:-translate-y-0.5",
+                  "transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 )}
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center transition-all duration-300 hover:bg-primary/15">

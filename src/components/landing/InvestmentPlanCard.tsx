@@ -49,9 +49,9 @@ export const InvestmentPlanCard = memo(({
       <div 
         className={cn(
           "relative h-full flex flex-col p-6 sm:p-8 rounded-2xl bg-card border",
-          "transition-all duration-300",
+          "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           popular ? "border-transparent" : "border-border/60 hover:border-primary/30",
-          "hover:shadow-xl hover:shadow-primary/5"
+          "hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
         )}
       >
         {/* Popular badge - gradient ribbon */}

@@ -181,7 +181,8 @@
      }
  
      const emailResponse = await resend.emails.send({
-       from: "Win-Tradex <notifications@win-tradex.com>",
+      from: "Win-Tradex <onboarding@resend.dev>",
+       // NOTE: For production, change to: "Win-Tradex <notifications@win-tradex.com>"
        to: [user_email],
        subject: `${config.icon} ${config.subject}`,
        html: `

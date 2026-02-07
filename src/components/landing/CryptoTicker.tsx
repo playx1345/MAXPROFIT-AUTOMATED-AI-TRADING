@@ -9,7 +9,6 @@ interface CryptoPrice {
   price_change_percentage_24h: number;
 }
 
-// Fallback data when API fails
 const FALLBACK_DATA: CryptoPrice[] = [
   { id: "bitcoin", symbol: "btc", current_price: 67500, price_change_percentage_24h: 2.5 },
   { id: "ethereum", symbol: "eth", current_price: 3450, price_change_percentage_24h: 1.8 },
@@ -22,19 +21,19 @@ const FALLBACK_DATA: CryptoPrice[] = [
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000;
 
-const CryptoItem = memo(({ crypto, index }: { crypto: CryptoPrice; index: number }) => {
+const CryptoItem = memo(({ crypto }: { crypto: CryptoPrice }) => {
   const isPositive = crypto.price_change_percentage_24h >= 0;
   
   return (
     <div 
-      className="flex items-center gap-3 px-6 min-w-[220px]"
+      className="flex items-center gap-3 px-5 sm:px-6"
       role="listitem"
-      aria-label={`${crypto.symbol.toUpperCase()}: $${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}, ${isPositive ? 'up' : 'down'} ${Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%`}
+      aria-label={`${crypto.symbol.toUpperCase()}: $${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
     >
       <span className="font-bold text-sm uppercase tracking-wider text-primary">
         {crypto.symbol}
       </span>
-      <span className="font-semibold text-foreground tabular-nums">
+      <span className="font-semibold text-foreground tabular-nums text-sm">
         ${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </span>
       <span 
@@ -50,6 +49,8 @@ const CryptoItem = memo(({ crypto, index }: { crypto: CryptoPrice; index: number
         )}
         {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
       </span>
+      {/* Separator dot */}
+      <span className="w-1 h-1 rounded-full bg-border/80 ml-2" aria-hidden="true" />
     </div>
   );
 });
@@ -57,30 +58,25 @@ const CryptoItem = memo(({ crypto, index }: { crypto: CryptoPrice; index: number
 CryptoItem.displayName = "CryptoItem";
 
 export const CryptoTicker = memo(() => {
-  // Start with fallback data immediately to prevent loading state from blocking render
   const [cryptos, setCryptos] = useState<CryptoPrice[]>(FALLBACK_DATA);
-  const [isLoading, setIsLoading] = useState(false); // Start as false since we have fallback data
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
   const retryCountRef = useRef(0);
 
   const fetchCryptoPrices = useCallback(async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       
       const response = await fetch(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether,binancecoin,solana,ripple,cardano,dogecoin&order=market_cap_desc&sparkline=false',
-        {
-          headers: { 'Accept': 'application/json' },
-          signal: controller.signal,
-        }
+        { headers: { 'Accept': 'application/json' }, signal: controller.signal }
       );
       
       clearTimeout(timeoutId);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       
       const data = await response.json();
       
@@ -92,10 +88,8 @@ export const CryptoTicker = memo(() => {
         throw new Error('Invalid data format');
       }
     } catch (err) {
-      // Silently fail - we already have fallback data showing
       if (retryCountRef.current < MAX_RETRIES) {
         retryCountRef.current += 1;
-        // Non-blocking retry in background
         setTimeout(fetchCryptoPrices, RETRY_DELAY * Math.pow(2, retryCountRef.current));
       } else {
         setError('Using cached data');
@@ -106,8 +100,7 @@ export const CryptoTicker = memo(() => {
   }, []);
 
   useEffect(() => {
-    // Fetch in background without blocking render
-    const timeoutId = setTimeout(fetchCryptoPrices, 100); // Small delay to prioritize initial render
+    const timeoutId = setTimeout(fetchCryptoPrices, 100);
     const interval = setInterval(fetchCryptoPrices, 60000);
     return () => {
       clearTimeout(timeoutId);
@@ -115,16 +108,16 @@ export const CryptoTicker = memo(() => {
     };
   }, [fetchCryptoPrices]);
 
-  // No loading state - we always have data (fallback or real)
-
   const displayCryptos = cryptos.length > 0 ? cryptos : FALLBACK_DATA;
   const duplicatedCryptos = [...displayCryptos, ...displayCryptos];
 
   return (
     <div 
-      className="bg-muted/30 border-y border-border/50 py-4 overflow-hidden relative"
+      className="bg-muted/30 border-y border-border/40 py-4 overflow-hidden relative"
       role="list"
       aria-label="Cryptocurrency prices ticker"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
       {error && (
         <div className="absolute top-1 right-2 flex items-center gap-1 text-xs text-muted-foreground">
@@ -135,14 +128,14 @@ export const CryptoTicker = memo(() => {
       <div 
         className={cn(
           "flex animate-scroll-left",
-          "motion-reduce:animate-none motion-reduce:overflow-x-auto"
+          "motion-reduce:animate-none motion-reduce:overflow-x-auto",
+          isPaused && "[animation-play-state:paused]"
         )}
       >
         {duplicatedCryptos.map((crypto, index) => (
           <CryptoItem 
             key={`${crypto.id}-${index}`} 
             crypto={crypto} 
-            index={index}
           />
         ))}
       </div>

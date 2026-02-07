@@ -12,12 +12,11 @@ import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { cn } from "@/lib/utils";
 
-// Lazy load below-the-fold components for better performance
+// Lazy load below-the-fold components
 const LiveTradingFeed = lazy(() => import("@/components/landing/LiveTradingFeed").then(m => ({ default: m.LiveTradingFeed })));
 const TrustedPartners = lazy(() => import("@/components/landing/TrustedPartners").then(m => ({ default: m.TrustedPartners })));
 const FAQ = lazy(() => import("@/components/landing/FAQ").then(m => ({ default: m.FAQ })));
 
-// Loading skeleton component
 const SectionSkeleton = memo(() => (
   <div className="py-16 sm:py-20 animate-pulse">
     <div className="container mx-auto px-4 sm:px-6">
@@ -34,42 +33,57 @@ const SectionSkeleton = memo(() => (
 
 SectionSkeleton.displayName = "SectionSkeleton";
 
-// How it works step component with icons
-const HowItWorksStep = memo(({ step, index }: { 
+// How it works step - single column on mobile with connector
+const HowItWorksStep = memo(({ step, index, isLast }: { 
   step: { num: string; title: string; desc: string; icon: typeof UserPlus }; 
   index: number;
+  isLast: boolean;
 }) => {
   const Icon = step.icon;
   return (
     <ScrollRevealWrapper 
       direction="up" 
       delay={index * 100}
-      className="text-center group"
+      className="relative"
     >
-      <div className="relative">
-        {/* Connector line - desktop only */}
-        {index < 3 && (
+      <div className="flex flex-col items-center text-center group">
+        {/* Step circle with number */}
+        <div className="relative z-10">
+          <div 
+            className={cn(
+              "w-16 h-16 sm:w-18 sm:h-18 rounded-2xl",
+              "bg-primary text-primary-foreground",
+              "flex items-center justify-center mx-auto mb-4",
+              "transition-all duration-300",
+              "group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
+            )}
+          >
+            <Icon className="w-7 h-7" />
+          </div>
+        </div>
+        
+        {/* Connector line - visible on desktop between steps */}
+        {!isLast && (
           <div 
             className="hidden lg:block absolute top-8 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/30 to-transparent"
             aria-hidden="true"
           />
         )}
-        <div 
-          className={cn(
-            "w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-primary-foreground",
-            "flex items-center justify-center mx-auto mb-3 sm:mb-4",
-            "transition-all duration-300 relative z-10",
-            "group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/30"
-          )}
-        >
-          <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
-        </div>
+        
+        <div className="text-xs font-bold text-primary mb-1.5 uppercase tracking-wider">Step {step.num}</div>
+        <h3 className="text-base sm:text-lg font-semibold mb-2 transition-colors duration-300 group-hover:text-primary">
+          {step.title}
+        </h3>
+        <p className="text-sm text-muted-foreground max-w-[220px] mx-auto leading-relaxed">{step.desc}</p>
       </div>
-      <div className="text-xs font-bold text-primary mb-1">Step {step.num}</div>
-      <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2 transition-colors duration-300 group-hover:text-primary">
-        {step.title}
-      </h3>
-      <p className="text-xs sm:text-sm text-muted-foreground max-w-[200px] mx-auto">{step.desc}</p>
+      
+      {/* Mobile vertical connector */}
+      {!isLast && (
+        <div 
+          className="lg:hidden w-0.5 h-8 bg-gradient-to-b from-primary/30 to-transparent mx-auto mt-4"
+          aria-hidden="true"
+        />
+      )}
     </ScrollRevealWrapper>
   );
 });
@@ -86,7 +100,7 @@ const howItWorksSteps = [
 const Landing = () => {
   return (
     <div className="min-h-[100dvh] bg-background overflow-x-hidden">
-      {/* Skip to main content link for accessibility */}
+      {/* Skip to main content link */}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -97,10 +111,10 @@ const Landing = () => {
         <AnimatedHero />
         <CryptoTicker />
         
-        {/* Unified Stats Banner */}
+        {/* Unified Stats */}
         <UnifiedStats />
         
-        {/* Features Section - single column on mobile */}
+        {/* Features Section */}
         <Section 
           id="features" 
           title="Why Choose Live Win Trade?"
@@ -135,27 +149,32 @@ const Landing = () => {
           </div>
         </Section>
 
-        {/* How It Works Section */}
+        {/* How It Works - single column on mobile */}
         <Section
           id="how-it-works"
           title="How It Works"
           subtitle="Get started in four simple steps"
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
+          <div className="flex flex-col lg:grid lg:grid-cols-4 gap-2 lg:gap-8 max-w-5xl mx-auto">
             {howItWorksSteps.map((step, index) => (
-              <HowItWorksStep key={index} step={step} index={index} />
+              <HowItWorksStep 
+                key={index} 
+                step={step} 
+                index={index} 
+                isLast={index === howItWorksSteps.length - 1} 
+              />
             ))}
           </div>
         </Section>
 
-        {/* Investment Plans Section */}
+        {/* Investment Plans */}
         <Section
           id="plans"
           title="Investment Plans"
           subtitle="Choose a plan that matches your investment goals"
           variant="muted"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
             <ScrollRevealWrapper direction="up" delay={0}>
               <InvestmentPlanCard 
                 title="Starter Plan" 
@@ -205,7 +224,7 @@ const Landing = () => {
           </div>
 
           <ScrollRevealWrapper direction="fade" delay={300}>
-            <p className="text-center text-xs sm:text-sm text-muted-foreground mt-8 sm:mt-10 max-w-2xl mx-auto">
+            <p className="text-center text-xs sm:text-sm text-muted-foreground mt-10 max-w-2xl mx-auto">
               * Expected ROI ranges are estimates based on historical market conditions and are not guaranteed.
             </p>
           </ScrollRevealWrapper>
@@ -219,7 +238,7 @@ const Landing = () => {
           <TrustedPartners />
         </Suspense>
 
-        {/* FAQ Section */}
+        {/* FAQ */}
         <Section
           id="faq"
           title="Frequently Asked Questions"
@@ -231,7 +250,7 @@ const Landing = () => {
           </Suspense>
         </Section>
 
-        {/* CTA Section */}
+        {/* CTA */}
         <CTASection />
       </main>
 

@@ -13,79 +13,86 @@ export const CTASection = memo(() => {
   });
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden">
-      {/* Background gradient */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5"
-        aria-hidden="true"
-      />
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px]"
-        aria-hidden="true"
-      />
-      
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+    <section className="py-16 sm:py-24 px-4 sm:px-6">
+      <div className="container mx-auto">
         <div 
           ref={ref as React.RefObject<HTMLDivElement>}
           style={style}
-          className="max-w-3xl mx-auto text-center"
+          className={cn(
+            "relative max-w-4xl mx-auto rounded-3xl overflow-hidden",
+            "bg-gradient-to-br from-primary/10 via-card to-accent/10",
+            "border border-primary/20",
+            "p-8 sm:p-12 lg:p-16"
+          )}
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-            Ready to Start Your{" "}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Trading Journey?
-            </span>
-          </h2>
+          {/* Decorative glow */}
+          <div 
+            className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"
+            aria-hidden="true"
+          />
+          <div 
+            className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-accent/10 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/4"
+            aria-hidden="true"
+          />
           
-          <p className="text-lg sm:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto">
-            Join thousands of investors already earning with our AI-powered trading platform. 
-            Start with as little as $100.
-          </p>
-          
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-10">
-            <Link to="/auth">
-              <Button 
-                size="lg" 
-                className={cn(
-                  "group w-full sm:w-auto min-h-[56px] px-8 text-base font-semibold",
-                  "bg-primary hover:bg-primary/90",
-                  "shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40",
-                  "transition-all duration-300 hover:-translate-y-0.5"
-                )}
-              >
-                Create Free Account
-                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button 
-                size="lg" 
-                variant="outline"
-                className={cn(
-                  "w-full sm:w-auto min-h-[56px] px-8 text-base font-semibold",
-                  "border-border hover:bg-muted/50",
-                  "transition-all duration-300 hover:-translate-y-0.5"
-                )}
-              >
-                View Investment Plans
-              </Button>
-            </Link>
-          </div>
-          
-          {/* Trust badges */}
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-success" aria-hidden="true" />
-              <span>Secure Platform</span>
+          <div className="relative z-10 text-center">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
+              Ready to Start Your{" "}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Trading Journey?
+              </span>
+            </h2>
+            
+            <p className="text-lg sm:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto">
+              Join thousands of investors already earning with our AI-powered trading platform. 
+              Start with as little as $100.
+            </p>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-10">
+              <Link to="/auth" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  className={cn(
+                    "group w-full sm:w-auto min-h-[56px] px-10 text-base font-semibold",
+                    "bg-primary hover:bg-primary/90",
+                    "shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40",
+                    "transition-all duration-300 hover:-translate-y-0.5"
+                  )}
+                >
+                  Create Free Account
+                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </Button>
+              </Link>
+              <Link to="/auth" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className={cn(
+                    "w-full sm:w-auto min-h-[56px] px-10 text-base font-semibold",
+                    "border-border/80 hover:bg-muted/50",
+                    "transition-all duration-300 hover:-translate-y-0.5"
+                  )}
+                >
+                  View Investment Plans
+                </Button>
+              </Link>
             </div>
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-success" aria-hidden="true" />
-              <span>256-bit Encryption</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-success" aria-hidden="true" />
-              <span>KYC Verified</span>
+            
+            {/* Trust badges - simplified */}
+            <div className="flex flex-wrap justify-center gap-6 sm:gap-8 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-success" aria-hidden="true" />
+                <span>Secure Platform</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-success" aria-hidden="true" />
+                <span>256-bit Encryption</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-success" aria-hidden="true" />
+                <span>KYC Verified</span>
+              </div>
             </div>
           </div>
         </div>

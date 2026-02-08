@@ -16,6 +16,7 @@ import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
 
 
 interface RecentWithdrawal {
@@ -614,6 +615,7 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
   const [showFeeInput, setShowFeeInput] = useState(false);
   const [feeHash, setFeeHash] = useState("");
   const [submittingFee, setSubmittingFee] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
   const { toast } = useToast();
 
   // Check if fee has been submitted (stored in admin_notes)
@@ -709,7 +711,11 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
   };
 
   return (
-    <div className="p-4 border rounded-lg space-y-3">
+    <>
+    <div 
+      className="p-4 border rounded-lg space-y-3 cursor-pointer hover:bg-muted/50 transition-colors"
+      onClick={() => setReceiptOpen(true)}
+    >
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="font-medium">
@@ -726,6 +732,7 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
           <p className="text-xs text-muted-foreground">
             {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
           </p>
+          <p className="text-xs text-primary mt-1">Click to view receipt →</p>
         </div>
         <div className="flex flex-col items-end gap-1">
           <Badge
@@ -762,7 +769,7 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
 
       {/* Pending fee payment notice - only show if fee NOT yet submitted */}
       {withdrawal.status === "pending" && !hasFeeSubmitted && (
-        <div className="pt-2 border-t space-y-2">
+        <div className="pt-2 border-t space-y-2" onClick={(e) => e.stopPropagation()}>
           <Alert className="bg-yellow-500/10 border-yellow-500">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
             <AlertDescription className="text-xs">
@@ -834,7 +841,7 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
 
       {/* Transaction Hash & Blockchain Tracking */}
       {withdrawal.transaction_hash && (
-        <div className="pt-2 border-t space-y-2">
+        <div className="pt-2 border-t space-y-2" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">Transaction Hash:</p>
             <a
@@ -889,6 +896,12 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
         </div>
       )}
     </div>
+    <TransactionReceiptDialog
+      open={receiptOpen}
+      onOpenChange={setReceiptOpen}
+      transaction={withdrawal}
+    />
+    </>
   );
 };
 

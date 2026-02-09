@@ -732,7 +732,13 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
           <p className="text-xs text-muted-foreground">
             {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
           </p>
-          <p className="text-xs text-primary mt-1">Click to view receipt →</p>
+          <button 
+            type="button"
+            className="text-xs text-primary mt-1 hover:underline cursor-pointer bg-transparent border-none p-0 text-left"
+            onClick={(e) => { e.stopPropagation(); setReceiptOpen(true); }}
+          >
+            Click to view receipt →
+          </button>
         </div>
         <div className="flex flex-col items-end gap-1">
           <Badge

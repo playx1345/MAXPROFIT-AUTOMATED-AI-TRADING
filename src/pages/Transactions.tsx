@@ -11,6 +11,7 @@ import { AlertTriangle } from "lucide-react";
 import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
 
 interface Transaction {
   id: string;
@@ -21,12 +22,16 @@ interface Transaction {
   created_at: string;
   wallet_address: string | null;
   transaction_hash: string | null;
+  admin_notes: string | null;
+  memo_tag: string | null;
 }
 
 const Transactions = () => {
   const { t } = useTranslation();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [receiptOpen, setReceiptOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -130,7 +135,11 @@ const Transactions = () => {
                   </TableHeader>
                   <TableBody>
                     {transactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
+                      <TableRow 
+                        key={transaction.id} 
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => { setSelectedTransaction(transaction); setReceiptOpen(true); }}
+                      >
                         <TableCell className="font-medium">
                           {format(new Date(transaction.created_at), "MMM dd, yyyy HH:mm")}
                         </TableCell>
@@ -162,8 +171,9 @@ const Transactions = () => {
                 {transactions.map((transaction, index) => (
                   <div
                     key={transaction.id}
-                    className="p-4 rounded-xl border border-border/50 bg-card/80 space-y-3 press-effect glass-card-crypto animate-fade-in"
+                    className="p-4 rounded-xl border border-border/50 bg-card/80 space-y-3 press-effect glass-card-crypto animate-fade-in cursor-pointer hover:border-primary/30 transition-colors"
                     style={{ animationDelay: `${index * 50}ms` }}
+                    onClick={() => { setSelectedTransaction(transaction); setReceiptOpen(true); }}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -192,6 +202,7 @@ const Transactions = () => {
                         <span className="font-mono">{transaction.wallet_address}</span>
                       </div>
                     )}
+                    <p className="text-xs text-primary">Click to view receipt →</p>
                   </div>
                 ))}
               </div>
@@ -200,6 +211,11 @@ const Transactions = () => {
         </CardContent>
       </Card>
     </div>
+    <TransactionReceiptDialog
+      open={receiptOpen}
+      onOpenChange={setReceiptOpen}
+      transaction={selectedTransaction}
+    />
     </PullToRefresh>
   );
 };

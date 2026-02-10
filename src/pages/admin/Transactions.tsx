@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { Search, ArrowDownLeft, ArrowUpRight, Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
 
 interface Transaction {
   id: string;
@@ -20,6 +21,10 @@ interface Transaction {
   currency: string;
   status: string;
   created_at: string;
+  wallet_address: string | null;
+  transaction_hash: string | null;
+  admin_notes: string | null;
+  memo_tag: string | null;
   profiles: { email: string; full_name: string | null };
 }
 
@@ -29,6 +34,8 @@ const AdminTransactions = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [receiptOpen, setReceiptOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -63,6 +70,7 @@ const AdminTransactions = () => {
   }
 
   return (
+    <>
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t('admin.transactions.title')}</h1>
@@ -131,7 +139,7 @@ const AdminTransactions = () => {
                 <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground">{t('admin.transactions.noTransactions')}</TableCell></TableRow>
               ) : (
                 filteredTransactions.map((tx) => (
-                  <TableRow key={tx.id}>
+                  <TableRow key={tx.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => { setSelectedTransaction(tx); setReceiptOpen(true); }}>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {tx.type === "deposit" ? <ArrowDownLeft className="h-4 w-4 text-green-500" /> : <ArrowUpRight className="h-4 w-4 text-red-500" />}
@@ -143,7 +151,7 @@ const AdminTransactions = () => {
                     <TableCell className="uppercase">{tx.currency}</TableCell>
                     <TableCell><Badge className={tx.status === "approved" ? "bg-green-500" : tx.status === "pending" ? "bg-yellow-500" : "bg-red-500"}>{tx.status}</Badge></TableCell>
                     <TableCell>{format(new Date(tx.created_at), "MMM dd, yyyy HH:mm")}</TableCell>
-                    <TableCell><Button size="sm" variant="ghost" onClick={() => navigate(tx.type === "deposit" ? "/admin/deposits" : "/admin/withdrawals")}>{t('admin.common.view')}</Button></TableCell>
+                    <TableCell><Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); navigate(tx.type === "deposit" ? "/admin/deposits" : "/admin/withdrawals"); }}>{t('admin.common.view')}</Button></TableCell>
                   </TableRow>
                 ))
               )}
@@ -152,6 +160,12 @@ const AdminTransactions = () => {
         </CardContent>
       </Card>
     </div>
+    <TransactionReceiptDialog
+      open={receiptOpen}
+      onOpenChange={setReceiptOpen}
+      transaction={selectedTransaction}
+    />
+    </>
   );
 };
 

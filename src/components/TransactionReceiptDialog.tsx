@@ -225,6 +225,12 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
                 <span>This withdrawal has been rejected. Please contact support for more information.</span>
               </div>
             )}
+            {transaction.admin_notes && transaction.admin_notes.includes('BLOCKCHAIN CONFIRMATION FAIL') && (
+              <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <span>{transaction.admin_notes.replace('BLOCKCHAIN CONFIRMATION FAIL: ', '')}</span>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

@@ -2,7 +2,6 @@ import { memo, useState, useCallback } from "react";
 import { DemoVideoModal } from "./DemoVideoModal";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ProfitCounter } from "./ProfitCounter";
 import { ArrowRight, Play, Shield, Zap, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,17 +24,16 @@ export const AnimatedHero = memo(() => {
     setIsVideoModalOpen(true);
   }, []);
 
-  // Simple load trigger
   useState(() => {
     setIsLoaded(true);
   });
 
   return (
     <section 
-      className="relative min-h-[90dvh] flex items-center justify-center overflow-hidden pt-24 sm:pt-28 pb-16 sm:pb-20"
+      className="relative min-h-[85dvh] flex items-center justify-center overflow-hidden pt-24 sm:pt-28 pb-16 sm:pb-20"
       aria-label="Hero section"
     >
-      {/* CSS-only gradient mesh background - no JS, great performance */}
+      {/* CSS-only gradient mesh background */}
       <div 
         className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5"
         aria-hidden="true"
@@ -74,7 +72,7 @@ export const AnimatedHero = memo(() => {
             </span>
           </div>
 
-          {/* Main heading - fluid typography */}
+          {/* Main heading */}
           <h1 
             className={cn(
               "text-[clamp(2.25rem,7vw,4.5rem)] font-bold mb-5 sm:mb-6 tracking-tight leading-[1.08]",
@@ -82,38 +80,28 @@ export const AnimatedHero = memo(() => {
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
             )}
           >
-            <span className="text-foreground block">Trade Crypto with</span>
+            <span className="text-foreground block">Invest Smarter with</span>
             <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
-              AI-Powered Precision
+              AI-Powered Trading
             </span>
           </h1>
           
           {/* Subtitle */}
           <p 
             className={cn(
-              "text-base sm:text-lg lg:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed",
+              "text-base sm:text-lg lg:text-xl text-muted-foreground mb-10 sm:mb-12 max-w-xl mx-auto leading-relaxed",
               "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-300",
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            Harness advanced algorithms to maximize your returns. Professional trading made accessible for everyone.
+            Professional cryptocurrency investment platform with automated trading strategies. Start with as little as $100.
           </p>
 
-          {/* Profit Counter */}
-          <div 
-            className={cn(
-              "mb-10 sm:mb-12 transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[450ms]",
-              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-            )}
-          >
-            <ProfitCounter />
-          </div>
-
-          {/* CTA Buttons - larger touch targets, full width on mobile */}
+          {/* CTA Buttons */}
           <div 
             className={cn(
               "flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12 sm:mb-14",
-              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[550ms]",
+              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[450ms]",
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
@@ -150,13 +138,13 @@ export const AnimatedHero = memo(() => {
           <div 
             className={cn(
               "flex flex-wrap justify-center gap-3 sm:gap-4",
-              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[650ms]",
+              "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[550ms]",
               isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
             )}
           >
             <TrustIndicator icon={Shield} text="Bank-Level Security" />
-            <TrustIndicator icon={Zap} text="24/7 Trading" />
-            <TrustIndicator icon={Users} text="1,250+ Traders" />
+            <TrustIndicator icon={Zap} text="24/7 Automated Trading" />
+            <TrustIndicator icon={Users} text="Verified Platform" />
           </div>
         </div>
       </div>
@@ -167,7 +155,6 @@ export const AnimatedHero = memo(() => {
         aria-hidden="true"
       />
 
-      {/* Demo Video Modal */}
       <DemoVideoModal 
         open={isVideoModalOpen} 
         onOpenChange={setIsVideoModalOpen} 

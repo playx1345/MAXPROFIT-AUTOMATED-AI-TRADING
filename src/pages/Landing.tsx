@@ -8,14 +8,13 @@ import { Section } from "@/components/landing/Section";
 import { Header } from "@/components/landing/Header";
 import { ScrollRevealWrapper } from "@/components/landing/ScrollRevealWrapper";
 import { UnifiedStats } from "@/components/landing/UnifiedStats";
+import { LiveMarketPrices } from "@/components/landing/LiveMarketPrices";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { StructuredData } from "@/components/landing/StructuredData";
 import { useDynamicMeta } from "@/hooks/useDynamicMeta";
 import { cn } from "@/lib/utils";
 
-// Lazy load below-the-fold components
-const LiveTradingFeed = lazy(() => import("@/components/landing/LiveTradingFeed").then(m => ({ default: m.LiveTradingFeed })));
 const TrustedPartners = lazy(() => import("@/components/landing/TrustedPartners").then(m => ({ default: m.TrustedPartners })));
 const FAQ = lazy(() => import("@/components/landing/FAQ").then(m => ({ default: m.FAQ })));
 
@@ -24,8 +23,8 @@ const SectionSkeleton = memo(() => (
     <div className="container mx-auto px-4 sm:px-6">
       <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-4" />
       <div className="h-5 bg-muted rounded w-1/2 mx-auto mb-12" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="h-32 bg-muted rounded-xl" />
         ))}
       </div>
@@ -35,7 +34,6 @@ const SectionSkeleton = memo(() => (
 
 SectionSkeleton.displayName = "SectionSkeleton";
 
-// How it works step - single column on mobile with connector
 const HowItWorksStep = memo(({ step, index, isLast }: { 
   step: { num: string; title: string; desc: string; icon: typeof UserPlus }; 
   index: number;
@@ -50,7 +48,6 @@ const HowItWorksStep = memo(({ step, index, isLast }: {
       className="relative"
     >
       <div className="flex flex-col items-center text-center group">
-        {/* Step circle with number */}
         <div className="relative z-10">
           <div 
             className={cn(
@@ -65,7 +62,6 @@ const HowItWorksStep = memo(({ step, index, isLast }: {
           </div>
         </div>
         
-        {/* Connector line - visible on desktop between steps */}
         {!isLast && (
           <div 
             className="hidden lg:block absolute top-8 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/30 to-transparent"
@@ -80,7 +76,6 @@ const HowItWorksStep = memo(({ step, index, isLast }: {
         <p className="text-sm text-muted-foreground max-w-[220px] mx-auto leading-relaxed">{step.desc}</p>
       </div>
       
-      {/* Mobile vertical connector */}
       {!isLast && (
         <div 
           className="lg:hidden w-0.5 h-8 bg-gradient-to-b from-primary/30 to-transparent mx-auto mt-4"
@@ -108,7 +103,6 @@ const Landing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background overflow-x-hidden">
-      {/* Skip to main content link */}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -119,6 +113,9 @@ const Landing = () => {
       <main id="main-content">
         <AnimatedHero />
         <CryptoTicker />
+        
+        {/* Live Market Prices - Real data */}
+        <LiveMarketPrices />
         
         {/* Unified Stats */}
         <UnifiedStats />
@@ -158,7 +155,7 @@ const Landing = () => {
           </div>
         </Section>
 
-        {/* How It Works - single column on mobile */}
+        {/* How It Works */}
         <Section
           id="how-it-works"
           title="How It Works"
@@ -240,10 +237,6 @@ const Landing = () => {
         </Section>
 
         <Suspense fallback={<SectionSkeleton />}>
-          <LiveTradingFeed />
-        </Suspense>
-
-        <Suspense fallback={<SectionSkeleton />}>
           <TrustedPartners />
         </Suspense>
 
@@ -259,7 +252,6 @@ const Landing = () => {
           </Suspense>
         </Section>
 
-        {/* CTA */}
         <CTASection />
       </main>
 

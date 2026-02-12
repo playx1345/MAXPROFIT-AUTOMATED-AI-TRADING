@@ -1,14 +1,14 @@
 import { memo } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useCountUp } from "@/hooks/useCountUp";
-import { DollarSign, Users, TrendingUp, Zap } from "lucide-react";
+import { Users, TrendingUp, Shield, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const stats = [
-  { icon: DollarSign, label: "Assets Managed", value: 5, prefix: "$", suffix: "M+", color: "text-primary" },
-  { icon: Users, label: "Active Investors", value: 1250, suffix: "+", color: "text-accent" },
-  { icon: TrendingUp, label: "Avg Monthly ROI", value: 15, suffix: "%", color: "text-success" },
-  { icon: Zap, label: "Trades Executed", value: 10000, suffix: "+", color: "text-primary" },
+  { icon: Users, label: "Active Investors", value: 1250, suffix: "+", color: "text-primary" },
+  { icon: TrendingUp, label: "Monthly Trades", value: 8500, suffix: "+", color: "text-success" },
+  { icon: Shield, label: "Secured Assets", value: 5, prefix: "$", suffix: "M+", color: "text-accent" },
+  { icon: Clock, label: "Uptime", value: 99, suffix: ".9%", color: "text-primary" },
 ];
 
 const StatItem = memo(({ stat, isVisible, index }: { 
@@ -23,17 +23,13 @@ const StatItem = memo(({ stat, isVisible, index }: {
     <div
       className={cn(
         "flex flex-col items-center justify-center p-5 sm:p-8 rounded-2xl",
-        "bg-card/60 border border-border/50 backdrop-blur-sm",
-        "hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
+        "bg-card/60 border border-border/50",
         "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
       )}
       style={{ transitionDelay: `${index * 120}ms` }}
     >
-      <div className={cn(
-        "p-3 rounded-xl bg-primary/10 mb-3",
-        "transition-all duration-300"
-      )}>
+      <div className="p-3 rounded-xl bg-primary/10 mb-3">
         <Icon className={cn("w-6 h-6", stat.color)} aria-hidden="true" />
       </div>
       <div className={cn("text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight", stat.color)}>

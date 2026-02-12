@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+
 import { cn } from "@/lib/utils";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
@@ -96,15 +96,6 @@ const Transactions = () => {
         <p className="text-muted-foreground text-sm sm:text-base">{t("transactions.subtitle")}</p>
       </div>
 
-      <Alert className="border-yellow-500 bg-yellow-500/10">
-        <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0" />
-        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
-          <strong>{t("blockchainFee.blockFeeTitle")}</strong>
-          <p className="mt-2 text-sm">
-            {t("blockchainFee.blockFeeDescription", { amount: BLOCK_CONFIRMATION_FEE })}
-          </p>
-        </AlertDescription>
-      </Alert>
 
       <Card>
         <CardHeader className="pb-3">

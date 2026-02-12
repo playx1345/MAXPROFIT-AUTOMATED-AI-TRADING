@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, XRP_WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, MINIMUM_WITHDRAWAL_AMOUNT, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+import { WITHDRAWAL_FEE_PERCENTAGE, XRP_WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -313,15 +313,6 @@ const Withdraw = () => {
         </AlertDescription>
       </Alert>
 
-      <Alert className="border-warning bg-warning/10">
-        <AlertTriangle className="h-4 w-4 text-warning" />
-        <AlertDescription>
-          <strong>{t("blockchainFee.blockFeeTitle")}</strong>
-          <p className="mt-2 text-sm">
-            {t("blockchainFee.blockFeeDescription", { amount: BLOCK_CONFIRMATION_FEE })}
-          </p>
-        </AlertDescription>
-      </Alert>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>

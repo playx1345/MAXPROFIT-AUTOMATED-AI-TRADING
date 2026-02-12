@@ -19,8 +19,6 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
 import { UpgradeFeeNotification } from "@/components/UpgradeFeeNotification";
-import { BlockchainConfirmationFeeNotification } from "@/components/BlockchainConfirmationFeeNotification";
-import { BlockchainFeeBanner } from "@/components/BlockchainFeeBanner";
 
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -76,14 +74,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row w-full bg-background">
-      {/* Blockchain Fee Banner - Top of screen */}
-      <BlockchainFeeBanner />
-      
       {/* Upgrade Fee Notification */}
       <UpgradeFeeNotification />
-      
-      {/* Blockchain Confirmation Fee Notification */}
-      <BlockchainConfirmationFeeNotification />
       
       
       {/* Mobile Header with Menu Toggle */}

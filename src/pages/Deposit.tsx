@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { depositAmountSchema, transactionHashSchema, validateField } from "@/lib/validation";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
-import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+
 import { PullToRefresh } from "@/components/PullToRefresh";
 
 const PLATFORM_WALLETS = {
@@ -400,15 +400,6 @@ const Deposit = () => {
         </Card>
       </div>
 
-      <Alert className="border-yellow-500 bg-yellow-500/10">
-        <AlertTriangle className="h-4 w-4 text-yellow-600" />
-        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
-          <strong>Important: Block Confirmation Fee</strong>
-          <p className="mt-2 text-sm">
-            All deposit transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and verified on the blockchain. This fee ensures the security and integrity of your deposit.
-          </p>
-        </AlertDescription>
-      </Alert>
 
       {recentDeposits.length > 0 && (
         <Card>

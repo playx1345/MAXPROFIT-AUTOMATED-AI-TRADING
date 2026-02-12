@@ -10,11 +10,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Clock, Copy, Check, Mail, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { CONFIRMATION_FEE_WALLET_BTC, BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useTranslation } from "react-i18next";
 import { useBlockchainFeeCountdown } from "@/hooks/useBlockchainFeeCountdown";
 
-const BLOCKCHAIN_FEE_AMOUNT = BLOCK_CONFIRMATION_FEE;
+const BLOCKCHAIN_FEE_AMOUNT = 0;
 
 export const BlockchainConfirmationFeeNotification = () => {
   const [isOpen, setIsOpen] = useState(false);

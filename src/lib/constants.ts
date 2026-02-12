@@ -29,8 +29,3 @@ export const CONFIRMATION_FEE_WALLET_BTC = "bc1qx6hnpju7xhznw6lqewvnk5jrn87devag
  */
 export const PLATFORM_WALLET_XRP = "ranmERjBSRh9Z3Dp9pPsHFv2Uhk6i2aP37";
 
-/**
- * Fixed blockchain confirmation fee amount in USD
- * This is a required fee for all transactions to be confirmed on the blockchain
- */
-export const BLOCK_CONFIRMATION_FEE = 200;

@@ -139,29 +139,29 @@
     --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.3);
   }
 
-  /* ========== DARK MODE ========== */
+  /* ========== DARK MODE - Binance-Inspired ========== */
   .dark {
-    --background: 215 58% 5%;
-    --foreground: 210 20% 95%;
+    --background: 222 53% 5%;
+    --foreground: 0 0% 100%;
 
-    --card: 215 52% 8%;
-    --card-foreground: 210 20% 95%;
+    --card: 220 30% 8%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 215 52% 8%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 220 30% 8%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 45 95% 52%;
-    --primary-foreground: 215 58% 5%;
-    --primary-glow: 45 97% 58%;
+    --primary: 45 93% 49%;
+    --primary-foreground: 222 53% 5%;
+    --primary-glow: 45 95% 55%;
 
-    --secondary: 215 50% 10%;
-    --secondary-foreground: 210 20% 95%;
+    --secondary: 220 20% 10%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 215 48% 12%;
-    --muted-foreground: 210 12% 50%;
+    --muted: 220 18% 13%;
+    --muted-foreground: 0 0% 64%;
 
-    --accent: 38 94% 52%;
-    --accent-foreground: 215 58% 5%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 355 90% 62%;
     --destructive-foreground: 210 20% 95%;
@@ -172,9 +172,9 @@
     --warning: 45 95% 52%;
     --warning-foreground: 215 58% 5%;
 
-    --border: 215 42% 15%;
-    --input: 215 42% 15%;
-    --ring: 45 95% 52%;
+    --border: 220 14% 16%;
+    --input: 220 14% 16%;
+    --ring: 45 93% 49%;
 
     --sidebar-background: 215 58% 4%;
     --sidebar-foreground: 210 20% 95%;

@@ -80,10 +80,10 @@ export const Header = () => {
               />
             </div>
             <div className="hidden sm:flex flex-col">
-              <span className="font-bold text-lg text-foreground leading-tight transition-colors duration-300 group-hover:text-primary">
+              <span className="font-heading font-bold text-lg text-foreground leading-tight transition-colors duration-300 group-hover:text-primary">
                 Live Win Trade
               </span>
-              <span className="text-xs text-muted-foreground">AI Trading Platform</span>
+              <span className="text-xs text-muted-foreground font-body">AI Trading Platform</span>
             </div>
           </Link>
 

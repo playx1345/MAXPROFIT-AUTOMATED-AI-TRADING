@@ -93,7 +93,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </Button>
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Live Win Trade" className="h-8 w-8 rounded-lg object-cover" />
-            <span className="text-gradient-premium font-display text-lg font-bold">Live Win Trade</span>
+            <span className="text-gradient-premium font-heading text-lg font-bold">Live Win Trade</span>
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />
@@ -113,7 +113,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
             <Link to="/" className="relative flex items-center gap-3 group">
               <img src={logo} alt="Live Win Trade" className="h-10 w-10 rounded-lg object-cover shadow-md group-hover:shadow-glow transition-shadow duration-300" />
-              <span className="text-gradient-premium font-display text-xl font-bold">
+              <span className="text-gradient-premium font-heading text-xl font-bold">
                 Live Win Trade
               </span>
             </Link>
@@ -149,7 +149,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                       "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary flex-shrink-0",
                       isActive && "drop-shadow-glow"
                     )} />
-                    <span className="relative font-medium truncate">{item.label}</span>
+                    <span className="relative font-body font-medium truncate">{item.label}</span>
                     
                     {/* Arrow indicator with accent color on hover */}
                     <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent flex-shrink-0 ${isActive ? 'opacity-100 translate-x-0' : ''}`}>

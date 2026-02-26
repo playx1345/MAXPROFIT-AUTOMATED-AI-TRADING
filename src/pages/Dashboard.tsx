@@ -183,10 +183,10 @@ const Dashboard = () => {
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2 font-display bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold mb-2 font-heading bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
               {t("dashboard.title", "Dashboard")}
             </h1>
-            <p className="text-muted-foreground">{t("dashboard.welcome", "Welcome to your investment dashboard")}</p>
+            <p className="text-muted-foreground font-body">{t("dashboard.welcome", "Welcome to your investment dashboard")}</p>
           </div>
           <SecurityBadge variant="shield" label="Account Secured" />
         </div>
@@ -254,7 +254,7 @@ const Dashboard = () => {
       <Card className={`glass-card-enhanced border-border/50 transition-all duration-500 delay-200 hover:shadow-none hover:scale-100 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2 font-display">
+            <CardTitle className="flex items-center gap-2 font-heading">
               {t("dashboard.kycStatus", "KYC Verification Status")}
             </CardTitle>
             <CardDescription className="mt-1">
@@ -308,7 +308,7 @@ const Dashboard = () => {
       {/* Recent Transactions with slide-in animation */}
       <Card className={`glass-card-enhanced border-border/50 transition-all duration-500 delay-500 hover:shadow-none hover:scale-100 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2 font-display">
+          <CardTitle className="flex items-center gap-2 font-heading">
             <span className="relative">
               {t("dashboard.recentTransactions", "Recent Transactions")}
               <span className="absolute -right-3 -top-1 h-2 w-2 bg-primary rounded-full animate-pulse" />
@@ -355,7 +355,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-3 sm:text-right pl-13 sm:pl-0">
-                    <div className="font-bold font-display text-base sm:text-sm">${Number(tx.amount).toFixed(2)}</div>
+                    <div className="font-bold font-heading text-base sm:text-sm">${Number(tx.amount).toFixed(2)}</div>
                     <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block whitespace-nowrap ${
                       tx.status === "completed" ? "bg-success/10 text-success" :
                       tx.status === "pending" ? "bg-warning/10 text-warning" :

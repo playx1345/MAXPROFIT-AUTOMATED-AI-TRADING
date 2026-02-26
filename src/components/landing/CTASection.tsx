@@ -36,9 +36,9 @@ export const CTASection = memo(() => {
           />
           
           <div className="relative z-10 text-center">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold mb-4 sm:mb-6">
               Ready to Start Your{" "}
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-primary">
                 Trading Journey?
               </span>
             </h2>

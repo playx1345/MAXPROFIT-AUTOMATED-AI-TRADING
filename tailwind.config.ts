@@ -76,9 +76,11 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Outfit', 'system-ui', 'sans-serif'],
-        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        sans: ['Inter', 'Outfit', 'system-ui', 'sans-serif'],
+        display: ['Poppins', '"Playfair Display"', 'Georgia', 'sans-serif'],
         serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        heading: ['Poppins', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
       },
       spacing: {
         'touch': '44px',

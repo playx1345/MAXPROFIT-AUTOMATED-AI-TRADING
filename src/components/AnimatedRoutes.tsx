@@ -23,6 +23,11 @@ import AdminTransactions from "@/pages/admin/Transactions";
 import AdminAnalytics from "@/pages/admin/Analytics";
 import AdminReversals from "@/pages/admin/Reversals";
 import NotFound from "@/pages/NotFound";
+import TermsAndConditions from "@/pages/legal/TermsAndConditions";
+import PrivacyPolicy from "@/pages/legal/PrivacyPolicy";
+import RiskDisclosure from "@/pages/legal/RiskDisclosure";
+import AMLKYCPolicy from "@/pages/legal/AMLKYCPolicy";
+import CookiePolicy from "@/pages/legal/CookiePolicy";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import DashboardLayout from "./DashboardLayout";
@@ -214,6 +219,13 @@ export const AnimatedRoutes = () => {
           </AdminProtectedRoute>
         } />
         
+        {/* Legal Routes */}
+        <Route path="/legal/terms" element={<PageTransition><TermsAndConditions /></PageTransition>} />
+        <Route path="/legal/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+        <Route path="/legal/risk" element={<PageTransition><RiskDisclosure /></PageTransition>} />
+        <Route path="/legal/aml-kyc" element={<PageTransition><AMLKYCPolicy /></PageTransition>} />
+        <Route path="/legal/cookies" element={<PageTransition><CookiePolicy /></PageTransition>} />
+
         <Route path="*" element={
           <PageTransition>
             <NotFound />

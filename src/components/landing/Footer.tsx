@@ -9,7 +9,7 @@ import {
   Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/lwt-logo.png";
 import { toast } from "sonner";
 
 const footerLinks = {
@@ -26,10 +26,10 @@ const footerLinks = {
     { label: "Security & Safety", href: "#" },
   ],
   legal: [
-    { label: "Terms & Conditions", href: "#" },
-    { label: "Privacy Policy", href: "#" },
-    { label: "Risk Disclosure", href: "#" },
-    { label: "AML/KYC Policy", href: "#" },
+    { label: "Terms & Conditions", href: "/legal/terms" },
+    { label: "Privacy Policy", href: "/legal/privacy" },
+    { label: "Risk Disclosure", href: "/legal/risk" },
+    { label: "AML/KYC Policy", href: "/legal/aml-kyc" },
   ],
   social: [
     { icon: Twitter, label: "Twitter", href: "#" },
@@ -146,12 +146,12 @@ export const Footer = memo(() => {
               <ul className="space-y-3">
                 {footerLinks.legal.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.href}
                       className="text-sm font-body text-muted-foreground hover:text-primary transition-colors duration-200"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

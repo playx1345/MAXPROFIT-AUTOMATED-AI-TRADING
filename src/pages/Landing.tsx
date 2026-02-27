@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 
 const TrustedPartners = lazy(() => import("@/components/landing/TrustedPartners").then(m => ({ default: m.TrustedPartners })));
 const FAQ = lazy(() => import("@/components/landing/FAQ").then(m => ({ default: m.FAQ })));
+const Testimonials = lazy(() => import("@/components/landing/Testimonials").then(m => ({ default: m.Testimonials })));
+const TrustSection = lazy(() => import("@/components/landing/TrustSection").then(m => ({ default: m.TrustSection })));
 
 const SectionSkeleton = memo(() => (
   <div className="py-16 sm:py-20 animate-pulse">
@@ -236,16 +238,38 @@ const Landing = () => {
           </ScrollRevealWrapper>
         </Section>
 
+        {/* Trust & Transparency */}
+        <Section
+          id="trust"
+          title="Trust & Transparency"
+          subtitle="Enterprise‑grade security and full regulatory compliance"
+        >
+          <Suspense fallback={<SectionSkeleton />}>
+            <TrustSection />
+          </Suspense>
+        </Section>
+
         <Suspense fallback={<SectionSkeleton />}>
           <TrustedPartners />
         </Suspense>
+
+        {/* Testimonials */}
+        <Section
+          id="testimonials"
+          title="What Our Users Say"
+          subtitle="Trusted by traders worldwide"
+          variant="muted"
+        >
+          <Suspense fallback={<SectionSkeleton />}>
+            <Testimonials />
+          </Suspense>
+        </Section>
 
         {/* FAQ */}
         <Section
           id="faq"
           title="Frequently Asked Questions"
           subtitle="Find answers to common questions"
-          variant="muted"
         >
           <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded-lg" />}>
             <FAQ />

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/lwt-logo.png";
 import { cn } from "@/lib/utils";
 
 export const Header = () => {

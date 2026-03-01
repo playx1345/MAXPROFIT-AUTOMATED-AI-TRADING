@@ -18,7 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.jpg";
-import { UpgradeFeeNotification } from "@/components/UpgradeFeeNotification";
+
 
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -74,8 +74,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row w-full bg-background">
-      {/* Upgrade Fee Notification */}
-      <UpgradeFeeNotification />
       
       
       {/* Mobile Header with Menu Toggle */}

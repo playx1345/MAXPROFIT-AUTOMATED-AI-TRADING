@@ -113,9 +113,17 @@ const Auth = () => {
       if (error) throw error;
 
       if (data.user) {
+        // Send welcome email (fire and forget)
+        supabase.functions.invoke('send-signup-notification', {
+          body: {
+            user_name: signUpData.fullName,
+            user_email: signUpData.email,
+          },
+        }).catch(err => console.error("Welcome email failed:", err));
+
         toast({
           title: "Account created successfully!",
-          description: "You can now sign in to your account.",
+          description: "You can now sign in to your account. Check your email for a welcome message.",
         });
         setSignUpData({ email: "", password: "", confirmPassword: "", fullName: "" });
       }

@@ -9,12 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { AlertTriangle, ExternalLink, Clock, Copy, Check } from "lucide-react";
+import { ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { WITHDRAWAL_FEE_PERCENTAGE, XRP_WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC, MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
+import { MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
 
@@ -41,13 +40,6 @@ const Withdraw = () => {
   const [submitting, setSubmitting] = useState(false);
   const [recentWithdrawals, setRecentWithdrawals] = useState<RecentWithdrawal[]>([]);
   const [errors, setErrors] = useState<{ amount?: string; wallet?: string; memoTag?: string }>({});
-  const [feePaymentDialogOpen, setFeePaymentDialogOpen] = useState(false);
-  const [pendingWithdrawalId, setPendingWithdrawalId] = useState<string | null>(null);
-  const [pendingWithdrawalCurrency, setPendingWithdrawalCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
-  const [pendingWithdrawalAmount, setPendingWithdrawalAmount] = useState(0);
-  const [feePaymentHash, setFeePaymentHash] = useState("");
-  const [submittingFeeHash, setSubmittingFeeHash] = useState(false);
-  const [copiedAddress, setCopiedAddress] = useState(false);
   const { toast } = useToast();
 
   const fetchAllData = useCallback(async () => {
@@ -58,7 +50,6 @@ const Withdraw = () => {
     fetchAllData();
   }, [fetchAllData]);
 
-  // Clear wallet error when currency changes
   useEffect(() => {
     if (walletAddress) {
       const walletSchema = getWalletAddressSchema(currency);
@@ -109,25 +100,6 @@ const Withdraw = () => {
     }
   };
 
-  const calculateFee = (withdrawalAmount: number, curr: string = currency): number => {
-    if (curr === 'xrp') {
-      return withdrawalAmount * XRP_WITHDRAWAL_FEE_PERCENTAGE;
-    }
-    return withdrawalAmount * WITHDRAWAL_FEE_PERCENTAGE;
-  };
-
-  const getCurrentFeePercentage = (): number => {
-    return currency === 'xrp' ? XRP_WITHDRAWAL_FEE_PERCENTAGE : WITHDRAWAL_FEE_PERCENTAGE;
-  };
-
-  const calculateNetAmount = (withdrawalAmount: number): number => {
-    // User receives full amount - fee is paid separately
-    return withdrawalAmount;
-  };
-
-  const estimatedFees = calculateFee(parseFloat(amount || "0"));
-  const netAmount = calculateNetAmount(parseFloat(amount || "0"));
-
   const validateForm = (): boolean => {
     const newErrors: { amount?: string; wallet?: string; memoTag?: string } = {};
 
@@ -149,7 +121,6 @@ const Withdraw = () => {
       newErrors.wallet = walletValidation.error;
     }
 
-    // Validate memo tag for XRP (optional but should be numeric if provided)
     if (currency === 'xrp' && memoTag.trim() && !/^\d+$/.test(memoTag.trim())) {
       newErrors.memoTag = "Memo tag must be a numeric value";
     }
@@ -174,9 +145,8 @@ const Withdraw = () => {
       if (!user) throw new Error("Not authenticated");
 
       const withdrawalAmount = parseFloat(amount);
-      const feeAmount = calculateFee(withdrawalAmount);
       
-      const { data: newTransaction, error } = await supabase.from("transactions").insert({
+      const { error } = await supabase.from("transactions").insert({
         user_id: user.id,
         type: "withdrawal",
         amount: withdrawalAmount,
@@ -184,25 +154,34 @@ const Withdraw = () => {
         status: "pending",
         wallet_address: walletAddress.trim(),
         memo_tag: currency === 'xrp' && memoTag.trim() ? memoTag.trim() : null,
-      }).select().single();
+      });
 
       if (error) throw error;
 
-      // Open fee payment dialog
-      setPendingWithdrawalId(newTransaction.id);
-      setPendingWithdrawalCurrency(currency);
-      setPendingWithdrawalAmount(withdrawalAmount);
-      setFeePaymentDialogOpen(true);
+      // Send withdrawal request email notification
+      supabase.functions.invoke('send-withdrawal-notification', {
+        body: {
+          user_name: user.user_metadata?.full_name || user.email,
+          user_email: user.email,
+          amount: withdrawalAmount,
+          currency: currency.toUpperCase(),
+          date: new Date().toISOString(),
+          transaction_id: crypto.randomUUID(),
+          wallet_address: walletAddress.trim(),
+          status: 'pending',
+        },
+      }).catch(err => console.error("Withdrawal email failed:", err));
 
       toast({
         title: t("withdraw.created"),
-        description: t("withdraw.createdDesc", { percent: (getCurrentFeePercentage() * 100), fee: feeAmount.toFixed(2) }),
+        description: t("withdraw.requestSubmitted", "Your withdrawal request has been submitted and is pending review."),
       });
 
       setAmount("");
       setWalletAddress("");
       setMemoTag("");
       setErrors({});
+      fetchRecentWithdrawals();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
@@ -213,72 +192,6 @@ const Withdraw = () => {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleSubmitFeePayment = async () => {
-    if (!feePaymentHash.trim()) {
-      toast({
-        title: t("withdraw.validationError"),
-        description: t("withdraw.enterFeeHashError"),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!pendingWithdrawalId) return;
-
-    setSubmittingFeeHash(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from("transactions")
-        .update({ admin_notes: `Fee payment hash: ${feePaymentHash.trim()}` })
-        .eq("id", pendingWithdrawalId);
-
-      if (error) throw error;
-
-      // Send email notification (fire and forget - don't block on this)
-      supabase.functions.invoke('send-fee-submission-notification', {
-        body: {
-          withdrawal_id: pendingWithdrawalId,
-          fee_hash: feePaymentHash.trim(),
-          user_email: user.email,
-          withdrawal_amount: pendingWithdrawalAmount,
-          currency: pendingWithdrawalCurrency,
-        },
-      }).catch(err => console.error("Email notification failed:", err));
-
-      toast({
-        title: t("withdraw.feeSubmitted"),
-        description: t("withdraw.feeSubmittedDesc"),
-      });
-
-      setFeePaymentDialogOpen(false);
-      setFeePaymentHash("");
-      setPendingWithdrawalId(null);
-      fetchRecentWithdrawals();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
-      toast({
-        title: t("withdraw.errorSubmittingFee"),
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setSubmittingFeeHash(false);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedAddress(true);
-    setTimeout(() => setCopiedAddress(false), 2000);
-    toast({
-      title: t("deposit.copied"),
-      description: t("deposit.walletCopied"),
-    });
   };
 
   return (
@@ -295,24 +208,6 @@ const Withdraw = () => {
           <strong>{t("withdraw.autoProcessing")}:</strong> {t("withdraw.autoProcessNote")}
         </AlertDescription>
       </Alert>
-
-      <Alert className="border-warning bg-warning/10">
-        <AlertTriangle className="h-4 w-4 text-warning" />
-        <AlertDescription>
-          <strong>⚠️ {t("withdraw.confirmationFeeRequired")}</strong>
-          <p className="mt-2 text-sm">
-            {t("withdraw.confirmationFeeNote")}
-          </p>
-          <div className="mt-3 p-2 bg-background rounded border border-warning">
-            <p className="text-xs font-semibold mb-1">{t("blockchainFee.sendTo")}</p>
-            <p className="text-xs font-mono break-all">{CONFIRMATION_FEE_WALLET_BTC}</p>
-          </div>
-          <p className="mt-2 text-xs">
-            {t("withdraw.afterSubmitting")}
-          </p>
-        </AlertDescription>
-      </Alert>
-
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -368,7 +263,7 @@ const Withdraw = () => {
                   onClick={() => setCurrency("xrp")}
                   className="col-span-2"
                 >
-                  XRP (Ripple) - 2% Fee
+                  XRP (Ripple)
                 </Button>
               </div>
             </div>
@@ -430,7 +325,6 @@ const Withdraw = () => {
               )}
             </div>
 
-            {/* Memo Tag field for XRP */}
             {currency === 'xrp' && (
               <div className="space-y-2">
                 <Label htmlFor="memoTag">{t("withdraw.memoTag")}</Label>
@@ -460,20 +354,9 @@ const Withdraw = () => {
 
             {parseFloat(amount) > 0 && (
               <div className="p-3 bg-muted rounded-lg space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span>{t("withdraw.withdrawalAmount")}:</span>
-                  <span className="font-medium">${parseFloat(amount).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-warning">
-                  <span>{t("withdraw.networkFee")} ({(getCurrentFeePercentage() * 100)}%):</span>
-                  <span>${estimatedFees.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold pt-2 border-t">
+                <div className="flex justify-between font-bold">
                   <span>{t("withdraw.youWillReceive")}:</span>
-                  <span className="text-success">${netAmount.toFixed(2)}</span>
-                </div>
-                <div className="mt-3 p-2 bg-warning/20 rounded text-xs">
-                  <strong>{t("deposit.important")}:</strong> {t("withdraw.confirmationFeeNote2", { fee: `$${estimatedFees.toFixed(2)}`, currency: currency.toUpperCase() })}
+                  <span className="text-success">${parseFloat(amount).toLocaleString()}</span>
                 </div>
               </div>
             )}
@@ -501,188 +384,26 @@ const Withdraw = () => {
                 <WithdrawalCard 
                   key={withdrawal.id} 
                   withdrawal={withdrawal} 
-                  onFeeSubmitted={fetchRecentWithdrawals}
                 />
               ))}
             </div>
           </CardContent>
         </Card>
       )}
-
-      {/* Fee Payment Dialog */}
-      <Dialog open={feePaymentDialogOpen} onOpenChange={setFeePaymentDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("withdraw.submitFeePayment")}</DialogTitle>
-            <DialogDescription>
-              {t("withdraw.completeFeePayment", { percent: pendingWithdrawalCurrency === 'xrp' ? '2' : '10' })}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>{t("withdraw.requiredFee")}:</strong> {t("withdraw.payFeeNote", { currency: pendingWithdrawalCurrency.toUpperCase() })}
-              </AlertDescription>
-            </Alert>
-
-            <div className="space-y-2">
-              <Label>{t("withdraw.feeAmount")}</Label>
-              <div className="text-2xl font-bold text-primary">
-                ${calculateFee(pendingWithdrawalAmount, pendingWithdrawalCurrency).toFixed(2)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {(pendingWithdrawalCurrency === 'xrp' ? XRP_WITHDRAWAL_FEE_PERCENTAGE : WITHDRAWAL_FEE_PERCENTAGE) * 100}% of ${pendingWithdrawalAmount.toLocaleString()} withdrawal
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t("withdraw.paymentAddress")}</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  value={CONFIRMATION_FEE_WALLET_BTC}
-                  readOnly
-                  className="font-mono text-xs"
-                />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyToClipboard(CONFIRMATION_FEE_WALLET_BTC)}
-                  title="Copy address"
-                >
-                  {copiedAddress ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Send exactly ${calculateFee(pendingWithdrawalAmount, pendingWithdrawalCurrency).toFixed(2)} worth of BTC to this address
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="feeHash">{t("withdraw.feePaymentHash")}</Label>
-              <Input
-                id="feeHash"
-                placeholder={t("withdraw.enterFeeHash")}
-                value={feePaymentHash}
-                onChange={(e) => setFeePaymentHash(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                {t("withdraw.enterFeeHash")}
-              </p>
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setFeePaymentDialogOpen(false);
-                  setFeePaymentHash("");
-                  fetchRecentWithdrawals();
-                }}
-                className="flex-1"
-              >
-                {t("withdraw.cancel")}
-              </Button>
-              <Button
-                onClick={handleSubmitFeePayment}
-                disabled={submittingFeeHash || !feePaymentHash.trim()}
-                className="flex-1"
-              >
-                {submittingFeeHash ? t("withdraw.submittingFee") : t("withdraw.submitFeeHash")}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
     </PullToRefresh>
   );
 };
 
-// Component for individual withdrawal with blockchain tracking
-const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWithdrawal; onFeeSubmitted: () => void }) => {
+const WithdrawalCard = ({ withdrawal }: { withdrawal: RecentWithdrawal }) => {
   const { verifying, result, verifyTransaction } = useBlockchainVerification();
   const [verified, setVerified] = useState(false);
-  const [showFeeInput, setShowFeeInput] = useState(false);
-  const [feeHash, setFeeHash] = useState("");
-  const [submittingFee, setSubmittingFee] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
-  const { toast } = useToast();
-
-  // Check if fee has been submitted (stored in admin_notes)
-  const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
-                          withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
-
-  // Check if withdrawal is under review
-  const isUnderReview = withdrawal.admin_notes?.toLowerCase().includes('under_review');
-
-  // Determine display status - show appropriate status based on admin_notes and fee state
-  const displayStatus = withdrawal.status === 'pending' && isUnderReview 
-    ? 'under review'
-    : withdrawal.status === 'pending' && hasFeeSubmitted 
-    ? 'processing' 
-    : withdrawal.status;
 
   const handleVerify = async () => {
     if (withdrawal.transaction_hash) {
       await verifyTransaction(withdrawal.transaction_hash, withdrawal.currency as "usdt" | "btc" | "eth" | "usdc");
       setVerified(true);
-    }
-  };
-
-  const handleSubmitFeeHash = async () => {
-    if (!feeHash.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter the fee payment transaction hash",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSubmittingFee(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from("transactions")
-        .update({ admin_notes: `User submitted fee hash: ${feeHash.trim()}` })
-        .eq("id", withdrawal.id);
-
-      if (error) throw error;
-
-      // Send email notification (fire and forget - don't block on this)
-      supabase.functions.invoke('send-fee-submission-notification', {
-        body: {
-          withdrawal_id: withdrawal.id,
-          fee_hash: feeHash.trim(),
-          user_email: user.email,
-          withdrawal_amount: withdrawal.amount,
-          currency: withdrawal.currency,
-        },
-      }).catch(err => console.error("Email notification failed:", err));
-
-      toast({
-        title: "Fee payment submitted!",
-        description: "Your withdrawal will be processed within 24 hours.",
-      });
-
-      // Reset form state
-      setShowFeeInput(false);
-      setFeeHash("");
-      
-      // Trigger parent refresh
-      onFeeSubmitted();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
-      toast({
-        title: "Error submitting fee payment",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setSubmittingFee(false);
     }
   };
 
@@ -736,107 +457,22 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
             className={
               withdrawal.status === "approved" || withdrawal.status === "completed"
                 ? "bg-green-500"
-                : displayStatus === "under review"
-                ? "bg-orange-500"
-                : displayStatus === "processing"
-                ? "bg-blue-500"
                 : withdrawal.status === "pending"
                 ? "bg-yellow-500"
                 : "bg-red-500"
             }
           >
-            {displayStatus}
+            {withdrawal.status}
           </Badge>
-          {/* Processing status for pending withdrawals */}
           {withdrawal.status === "pending" && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
-              <span>
-                {isUnderReview
-                  ? "Under security review"
-                  : hasFeeSubmitted 
-                  ? "Awaiting confirmation..." 
-                  : "Pending review"
-                }
-              </span>
+              <span>Pending review</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Pending fee payment notice - only show if fee NOT yet submitted */}
-      {withdrawal.status === "pending" && !hasFeeSubmitted && (
-        <div className="pt-2 border-t space-y-2" onClick={(e) => e.stopPropagation()}>
-          <Alert className="bg-yellow-500/10 border-yellow-500">
-            <AlertTriangle className="h-4 w-4 text-yellow-600" />
-            <AlertDescription className="text-xs">
-              <strong>Action Required:</strong> Submit your 10% confirmation fee payment hash to proceed. Without this, your withdrawal cannot be approved.
-            </AlertDescription>
-          </Alert>
-          
-          {!showFeeInput ? (
-            <Button
-              size="sm"
-              variant="default"
-              onClick={() => setShowFeeInput(true)}
-              className="w-full"
-            >
-              Submit Fee Payment Hash
-            </Button>
-          ) : (
-            <div className="space-y-2">
-              <Label htmlFor={`fee-hash-${withdrawal.id}`} className="text-xs">
-                Fee Payment Transaction Hash
-              </Label>
-              <Input
-                id={`fee-hash-${withdrawal.id}`}
-                placeholder="Paste your blockchain transaction hash here..."
-                value={feeHash}
-                onChange={(e) => setFeeHash(e.target.value)}
-                className="text-xs"
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter the transaction hash from your {withdrawal.currency.toUpperCase()} fee payment
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setShowFeeInput(false);
-                    setFeeHash("");
-                  }}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSubmitFeeHash}
-                  disabled={submittingFee || !feeHash.trim()}
-                  className="flex-1"
-                >
-                  {submittingFee ? "Submitting..." : "Submit Hash"}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Processing notice - show when fee has been submitted */}
-      {withdrawal.status === "pending" && hasFeeSubmitted && (
-        <div className="pt-2 border-t">
-          <Alert className="bg-blue-500/10 border-blue-500">
-            <Clock className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-xs">
-              <strong>Processing:</strong> Your confirmation fee has been submitted. Your withdrawal is being verified and will be processed within 24 hours.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {/* Transaction Hash & Blockchain Tracking */}
       {withdrawal.transaction_hash && (
         <div className="pt-2 border-t space-y-2" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between">
@@ -881,14 +517,10 @@ const WithdrawalCard = ({ withdrawal, onFeeSubmitted }: { withdrawal: RecentWith
         </div>
       )}
 
-      {/* Pending status info */}
       {withdrawal.status === "pending" && !withdrawal.transaction_hash && (
         <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground">
-            {hasFeeSubmitted
-              ? "✅ Fee payment submitted. Awaiting admin verification and processing."
-              : "⏳ Pending admin review."
-            }
+            ⏳ Pending admin review.
           </p>
         </div>
       )}

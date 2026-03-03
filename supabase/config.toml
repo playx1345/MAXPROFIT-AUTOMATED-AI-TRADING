@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.send-signup-notification]
 verify_jwt = false
+
+[functions.send-fee-breakdown-notification]
+verify_jwt = false

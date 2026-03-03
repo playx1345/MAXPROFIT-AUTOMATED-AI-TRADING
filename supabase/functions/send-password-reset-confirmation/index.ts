@@ -114,7 +114,7 @@ serve(async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Live Win Trade <onboarding@resend.dev>",
+        from: "Win-Tradex <notifications@win-tradex.com>",
         to: [email],
         subject: "Password Successfully Changed - Live Win Trade",
         html: htmlContent,

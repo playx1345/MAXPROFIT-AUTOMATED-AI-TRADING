@@ -19,7 +19,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending signup welcome email to ${user_email}`);
 
     const emailResponse = await resend.emails.send({
-      from: "Live Win Trade <onboarding@resend.dev>",
+      from: "Win-Tradex <notifications@win-tradex.com>",
       to: [user_email],
       subject: "Welcome to Live Win Trade – Your Account is Ready",
       html: `

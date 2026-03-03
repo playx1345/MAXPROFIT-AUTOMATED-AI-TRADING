@@ -96,7 +96,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "Live Win Trade <onboarding@resend.dev>",
+      from: "Win-Tradex <notifications@win-tradex.com>",
       to: [userEmail],
       subject: emailSubject,
       html: `

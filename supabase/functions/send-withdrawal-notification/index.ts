@@ -85,8 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
     const orderNumber = transaction_id.slice(0, 12).toUpperCase();
 
     const emailResponse = await resend.emails.send({
-      from: "Win-Tradex <onboarding@resend.dev>",
-      // NOTE: For production, change to: "Win-Tradex <notifications@win-tradex.com>"
+      from: "Win-Tradex <notifications@win-tradex.com>",
       to: [user_email],
       subject: `Withdrawal ${statusConfig.label} - ${amount.toLocaleString()} ${currency.toUpperCase()} | Order #${orderNumber}`,
       html: `

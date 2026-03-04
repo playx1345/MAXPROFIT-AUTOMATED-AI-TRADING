@@ -81,7 +81,7 @@ const AdminLogin = () => {
     try {
       emailSchema.parse(resetEmail);
       recordAttempt();
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: `${window.location.origin}/admin/login?type=recovery` });
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: `${window.location.origin}/reset-password` });
       if (error) throw error;
       toast({ title: t('admin.login.resetEmailSent'), description: t('admin.login.resetEmailSentDesc') });
       setResetEmail("");

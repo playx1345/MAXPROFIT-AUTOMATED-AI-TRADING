@@ -22,6 +22,7 @@ import AdminActivityLog from "@/pages/admin/ActivityLog";
 import AdminTransactions from "@/pages/admin/Transactions";
 import AdminAnalytics from "@/pages/admin/Analytics";
 import AdminReversals from "@/pages/admin/Reversals";
+import ResetPassword from "@/pages/ResetPassword";
 import NotFound from "@/pages/NotFound";
 import TermsAndConditions from "@/pages/legal/TermsAndConditions";
 import PrivacyPolicy from "@/pages/legal/PrivacyPolicy";
@@ -47,6 +48,11 @@ export const AnimatedRoutes = () => {
         <Route path="/auth" element={
           <PageTransition>
             <Auth />
+          </PageTransition>
+        } />
+        <Route path="/reset-password" element={
+          <PageTransition>
+            <ResetPassword />
           </PageTransition>
         } />
         <Route path="/dashboard" element={

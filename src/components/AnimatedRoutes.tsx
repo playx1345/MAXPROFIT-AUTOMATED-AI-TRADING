@@ -1,243 +1,104 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "./PageTransition";
-import Landing from "@/pages/Landing";
-import Auth from "@/pages/Auth";
-import Dashboard from "@/pages/Dashboard";
-import Investments from "@/pages/Investments";
-import Transactions from "@/pages/Transactions";
-import Deposit from "@/pages/Deposit";
-import Withdraw from "@/pages/Withdraw";
-import Referrals from "@/pages/Referrals";
-import Profile from "@/pages/Profile";
-import AdminLogin from "@/pages/admin/Login";
-import AdminDashboard from "@/pages/admin/Dashboard";
-import AdminUsers from "@/pages/admin/Users";
-import AdminDeposits from "@/pages/admin/Deposits";
-import AdminWithdrawals from "@/pages/admin/Withdrawals";
-import AdminInvestments from "@/pages/admin/Investments";
-import AdminTradingBot from "@/pages/admin/TradingBot";
-import AdminSettings from "@/pages/admin/Settings";
-import AdminActivityLog from "@/pages/admin/ActivityLog";
-import AdminTransactions from "@/pages/admin/Transactions";
-import AdminAnalytics from "@/pages/admin/Analytics";
-import AdminReversals from "@/pages/admin/Reversals";
-import ResetPassword from "@/pages/ResetPassword";
-import NotFound from "@/pages/NotFound";
-import TermsAndConditions from "@/pages/legal/TermsAndConditions";
-import PrivacyPolicy from "@/pages/legal/PrivacyPolicy";
-import RiskDisclosure from "@/pages/legal/RiskDisclosure";
-import AMLKYCPolicy from "@/pages/legal/AMLKYCPolicy";
-import CookiePolicy from "@/pages/legal/CookiePolicy";
+import { PageLoader } from "./PageLoader";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import DashboardLayout from "./DashboardLayout";
 import AdminLayout from "./AdminLayout";
 
+// Lazy-loaded pages
+const Landing = lazy(() => import("@/pages/Landing"));
+const Auth = lazy(() => import("@/pages/Auth"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Investments = lazy(() => import("@/pages/Investments"));
+const Transactions = lazy(() => import("@/pages/Transactions"));
+const Deposit = lazy(() => import("@/pages/Deposit"));
+const Withdraw = lazy(() => import("@/pages/Withdraw"));
+const Referrals = lazy(() => import("@/pages/Referrals"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const AdminLogin = lazy(() => import("@/pages/admin/Login"));
+const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const AdminUsers = lazy(() => import("@/pages/admin/Users"));
+const AdminDeposits = lazy(() => import("@/pages/admin/Deposits"));
+const AdminWithdrawals = lazy(() => import("@/pages/admin/Withdrawals"));
+const AdminInvestments = lazy(() => import("@/pages/admin/Investments"));
+const AdminTradingBot = lazy(() => import("@/pages/admin/TradingBot"));
+const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
+const AdminActivityLog = lazy(() => import("@/pages/admin/ActivityLog"));
+const AdminTransactions = lazy(() => import("@/pages/admin/Transactions"));
+const AdminAnalytics = lazy(() => import("@/pages/admin/Analytics"));
+const AdminReversals = lazy(() => import("@/pages/admin/Reversals"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const TermsAndConditions = lazy(() => import("@/pages/legal/TermsAndConditions"));
+const PrivacyPolicy = lazy(() => import("@/pages/legal/PrivacyPolicy"));
+const RiskDisclosure = lazy(() => import("@/pages/legal/RiskDisclosure"));
+const AMLKYCPolicy = lazy(() => import("@/pages/legal/AMLKYCPolicy"));
+const CookiePolicy = lazy(() => import("@/pages/legal/CookiePolicy"));
+
+const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute>
+    <DashboardLayout>
+      <PageTransition>{children}</PageTransition>
+    </DashboardLayout>
+  </ProtectedRoute>
+);
+
+const AdminRoute = ({ children }: { children: React.ReactNode }) => (
+  <AdminProtectedRoute>
+    <AdminLayout>
+      <PageTransition>{children}</PageTransition>
+    </AdminLayout>
+  </AdminProtectedRoute>
+);
+
 export const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={
-          <PageTransition>
-            <Landing />
-          </PageTransition>
-        } />
-        <Route path="/auth" element={
-          <PageTransition>
-            <Auth />
-          </PageTransition>
-        } />
-        <Route path="/reset-password" element={
-          <PageTransition>
-            <ResetPassword />
-          </PageTransition>
-        } />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PageTransition>
-                <Dashboard />
-              </PageTransition>
-            </DashboardLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard/investments" element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PageTransition>
-                <Investments />
-              </PageTransition>
-            </DashboardLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard/transactions" element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PageTransition>
-                <Transactions />
-              </PageTransition>
-            </DashboardLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard/deposit" element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PageTransition>
-                <Deposit />
-              </PageTransition>
-            </DashboardLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard/withdraw" element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PageTransition>
-                <Withdraw />
-              </PageTransition>
-            </DashboardLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard/referrals" element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PageTransition>
-                <Referrals />
-              </PageTransition>
-            </DashboardLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard/profile" element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PageTransition>
-                <Profile />
-              </PageTransition>
-            </DashboardLayout>
-          </ProtectedRoute>
-        } />
-        
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={
-          <PageTransition>
-            <AdminLogin />
-          </PageTransition>
-        } />
-        <Route path="/admin/dashboard" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminDashboard />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/users" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminUsers />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/transactions" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminTransactions />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/analytics" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminAnalytics />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/deposits" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminDeposits />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/withdrawals" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminWithdrawals />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/investments" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminInvestments />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/trading-bot" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminTradingBot />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/settings" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminSettings />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/reversals" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminReversals />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        <Route path="/admin/activity-log" element={
-          <AdminProtectedRoute>
-            <AdminLayout>
-              <PageTransition>
-                <AdminActivityLog />
-              </PageTransition>
-            </AdminLayout>
-          </AdminProtectedRoute>
-        } />
-        
-        {/* Legal Routes */}
-        <Route path="/legal/terms" element={<PageTransition><TermsAndConditions /></PageTransition>} />
-        <Route path="/legal/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
-        <Route path="/legal/risk" element={<PageTransition><RiskDisclosure /></PageTransition>} />
-        <Route path="/legal/aml-kyc" element={<PageTransition><AMLKYCPolicy /></PageTransition>} />
-        <Route path="/legal/cookies" element={<PageTransition><CookiePolicy /></PageTransition>} />
+    <Suspense fallback={<PageLoader />}>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          {/* Public */}
+          <Route path="/" element={<PageTransition><Landing /></PageTransition>} />
+          <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
+          <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
 
-        <Route path="*" element={
-          <PageTransition>
-            <NotFound />
-          </PageTransition>
-        } />
-      </Routes>
-    </AnimatePresence>
+          {/* Dashboard */}
+          <Route path="/dashboard" element={<DashboardRoute><Dashboard /></DashboardRoute>} />
+          <Route path="/dashboard/investments" element={<DashboardRoute><Investments /></DashboardRoute>} />
+          <Route path="/dashboard/transactions" element={<DashboardRoute><Transactions /></DashboardRoute>} />
+          <Route path="/dashboard/deposit" element={<DashboardRoute><Deposit /></DashboardRoute>} />
+          <Route path="/dashboard/withdraw" element={<DashboardRoute><Withdraw /></DashboardRoute>} />
+          <Route path="/dashboard/referrals" element={<DashboardRoute><Referrals /></DashboardRoute>} />
+          <Route path="/dashboard/profile" element={<DashboardRoute><Profile /></DashboardRoute>} />
+
+          {/* Admin */}
+          <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
+          <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+          <Route path="/admin/transactions" element={<AdminRoute><AdminTransactions /></AdminRoute>} />
+          <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+          <Route path="/admin/deposits" element={<AdminRoute><AdminDeposits /></AdminRoute>} />
+          <Route path="/admin/withdrawals" element={<AdminRoute><AdminWithdrawals /></AdminRoute>} />
+          <Route path="/admin/investments" element={<AdminRoute><AdminInvestments /></AdminRoute>} />
+          <Route path="/admin/trading-bot" element={<AdminRoute><AdminTradingBot /></AdminRoute>} />
+          <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
+          <Route path="/admin/reversals" element={<AdminRoute><AdminReversals /></AdminRoute>} />
+          <Route path="/admin/activity-log" element={<AdminRoute><AdminActivityLog /></AdminRoute>} />
+
+          {/* Legal */}
+          <Route path="/legal/terms" element={<PageTransition><TermsAndConditions /></PageTransition>} />
+          <Route path="/legal/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/legal/risk" element={<PageTransition><RiskDisclosure /></PageTransition>} />
+          <Route path="/legal/aml-kyc" element={<PageTransition><AMLKYCPolicy /></PageTransition>} />
+          <Route path="/legal/cookies" element={<PageTransition><CookiePolicy /></PageTransition>} />
+
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
+    </Suspense>
   );
 };

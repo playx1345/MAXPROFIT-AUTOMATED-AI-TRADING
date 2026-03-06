@@ -142,19 +142,20 @@ export const MobileNav = memo(() => {
         )} />
       )}
       
-      <div className="bg-card/95 backdrop-blur-xl border-t border-border">
+      <div className="bg-card/95 backdrop-blur-xl border-t border-border will-change-transform">
         {/* Progress indicator showing current position */}
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-muted overflow-hidden">
           <div 
-            className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300 ease-out"
+            className="h-full bg-gradient-to-r from-primary to-accent transition-transform duration-300 ease-out"
             style={{ 
-              width: `${((currentIndex + 1) / allNavItems.length) * 100}%`,
-              marginLeft: 0
+              width: '100%',
+              transform: `scaleX(${(currentIndex + 1) / allNavItems.length})`,
+              transformOrigin: 'left'
             }}
           />
         </div>
         
-        <div className="flex items-center justify-around px-2 py-2">
+        <div className="flex items-center justify-around px-1 py-1.5">
           {mainNavItems.map((item) => {
             const isActive = isActiveRoute(item.path);
             const Icon = item.icon;
@@ -165,9 +166,9 @@ export const MobileNav = memo(() => {
                 to={item.path}
                 onClick={() => handleNavClick(item.path)}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl",
-                  "transition-all duration-300 min-w-[60px]",
-                  "active:scale-90",
+                  "relative flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl",
+                  "transition-colors duration-200 min-w-[56px] touch-target",
+                  "active:scale-95",
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
@@ -179,18 +180,13 @@ export const MobileNav = memo(() => {
                 )}
                 
                 <div className={cn(
-                  "relative p-1.5 rounded-lg transition-all duration-300",
-                  isActive && "bg-primary/20 scale-110"
+                  "relative p-1.5 rounded-lg transition-colors duration-200",
+                  isActive && "bg-primary/20"
                 )}>
                   <Icon className={cn(
-                    "w-5 h-5 transition-all duration-200",
-                    isActive && "text-primary drop-shadow-glow"
+                    "w-5 h-5",
+                    isActive && "text-primary"
                   )} />
-                  
-                  {/* Ripple effect on active */}
-                  {isActive && (
-                    <span className="absolute inset-0 rounded-lg bg-primary/20 animate-ping opacity-75" />
-                  )}
                 </div>
                 
                 <span className={cn(

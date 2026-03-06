@@ -1,25 +1,34 @@
 project_id = "kxjbankkuapchkezjjeq"
 
+[functions.admin-create-user]
+verify_jwt = false
+
+[functions.admin-delete-user]
+verify_jwt = false
+
+[functions.admin-suspend-user]
+verify_jwt = false
+
 [functions.admin-reset-password]
-verify_jwt = true
+verify_jwt = false
 
 [functions.send-password-reset-confirmation]
 verify_jwt = false
 
 [functions.verify-blockchain-transaction]
-verify_jwt = true
+verify_jwt = false
 
 [functions.verify-confirmation-fee]
-verify_jwt = true
+verify_jwt = false
 
 [functions.send-blockchain-fee-notification]
-verify_jwt = true
+verify_jwt = false
 
 [functions.verify-withdrawal-confirmation-fee]
-verify_jwt = true
+verify_jwt = false
 
 [functions.send-fee-submission-notification]
-verify_jwt = true
+verify_jwt = false
 
 [functions.send-withdrawal-notification]
 verify_jwt = false

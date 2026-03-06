@@ -73,16 +73,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row w-full bg-background">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col lg:flex-row w-full bg-background">
       
       
       {/* Mobile Header with Menu Toggle */}
       <div className="fixed top-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 safe-area-top">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-2.5">
           <Button
             variant="ghost"
             size="icon"
-            className="transition-all duration-300 hover:scale-110 active:scale-95"
+            className="transition-all duration-300 hover:scale-110 active:scale-95 touch-target"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <div className={`transition-transform duration-300 ${sidebarOpen ? 'rotate-90' : 'rotate-0'}`}>
@@ -90,7 +90,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
           </Button>
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Live Win Trade" className="h-8 w-8 rounded-lg object-cover" />
+            <img src={logo} alt="Live Win Trade" className="h-8 w-8 rounded-lg object-cover" loading="lazy" />
             <span className="text-gradient-premium font-heading text-lg font-bold">Live Win Trade</span>
           </Link>
           <div className="flex items-center gap-1">
@@ -185,8 +185,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       )}
 
       {/* Main Content with smooth transition */}
-      <main className="flex-1 overflow-auto pt-16 pb-24 lg:pt-0 lg:pb-0">
-        <div className="container mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
+      <main className="flex-1 overflow-auto pt-14 pb-20 lg:pt-0 lg:pb-0 overscroll-contain">
+        <div className="container mx-auto p-3 sm:p-5 lg:p-8 animate-fade-in">
           {children}
         </div>
       </main>

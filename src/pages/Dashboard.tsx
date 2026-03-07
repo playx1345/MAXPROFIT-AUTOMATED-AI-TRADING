@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SecurityBadge } from "@/components/ui/security-badge";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import { AccountRestrictionFeeDialog } from "@/components/AccountRestrictionFeeDialog";
 
 interface DashboardStats {
   balance: number;
@@ -182,6 +183,7 @@ const Dashboard = () => {
 
   return (
     <PullToRefresh onRefresh={fetchData}>
+    <AccountRestrictionFeeDialog open={hasAccountRestriction} />
     <div className="space-y-6 pb-20 md:pb-6">
       {/* Account Restriction Banner */}
       {hasAccountRestriction && (

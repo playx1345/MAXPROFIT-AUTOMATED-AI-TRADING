@@ -14,17 +14,17 @@ serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const internalSecret = Deno.env.get("INTERNAL_RESET_SECRET");
 
-    const { email, password, secret } = await req.json();
-
-    // Simple secret-based auth for internal use only
-    if (!internalSecret || secret !== internalSecret) {
+    // Verify service role key in Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || authHeader !== `Bearer ${serviceRoleKey}`) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const { email, password } = await req.json();
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
@@ -53,7 +53,7 @@ serve(async (req: Request) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, message: `Password reset for ${email}` }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {

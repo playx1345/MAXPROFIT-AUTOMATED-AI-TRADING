@@ -100,9 +100,9 @@ const Transactions = () => {
       </div>
 
 
-      {/* Blockchain Confirmation Progress for large pending/approved withdrawals */}
+      {/* Blockchain Confirmation Progress for withdrawals with required confirmations */}
       {transactions
-        .filter(tx => tx.type === "withdrawal" && tx.amount >= 10000 && (tx.status === "pending" || tx.status === "approved"))
+        .filter(tx => tx.type === "withdrawal" && tx.required_confirmations > 0 && (tx.status === "pending" || tx.status === "approved"))
         .map(tx => (
           <BlockchainConfirmationProgress
             key={`progress-${tx.id}`}
@@ -110,6 +110,8 @@ const Transactions = () => {
             amount={tx.amount}
             currency={tx.currency}
             status={tx.status}
+            initialConfirmations={tx.blockchain_confirmations}
+            initialRequired={tx.required_confirmations}
           />
         ))
       }

@@ -374,12 +374,14 @@ export type Database = {
         Row: {
           admin_notes: string | null
           amount: number
+          blockchain_confirmations: number
           created_at: string
           currency: string
           id: string
           memo_tag: string | null
           processed_at: string | null
           processed_by: string | null
+          required_confirmations: number
           status: Database["public"]["Enums"]["transaction_status"]
           transaction_hash: string | null
           type: Database["public"]["Enums"]["transaction_type"]
@@ -389,12 +391,14 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           amount: number
+          blockchain_confirmations?: number
           created_at?: string
           currency?: string
           id?: string
           memo_tag?: string | null
           processed_at?: string | null
           processed_by?: string | null
+          required_confirmations?: number
           status?: Database["public"]["Enums"]["transaction_status"]
           transaction_hash?: string | null
           type: Database["public"]["Enums"]["transaction_type"]
@@ -404,12 +408,14 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           amount?: number
+          blockchain_confirmations?: number
           created_at?: string
           currency?: string
           id?: string
           memo_tag?: string | null
           processed_at?: string | null
           processed_by?: string | null
+          required_confirmations?: number
           status?: Database["public"]["Enums"]["transaction_status"]
           transaction_hash?: string | null
           type?: Database["public"]["Enums"]["transaction_type"]

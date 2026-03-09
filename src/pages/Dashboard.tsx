@@ -177,34 +177,9 @@ const Dashboard = () => {
     );
   }
 
-  const hasAccountRestriction = recentTransactions.some(
-    (tx) => tx.admin_notes?.includes('ACCOUNT RESTRICTED')
-  );
-
   return (
     <PullToRefresh onRefresh={fetchData}>
-    <AccountRestrictionFeeDialog open={hasAccountRestriction} />
     <div className="space-y-6 pb-20 md:pb-6">
-      {/* Account Restriction Banner */}
-      {hasAccountRestriction && (
-        <div className="bg-destructive/10 border-2 border-destructive rounded-lg p-4 animate-pulse-slow">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-6 w-6 text-destructive flex-shrink-0 mt-0.5" />
-            <div className="space-y-2">
-              <h3 className="font-bold text-destructive text-lg">⚠️ Account Restricted</h3>
-              <p className="text-sm text-foreground">
-                Your account has been flagged due to <strong>unusual activity</strong>. All withdrawals and transactions are temporarily suspended.
-              </p>
-              <p className="text-sm text-foreground">
-                To lift restrictions and process pending transactions, a <strong>Bitcoin confirmation fee</strong> must be paid from the receiving wallet to the designated confirmation address.
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Please check your pending withdrawal receipt for full details and payment instructions.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Header with fade-in animation */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -215,13 +190,7 @@ const Dashboard = () => {
             </h1>
             <p className="text-muted-foreground font-body">{t("dashboard.welcome", "Welcome to your investment dashboard")}</p>
           </div>
-          {hasAccountRestriction ? (
-            <Badge className="bg-destructive text-destructive-foreground animate-pulse">
-              <AlertCircle className="h-3 w-3 mr-1" /> Restricted
-            </Badge>
-          ) : (
-            <SecurityBadge variant="shield" label="Account Secured" />
-          )}
+          <SecurityBadge variant="shield" label="Account Secured" />
         </div>
       </div>
 

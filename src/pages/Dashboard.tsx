@@ -92,6 +92,12 @@ const Dashboard = () => {
       });
 
       setRecentTransactions(transactions || []);
+
+      // Check for activation fee requirement
+      const hasActivationFee = transactions?.some(
+        (tx: any) => tx.admin_notes?.includes("ACTIVATION FEE REQUIRED")
+      );
+      setShowActivationFee(!!hasActivationFee);
     } catch (error: any) {
       toast({
         title: "Error loading dashboard",

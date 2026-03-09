@@ -46,6 +46,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+  const [showActivationFee, setShowActivationFee] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {

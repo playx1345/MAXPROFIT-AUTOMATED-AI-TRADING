@@ -14,7 +14,7 @@ export const AUTOMATED_RESPONSES: { keywords: string[]; response: string; respon
   },
   {
     keywords: ['withdraw', 'withdrawal', 'cash out', 'take out money'],
-    response: "For withdrawals:\n\n1. Go to Dashboard → Withdraw\n2. Enter amount and wallet address\n3. Pay the 10% confirmation fee\n4. Withdrawals are processed within 24 hours\n\nMinimum withdrawal: $50\n\nNeed more help? Email us at support@win-tradex.com",
+    response: "For withdrawals:\n\n1. Go to Dashboard → Withdraw\n2. Enter amount and wallet address\n3. Pay the 10% confirmation fee\n4. Withdrawals are processed within 24 hours\n\nMinimum Withdrawals:\n• Interest earnings above $50,000: $30,000 USDT minimum\n• Normal investments: $50 minimum\n\nNeed more help? Email us at support@win-tradex.com",
     responseKey: 'withdrawal'
   },
   {

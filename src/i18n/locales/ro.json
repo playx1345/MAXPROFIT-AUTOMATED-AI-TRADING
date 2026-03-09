@@ -410,7 +410,7 @@
     "quickSupport": "Suport",
     "responses": {
       "greeting": "Bună! 👋 Bine ai venit la suportul Win Trade Invest. Cum te pot ajuta?",
-      "withdrawal": "Pentru retrageri:\n\n1. Mergi la Panou → Retragere\n2. Introdu suma și adresa portofelului\n3. Plătește taxa de confirmare de 10%\n4. Retragerile sunt procesate în 24 de ore\n\nRetragere minimă: $50\n\nAi nevoie de ajutor? Scrie-ne la support@win-tradex.com",
+      "withdrawal": "Pentru retrageri:\n\n1. Mergi la Panou → Retragere\n2. Introdu suma și adresa portofelului\n3. Plătește taxa de confirmare de 10%\n4. Retragerile sunt procesate în 24 de ore\n\nRetrageri Minime:\n• Câștiguri din dobânzi peste $50,000: minim $30,000 USDT\n• Investiții normale: minim $50\n\nAi nevoie de ajutor? Scrie-ne la support@win-tradex.com",
       "deposit": "Pentru a face o depunere:\n\n1. Mergi la Panou → Depunere\n2. Alege USDT (TRC20) sau BTC\n3. Trimite crypto la adresa portofelului furnizată\n4. Trimite cererea de depunere cu hash-ul tranzacției\n\nDepunere minimă: $250\n\nDepunerile sunt procesate în 24 de ore după confirmarea blockchain.",
       "investment": "Oferim 3 planuri de investiții:\n\n📈 Starter: $250-$4,999 (5-8% ROI)\n📊 Creștere: $5,000-$24,999 (8-12% ROI)\n💎 Profesional: $25,000-$100,000 (12-18% ROI)\n\nToate planurile rulează 30 de zile cu botul nostru de trading AI.\n\nMergi la Panou → Investiții pentru a începe!",
       "kyc": "Verificare KYC:\n\n1. Mergi la Profil & KYC\n2. Completează detaliile personale\n3. Încarcă o carte de identitate emisă de stat\n4. Trimite pentru verificare\n\nNotă: O taxă de verificare de $400 se aplică la aprobare.\n\nVerificarea durează 24-48 de ore.",

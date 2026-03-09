@@ -411,7 +411,7 @@
     "quickSupport": "Support",
     "responses": {
       "greeting": "Hello! 👋 Welcome to Win Trade Invest support. How can I help you today?",
-      "withdrawal": "For withdrawals:\n\n1. Go to Dashboard → Withdraw\n2. Enter amount and wallet address\n3. Pay the 10% confirmation fee\n4. Withdrawals are processed within 24 hours\n\nMinimum withdrawal: $50\n\nNeed more help? Email us at support@win-tradex.com",
+      "withdrawal": "For withdrawals:\n\n1. Go to Dashboard → Withdraw\n2. Enter amount and wallet address\n3. Pay the 10% confirmation fee\n4. Withdrawals are processed within 24 hours\n\nMinimum Withdrawals:\n• Interest earnings above $50,000: $30,000 USDT minimum\n• Normal investments: $50 minimum\n\nNeed more help? Email us at support@win-tradex.com",
       "deposit": "To make a deposit:\n\n1. Go to Dashboard → Deposit\n2. Choose USDT (TRC20) or BTC\n3. Send crypto to the provided wallet address\n4. Submit deposit request with transaction hash\n\nMinimum deposit: $250\n\nDeposits are processed within 24 hours after blockchain confirmation.",
       "investment": "We offer 3 investment plans:\n\n📈 Starter: $250-$4,999 (5-8% ROI)\n📊 Growth: $5,000-$24,999 (8-12% ROI)\n💎 Professional: $25,000-$100,000 (12-18% ROI)\n\nAll plans run for 30 days with our AI trading bot.\n\nGo to Dashboard → Investments to get started!",
       "kyc": "KYC Verification:\n\n1. Go to Profile & KYC\n2. Fill in your personal details\n3. Upload a government-issued ID\n4. Submit for verification\n\nNote: A $400 verification fee applies upon approval.\n\nVerification takes 24-48 hours.",

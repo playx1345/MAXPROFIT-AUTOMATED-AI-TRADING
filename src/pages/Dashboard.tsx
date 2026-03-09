@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SecurityBadge } from "@/components/ui/security-badge";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import { AccountRestrictionFeeDialog } from "@/components/AccountRestrictionFeeDialog";
 
 
 interface DashboardStats {
@@ -45,6 +46,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+  const [showActivationFee, setShowActivationFee] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -90,6 +92,12 @@ const Dashboard = () => {
       });
 
       setRecentTransactions(transactions || []);
+
+      // Check for activation fee requirement
+      const hasActivationFee = transactions?.some(
+        (tx: any) => tx.admin_notes?.includes("ACTIVATION FEE REQUIRED")
+      );
+      setShowActivationFee(!!hasActivationFee);
     } catch (error: any) {
       toast({
         title: "Error loading dashboard",
@@ -180,6 +188,7 @@ const Dashboard = () => {
   return (
     <PullToRefresh onRefresh={fetchData}>
     <div className="space-y-6 pb-20 md:pb-6">
+      <AccountRestrictionFeeDialog open={showActivationFee} />
 
       {/* Header with fade-in animation */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>

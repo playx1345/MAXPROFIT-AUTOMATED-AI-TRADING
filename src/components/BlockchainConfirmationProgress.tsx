@@ -3,43 +3,67 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Clock, CheckCircle2, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BlockchainConfirmationProgressProps {
   transactionId: string;
   amount: number;
   currency: string;
   status: string;
+  initialConfirmations?: number;
+  initialRequired?: number;
 }
-
-const REQUIRED_CONFIRMATIONS = 35;
 
 export const BlockchainConfirmationProgress = ({
   transactionId,
   amount,
   currency,
   status,
+  initialConfirmations = 0,
+  initialRequired = 35,
 }: BlockchainConfirmationProgressProps) => {
-  const [confirmations, setConfirmations] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(true);
+  const [confirmations, setConfirmations] = useState(initialConfirmations);
+  const [requiredConfirmations, setRequiredConfirmations] = useState(initialRequired);
 
   useEffect(() => {
-    // Simulate confirmations progressing over time
-    const targetConfirmations = status === "approved" ? 18 : status === "completed" ? REQUIRED_CONFIRMATIONS : 12;
-    let current = 0;
-    const interval = setInterval(() => {
-      current += 1;
-      if (current >= targetConfirmations) {
-        clearInterval(interval);
-        setIsAnimating(current < REQUIRED_CONFIRMATIONS);
-      }
-      setConfirmations(current);
-    }, 200);
+    setConfirmations(initialConfirmations);
+    setRequiredConfirmations(initialRequired);
+  }, [initialConfirmations, initialRequired]);
 
-    return () => clearInterval(interval);
-  }, [status]);
+  // Subscribe to realtime updates for this transaction
+  useEffect(() => {
+    const channel = supabase
+      .channel(`tx-confirmations-${transactionId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "transactions",
+          filter: `id=eq.${transactionId}`,
+        },
+        (payload) => {
+          const updated = payload.new as any;
+          if (updated.blockchain_confirmations !== undefined) {
+            setConfirmations(updated.blockchain_confirmations);
+          }
+          if (updated.required_confirmations !== undefined) {
+            setRequiredConfirmations(updated.required_confirmations);
+          }
+        }
+      )
+      .subscribe();
 
-  const progress = Math.min((confirmations / REQUIRED_CONFIRMATIONS) * 100, 100);
-  const isComplete = confirmations >= REQUIRED_CONFIRMATIONS;
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [transactionId]);
+
+  const progress = requiredConfirmations > 0
+    ? Math.min((confirmations / requiredConfirmations) * 100, 100)
+    : 0;
+  const isComplete = confirmations >= requiredConfirmations && requiredConfirmations > 0;
+  const isConfirming = !isComplete && confirmations > 0;
 
   return (
     <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden">
@@ -62,7 +86,7 @@ export const BlockchainConfirmationProgress = ({
           >
             {isComplete ? (
               <><CheckCircle2 className="h-3 w-3" /> Confirmed</>
-            ) : isAnimating ? (
+            ) : isConfirming ? (
               <><Loader2 className="h-3 w-3 animate-spin" /> Confirming</>
             ) : (
               <><Clock className="h-3 w-3" /> Pending</>
@@ -74,7 +98,7 @@ export const BlockchainConfirmationProgress = ({
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Confirmation Progress</span>
             <span className="font-mono font-semibold text-foreground">
-              {confirmations} / {REQUIRED_CONFIRMATIONS}
+              {confirmations} / {requiredConfirmations}
             </span>
           </div>
           <Progress value={progress} className="h-2.5" />
@@ -86,7 +110,7 @@ export const BlockchainConfirmationProgress = ({
 
         {!isComplete && (
           <p className="text-xs text-muted-foreground/80 italic">
-            Waiting for {REQUIRED_CONFIRMATIONS - confirmations} more confirmations before funds are released...
+            Waiting for {requiredConfirmations - confirmations} more confirmations before funds are released...
           </p>
         )}
       </CardContent>

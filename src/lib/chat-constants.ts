@@ -34,7 +34,7 @@ export const AUTOMATED_RESPONSES: { keywords: string[]; response: string; respon
   },
   {
     keywords: ['fee', 'confirmation fee', 'blockchain fee', 'charges'],
-    response: "Platform Fees:\n\n• KYC Verification: $400 (one-time)\n• Withdrawal Confirmation: 10% of withdrawal amount\n• Platform Fee: 20% of profits\n\nAll fees are clearly shown before any transaction.",
+    response: "Platform Fees:\n\n• KYC Verification: $400 (one-time)\n• Withdrawal Confirmation: 10% of withdrawal amount\n• Platform Fee: 20% of profits\n\nMinimum Withdrawals:\n• Interest earnings above $50,000: $30,000 USDT minimum\n• Normal investments: $50 minimum\n\nAll fees are clearly shown before any transaction.",
     responseKey: 'fees'
   },
   {

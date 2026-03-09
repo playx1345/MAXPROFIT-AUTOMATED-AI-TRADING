@@ -822,10 +822,65 @@ const AdminUsers = () => {
                       <Bitcoin className="h-3 w-3 mr-1" />
                       {t('admin.users.recordFee')}
                     </Button>
+                   </div>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Activation Fee Flag</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs bg-green-500/10 border-green-500 text-green-600 hover:bg-green-500/20"
+                      onClick={async () => {
+                        try {
+                          const { data: { user: adminUser } } = await supabase.auth.getUser();
+                          if (!adminUser || !selectedUser) return;
+
+                          // Clear ACTIVATION FEE REQUIRED from all pending transactions for this user
+                          const { data: flaggedTxs } = await supabase
+                            .from("transactions")
+                            .select("id, admin_notes")
+                            .eq("user_id", selectedUser.id)
+                            .eq("status", "pending")
+                            .ilike("admin_notes", "%ACTIVATION FEE REQUIRED%");
+
+                          if (!flaggedTxs || flaggedTxs.length === 0) {
+                            toast({ title: "No activation fee flag found", description: "This user has no pending transactions with the activation fee flag." });
+                            return;
+                          }
+
+                          for (const tx of flaggedTxs) {
+                            const cleanedNotes = (tx.admin_notes || "").replace(/ACTIVATION FEE REQUIRED/g, "Activation fee paid - cleared by admin").trim();
+                            await supabase
+                              .from("transactions")
+                              .update({ admin_notes: cleanedNotes })
+                              .eq("id", tx.id);
+                          }
+
+                          // Log admin action
+                          await supabase.from("admin_activity_logs").insert({
+                            admin_id: adminUser.id,
+                            admin_email: adminUser.email || "",
+                            action: "clear_activation_fee",
+                            target_type: "user",
+                            target_id: selectedUser.id,
+                            target_email: selectedUser.email,
+                            details: { transactions_cleared: flaggedTxs.length },
+                          });
+
+                          toast({ title: "Activation fee cleared", description: `Cleared activation fee flag from ${flaggedTxs.length} transaction(s) for ${selectedUser.email}` });
+                        } catch (error: any) {
+                          toast({ title: "Error", description: error.message, variant: "destructive" });
+                        }
+                      }}
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Clear Activation Fee
+                    </Button>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">{t('admin.users.joined')}</Label>
+                   <Label className="text-muted-foreground">{t('admin.users.joined')}</Label>
                   <p className="font-medium">
                     {format(new Date(selectedUser.created_at), "MMM dd, yyyy")}
                   </p>

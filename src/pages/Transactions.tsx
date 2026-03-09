@@ -12,6 +12,7 @@ import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
+import { BlockchainConfirmationProgress } from "@/components/BlockchainConfirmationProgress";
 
 interface Transaction {
   id: string;

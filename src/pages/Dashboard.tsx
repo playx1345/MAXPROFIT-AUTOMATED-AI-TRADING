@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { StatCard } from "@/components/ui/stat-card";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Sparkline } from "@/components/ui/sparkline";
-import { Wallet, TrendingUp, ArrowDownLeft, ArrowUpRight, Loader2, AlertCircle, Shield } from "lucide-react";
+import { Wallet, TrendingUp, ArrowDownLeft, ArrowUpRight, Loader2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

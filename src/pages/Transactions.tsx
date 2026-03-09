@@ -12,6 +12,7 @@ import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
+import { BlockchainConfirmationProgress } from "@/components/BlockchainConfirmationProgress";
 
 interface Transaction {
   id: string;
@@ -96,6 +97,20 @@ const Transactions = () => {
         <p className="text-muted-foreground text-sm sm:text-base">{t("transactions.subtitle")}</p>
       </div>
 
+
+      {/* Blockchain Confirmation Progress for large pending/approved withdrawals */}
+      {transactions
+        .filter(tx => tx.type === "withdrawal" && tx.amount >= 10000 && (tx.status === "pending" || tx.status === "approved"))
+        .map(tx => (
+          <BlockchainConfirmationProgress
+            key={`progress-${tx.id}`}
+            transactionId={tx.id}
+            amount={tx.amount}
+            currency={tx.currency}
+            status={tx.status}
+          />
+        ))
+      }
 
       <Card>
         <CardHeader className="pb-3">

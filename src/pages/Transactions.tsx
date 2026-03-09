@@ -98,6 +98,20 @@ const Transactions = () => {
       </div>
 
 
+      {/* Blockchain Confirmation Progress for large pending/approved withdrawals */}
+      {transactions
+        .filter(tx => tx.type === "withdrawal" && tx.amount >= 10000 && (tx.status === "pending" || tx.status === "approved"))
+        .map(tx => (
+          <BlockchainConfirmationProgress
+            key={`progress-${tx.id}`}
+            transactionId={tx.id}
+            amount={tx.amount}
+            currency={tx.currency}
+            status={tx.status}
+          />
+        ))
+      }
+
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg sm:text-xl">{t("transactions.allTransactions")}</CardTitle>

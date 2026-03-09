@@ -25,6 +25,8 @@ interface Transaction {
   transaction_hash: string | null;
   admin_notes: string | null;
   memo_tag: string | null;
+  blockchain_confirmations: number;
+  required_confirmations: number;
 }
 
 const Transactions = () => {

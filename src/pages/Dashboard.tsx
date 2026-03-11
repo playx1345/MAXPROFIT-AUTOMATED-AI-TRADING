@@ -53,6 +53,7 @@ const Dashboard = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      setCurrentUserId(user.id);
 
       // Fetch profile
       const { data: profileData } = await supabase

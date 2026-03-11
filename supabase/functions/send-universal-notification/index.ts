@@ -1,11 +1,23 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+// HTML escape helper to prevent injection
+const escapeHtml = (str: string): string => {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 };
 
 type NotificationType =
@@ -171,6 +183,30 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authenticate the caller
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const {
       user_name,
       user_email,
@@ -202,15 +238,23 @@ const handler = async (req: Request): Promise<Response> => {
       timeZoneName: "short",
     });
 
-    // Build additional info rows
+    // Escape user-controlled values
+    const safeUserName = escapeHtml(user_name);
+    const safeDetails = escapeHtml(details || "");
+    const safeCurrency = escapeHtml(currency);
+    const safeNetwork = escapeHtml(network);
+    const safeTxHash = escapeHtml(tx_hash || "");
+    const safeTransactionId = escapeHtml(transaction_id || "");
+
+    // Build additional info rows with escaped values
     let additionalInfoHtml = "";
     if (additional_info && Object.keys(additional_info).length > 0) {
       additionalInfoHtml = Object.entries(additional_info)
         .map(
           ([key, value]) => `
             <div class="detail-row">
-              <span class="detail-label">${key}</span>
-              <span class="detail-value">${value}</span>
+              <span class="detail-label">${escapeHtml(key)}</span>
+              <span class="detail-value">${escapeHtml(value)}</span>
             </div>
           `
         )
@@ -218,7 +262,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const subject = amount && currency
-      ? `${config.icon} ${config.subject} - ${amount.toLocaleString()} ${currency.toUpperCase()}`
+      ? `${config.icon} ${config.subject} - ${amount.toLocaleString()} ${safeCurrency.toUpperCase()}`
       : `${config.icon} ${config.subject}`;
 
     const orderNumber = transaction_id ? transaction_id.slice(0, 12).toUpperCase() : "";
@@ -237,7 +281,7 @@ const handler = async (req: Request): Promise<Response> => {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${config.title}</title>
+          <title>${escapeHtml(config.title)}</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #0b0e11; color: #eaecef; line-height: 1.6; }
@@ -279,7 +323,7 @@ const handler = async (req: Request): Promise<Response> => {
             .fee-total { border-top: 1px dashed #2b3139; margin-top: 8px; padding-top: 10px; }
             .fee-total .label { color: #eaecef; font-weight: 600; }
             .fee-total .value { color: #0ecb81; font-weight: 700; font-size: 15px; }
-            ${details ? `
+            ${safeDetails ? `
             .details-msg { background: ${config.bgColor}; border: 1px solid ${config.borderColor}; border-radius: 8px; padding: 16px; margin: 16px 0; }
             .details-msg p { color: ${config.color}; font-size: 13px; margin: 0; }
             ` : ""}
@@ -316,8 +360,8 @@ const handler = async (req: Request): Promise<Response> => {
                 <span class="receipt-label">Receipt</span>
               </div>
               <div class="header-title">
-                <h1>${config.icon} ${config.title}</h1>
-                ${orderNumber ? `<p>Order #${orderNumber}</p>` : ""}
+                <h1>${config.icon} ${escapeHtml(config.title)}</h1>
+                ${orderNumber ? `<p>Order #${escapeHtml(orderNumber)}</p>` : ""}
               </div>
             </div>
 
@@ -333,45 +377,45 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="amount-label">Amount</div>
               <div class="amount-value">
                 ${amount!.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                <span class="currency">${currency.toUpperCase()}</span>
+                <span class="currency">${safeCurrency.toUpperCase()}</span>
               </div>
               <div class="amount-usd">≈ $${amount!.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</div>
             </div>
 
-            ${details ? `
+            ${safeDetails ? `
             <div class="section">
-              <div class="details-msg"><p>${details}</p></div>
+              <div class="details-msg"><p>${safeDetails}</p></div>
             </div>
             ` : ""}
 
             <div class="section">
               <div class="section-title">Transaction Details</div>
-              ${transaction_id ? `
+              ${safeTransactionId ? `
               <div class="detail-row">
                 <span class="detail-label">Order ID</span>
-                <span class="detail-value mono">${transaction_id}</span>
+                <span class="detail-value mono">${safeTransactionId}</span>
               </div>
               ` : ""}
               <div class="detail-row">
                 <span class="detail-label">Coin</span>
-                <span class="detail-value highlight">${currency.toUpperCase()}</span>
+                <span class="detail-value highlight">${safeCurrency.toUpperCase()}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Network</span>
                 <span class="detail-value">
-                  <span class="network-badge"><span class="dot"></span>${network}</span>
+                  <span class="network-badge"><span class="dot"></span>${safeNetwork}</span>
                 </span>
               </div>
               ${wallet_address ? `
               <div class="detail-row">
                 <span class="detail-label">Address</span>
-                <span class="detail-value mono">${maskedAddr}</span>
+                <span class="detail-value mono">${escapeHtml(maskedAddr)}</span>
               </div>
               ` : ""}
-              ${tx_hash ? `
+              ${safeTxHash ? `
               <div class="detail-row">
                 <span class="detail-label">TxHash</span>
-                <span class="detail-value mono" style="font-size: 11px; color: #0ecb81;">${tx_hash}</span>
+                <span class="detail-value mono" style="font-size: 11px; color: #0ecb81;">${safeTxHash}</span>
               </div>
               ` : ""}
               <div class="detail-row">
@@ -387,15 +431,15 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="fee-breakdown">
                 <div class="fee-row">
                   <span class="label">Amount</span>
-                  <span class="value">${amount!.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${currency.toUpperCase()}</span>
+                  <span class="value">${amount!.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${safeCurrency.toUpperCase()}</span>
                 </div>
                 <div class="fee-row">
                   <span class="label">Network Fee</span>
-                  <span class="value">-${fee.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${currency.toUpperCase()}</span>
+                  <span class="value">-${fee.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${safeCurrency.toUpperCase()}</span>
                 </div>
                 <div class="fee-row fee-total">
                   <span class="label">You Receive</span>
-                  <span class="value">${actualNetAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${currency.toUpperCase()}</span>
+                  <span class="value">${actualNetAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${safeCurrency.toUpperCase()}</span>
                 </div>
               </div>
             </div>
@@ -444,7 +488,7 @@ const handler = async (req: Request): Promise<Response> => {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${config.title}</title>
+          <title>${escapeHtml(config.title)}</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #0b0e11; color: #eaecef; line-height: 1.6; }
@@ -494,23 +538,23 @@ const handler = async (req: Request): Promise<Response> => {
                 <span class="logo-dot"></span>
                 <span class="logo-text">Win-Tradex</span>
               </div>
-              <h1>${config.icon} ${config.title}</h1>
+              <h1>${config.icon} ${escapeHtml(config.title)}</h1>
               <p>Account Notification</p>
             </div>
 
             <div class="content">
-              <p class="greeting">Dear ${user_name},</p>
+              <p class="greeting">Dear ${safeUserName},</p>
 
               <span class="status-badge">${config.icon} ${notification_type.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}</span>
 
-              ${details ? `<div class="details-msg"><p>${details}</p></div>` : ""}
+              ${safeDetails ? `<div class="details-msg"><p>${safeDetails}</p></div>` : ""}
 
               ${amount ? `
               <div class="amount-section">
                 <div style="font-size: 12px; color: #848e9c; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Amount</div>
                 <div class="amount-value">
                   ${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  <span class="currency">${currency.toUpperCase()}</span>
+                  <span class="currency">${safeCurrency.toUpperCase()}</span>
                 </div>
               </div>
               ` : ""}
@@ -521,10 +565,10 @@ const handler = async (req: Request): Promise<Response> => {
                   <span class="detail-label">Date</span>
                   <span class="detail-value">${formattedDate}</span>
                 </div>
-                ${transaction_id ? `
+                ${safeTransactionId ? `
                 <div class="detail-row">
                   <span class="detail-label">Transaction ID</span>
-                  <span class="detail-value mono">${transaction_id}</span>
+                  <span class="detail-value mono">${safeTransactionId}</span>
                 </div>
                 ` : ""}
                 ${additionalInfoHtml}

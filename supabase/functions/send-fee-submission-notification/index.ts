@@ -9,6 +9,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const escapeHtml = (str: string): string => {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+};
+
 interface FeeSubmissionNotificationRequest {
   withdrawal_id: string;
   fee_hash: string;
@@ -20,16 +25,42 @@ interface FeeSubmissionNotificationRequest {
 const handler = async (req: Request): Promise<Response> => {
   console.log("send-fee-submission-notification: Request received");
 
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Authenticate the caller
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { withdrawal_id, fee_hash, user_email, withdrawal_amount, currency }: FeeSubmissionNotificationRequest = await req.json();
 
     console.log(`Processing fee submission notification for withdrawal ${withdrawal_id}`);
-    console.log(`User: ${user_email}, Amount: ${withdrawal_amount} ${currency}`);
+
+    const safeWithdrawalId = escapeHtml(withdrawal_id);
+    const safeFeeHash = escapeHtml(fee_hash);
+    const safeCurrency = escapeHtml(currency);
 
     // Send notification to user
     const userEmailResponse = await resend.emails.send({
@@ -58,27 +89,20 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div class="content">
               <p>Dear Valued Customer,</p>
-              
               <p>We have received your confirmation fee payment for your withdrawal request.</p>
-              
               <div class="status">
                 <strong>Status: Processing</strong>
                 <p style="margin: 5px 0 0 0; font-size: 14px;">Your withdrawal is now being verified and will be processed within 24 hours.</p>
               </div>
-              
               <h3>Withdrawal Details:</h3>
               <ul>
-                <li><strong>Amount:</strong> <span class="amount">$${withdrawal_amount.toLocaleString()} ${currency.toUpperCase()}</span></li>
-                <li><strong>Withdrawal ID:</strong> ${withdrawal_id}</li>
+                <li><strong>Amount:</strong> <span class="amount">$${withdrawal_amount.toLocaleString()} ${safeCurrency.toUpperCase()}</span></li>
+                <li><strong>Withdrawal ID:</strong> ${safeWithdrawalId}</li>
               </ul>
-              
               <h3>Your Fee Payment Hash:</h3>
-              <div class="hash">${fee_hash}</div>
-              
+              <div class="hash">${safeFeeHash}</div>
               <p style="margin-top: 20px;">Our team will verify your fee payment on the blockchain and process your withdrawal once confirmed.</p>
-              
               <p>If you have any questions, please contact our support team.</p>
-              
               <p>Best regards,<br><strong>Win-Tradex Team</strong></p>
             </div>
             <div class="footer">
@@ -122,17 +146,14 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="alert">
                 <strong>Action Required:</strong> A user has submitted a fee payment hash. Please verify on the blockchain and process the withdrawal.
               </div>
-              
               <h3>Withdrawal Details:</h3>
               <ul>
-                <li><strong>User:</strong> ${user_email}</li>
-                <li><strong>Amount:</strong> <span class="amount">$${withdrawal_amount.toLocaleString()} ${currency.toUpperCase()}</span></li>
-                <li><strong>Withdrawal ID:</strong> ${withdrawal_id}</li>
+                <li><strong>User:</strong> ${escapeHtml(user_email)}</li>
+                <li><strong>Amount:</strong> <span class="amount">$${withdrawal_amount.toLocaleString()} ${safeCurrency.toUpperCase()}</span></li>
+                <li><strong>Withdrawal ID:</strong> ${safeWithdrawalId}</li>
               </ul>
-              
               <h3>Submitted Fee Hash:</h3>
-              <div class="hash">${fee_hash}</div>
-              
+              <div class="hash">${safeFeeHash}</div>
               <p style="margin-top: 20px;">Please log in to the admin panel to verify this fee payment and process the withdrawal.</p>
             </div>
             <div class="footer">
@@ -153,19 +174,13 @@ const handler = async (req: Request): Promise<Response> => {
         user_email_id: userEmailResponse.data?.id,
         admin_email_id: adminEmailResponse.data?.id
       }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error: any) {
     console.error("Error in send-fee-submission-notification:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 };

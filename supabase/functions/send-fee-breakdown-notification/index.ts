@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -8,22 +9,53 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const escapeHtml = (str: string): string => {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Authenticate the caller
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { user_name, user_email, withdrawal_amount, currency, fees } = await req.json();
 
     console.log(`Sending fee breakdown email to ${user_email}`);
 
+    const safeName = escapeHtml(user_name);
+    const safeCurrency = escapeHtml(currency);
     const totalFees = fees.reduce((sum: number, f: any) => sum + f.amount, 0);
     const netAmount = withdrawal_amount - totalFees;
 
     const feeRows = fees.map((f: any) => `
       <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #2b313930;">
-        <span style="font-size:13px;color:#848e9c;">${f.label}</span>
+        <span style="font-size:13px;color:#848e9c;">${escapeHtml(f.label)}</span>
         <span style="font-size:13px;color:#eaecef;font-weight:500;">$${f.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
       </div>
     `).join("");
@@ -31,7 +63,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Win-Tradex <notifications@win-tradex.com>",
       to: [user_email],
-      subject: `Action Required: Fee Payment for $${withdrawal_amount.toLocaleString()} ${currency} Withdrawal`,
+      subject: `Action Required: Fee Payment for $${withdrawal_amount.toLocaleString()} ${safeCurrency} Withdrawal`,
       html: `
         <!DOCTYPE html>
         <html lang="en">
@@ -42,8 +74,6 @@ const handler = async (req: Request): Promise<Response> => {
         </head>
         <body style="margin:0;padding:0;background-color:#0b0e11;color:#eaecef;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;line-height:1.6;">
           <div style="max-width:600px;margin:0 auto;background-color:#181a20;">
-            
-            <!-- Header -->
             <div style="background:linear-gradient(135deg,#1e2329 0%,#0b0e11 100%);padding:28px 32px;border-bottom:1px solid #2b3139;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
                 <div style="display:flex;align-items:center;gap:10px;">
@@ -58,13 +88,11 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
             </div>
 
-            <!-- Greeting -->
             <div style="padding:24px 32px;border-bottom:1px solid #2b3139;">
-              <p style="margin:0;font-size:14px;color:#eaecef;">Dear <strong>${user_name}</strong>,</p>
-              <p style="margin:12px 0 0;font-size:13px;color:#848e9c;">Your withdrawal request of <strong style="color:#d4af37;">$${withdrawal_amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong> ${currency} requires the following fees to be paid before processing can begin.</p>
+              <p style="margin:0;font-size:14px;color:#eaecef;">Dear <strong>${safeName}</strong>,</p>
+              <p style="margin:12px 0 0;font-size:13px;color:#848e9c;">Your withdrawal request of <strong style="color:#d4af37;">$${withdrawal_amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</strong> ${safeCurrency} requires the following fees to be paid before processing can begin.</p>
             </div>
 
-            <!-- Fee Breakdown -->
             <div style="padding:24px 32px;border-bottom:1px solid #2b3139;">
               <div style="font-size:13px;font-weight:600;color:#d4af37;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;">Fee Breakdown</div>
               <div style="background:#1e2329;border-radius:8px;padding:16px;">
@@ -84,19 +112,16 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
             </div>
 
-            <!-- Important Notice -->
             <div style="padding:24px 32px;border-bottom:1px solid #2b3139;">
               <div style="background:rgba(240,185,11,0.08);border:1px solid rgba(240,185,11,0.2);border-radius:8px;padding:16px;">
                 <h4 style="color:#f0b90b;font-size:13px;margin:0 0 8px;">⚠️ Important</h4>
                 <p style="color:#848e9c;font-size:12px;line-height:1.6;margin:0;">
                   These fees are required by the blockchain network and our platform to process your withdrawal securely. 
-                  Please submit payment at your earliest convenience to avoid delays. Your withdrawal will be processed 
-                  once all fees are confirmed.
+                  Please submit payment at your earliest convenience to avoid delays.
                 </p>
               </div>
             </div>
 
-            <!-- CTA -->
             <div style="padding:24px 32px;text-align:center;border-bottom:1px solid #2b3139;">
               <a href="https://win-tradex.com/dashboard/withdraw" style="display:inline-block;background:linear-gradient(135deg,#d4af37 0%,#b8962e 100%);color:#0b0e11;text-decoration:none;padding:14px 40px;border-radius:6px;font-weight:700;font-size:14px;letter-spacing:0.5px;text-transform:uppercase;">Pay Fees Now</a>
               <p style="margin:12px 0 0;font-size:12px;color:#848e9c;">
@@ -104,7 +129,6 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
             </div>
 
-            <!-- Footer -->
             <div style="padding:24px 32px;text-align:center;background:#0b0e11;">
               <p style="font-size:11px;color:#5e6673;margin:4px 0;">This is an automated notification. Please do not reply to this email.</p>
               <p style="font-size:11px;color:#5e6673;margin:4px 0;">© ${new Date().getFullYear()} Win-Tradex. All rights reserved.</p>

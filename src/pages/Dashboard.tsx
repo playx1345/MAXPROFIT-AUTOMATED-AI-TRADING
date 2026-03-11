@@ -47,11 +47,13 @@ const Dashboard = () => {
   const [mounted, setMounted] = useState(false);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [showActivationFee, setShowActivationFee] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>();
 
   const fetchData = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      setCurrentUserId(user.id);
 
       // Fetch profile
       const { data: profileData } = await supabase
@@ -188,7 +190,7 @@ const Dashboard = () => {
   return (
     <PullToRefresh onRefresh={fetchData}>
     <div className="space-y-6 pb-20 md:pb-6">
-      <AccountRestrictionFeeDialog open={showActivationFee} />
+      <AccountRestrictionFeeDialog open={showActivationFee} userId={currentUserId} />
 
       {/* Header with fade-in animation */}
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>

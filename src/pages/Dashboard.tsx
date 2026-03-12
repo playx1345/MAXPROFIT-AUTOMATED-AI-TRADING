@@ -196,7 +196,7 @@ const Dashboard = () => {
       <div className={`transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2 font-heading bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 font-heading bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
               {t("dashboard.title", "Dashboard")}
             </h1>
             <p className="text-muted-foreground font-body">{t("dashboard.welcome", "Welcome to your investment dashboard")}</p>
@@ -206,7 +206,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Cards with sparklines - Enhanced mobile grid */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2.5 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title={t("dashboard.totalBalance", "Available Balance")}
           icon={Wallet}

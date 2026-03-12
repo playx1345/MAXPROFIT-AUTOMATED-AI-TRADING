@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/wtx-logo.png";
 
 
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -90,8 +90,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
           </Button>
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Live Win Trade" className="h-8 w-8 rounded-lg object-cover" loading="lazy" />
-            <span className="text-gradient-premium font-heading text-lg font-bold">Live Win Trade</span>
+            <img src={logo} alt="Win-Tradex" className="h-8 w-8 object-contain" loading="lazy" />
+            <span className="text-gradient-premium font-heading text-lg font-bold">Win-Tradex</span>
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />
@@ -110,9 +110,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent opacity-60" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
             <Link to="/" className="relative flex items-center gap-3 group">
-              <img src={logo} alt="Live Win Trade" className="h-10 w-10 rounded-lg object-cover shadow-md group-hover:shadow-glow transition-shadow duration-300" />
+              <img src={logo} alt="Win-Tradex" className="h-10 w-10 object-contain group-hover:scale-105 transition-transform duration-300" />
               <span className="text-gradient-premium font-heading text-xl font-bold">
-                Live Win Trade
+                Win-Tradex
               </span>
             </Link>
           </div>
@@ -185,10 +185,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       )}
 
       {/* Main Content with smooth transition */}
-      <main className="flex-1 overflow-auto pt-14 pb-20 lg:pt-0 lg:pb-0 overscroll-contain">
-        <div className="container mx-auto p-3 sm:p-5 lg:p-8 animate-fade-in">
-          {children}
-        </div>
+      <main className="flex-1 overflow-auto pt-[52px] pb-[72px] lg:pt-0 lg:pb-0 overscroll-contain">
+        <div className="container mx-auto p-3 sm:p-5 lg:p-8">{children}</div>
       </main>
       
       {/* Mobile Bottom Navigation */}

@@ -9,7 +9,7 @@ import {
   Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/lwt-logo.png";
+import logo from "@/assets/wtx-logo.png";
 import { toast } from "sonner";
 
 const footerLinks = {
@@ -60,13 +60,13 @@ export const Footer = memo(() => {
               <div className="flex items-center gap-3 mb-5">
                 <img 
                   src={logo} 
-                  alt="Live Win Trade Investment logo" 
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 rounded-xl object-cover"
+                  alt="Win-Tradex logo" 
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 object-contain"
                   loading="lazy"
                 />
-                <span className="font-heading font-bold text-lg text-foreground">Live Win Trade</span>
+                <span className="font-heading font-bold text-lg text-foreground">Win-Tradex</span>
               </div>
               <p className="text-sm text-muted-foreground mb-6 max-w-xs leading-relaxed font-body">
                 AI‑driven trading tools for modern investors. Secure, transparent, and always available.
@@ -163,7 +163,7 @@ export const Footer = memo(() => {
         <div className="py-6 border-t border-[hsl(220,14%,14%)]">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs font-body text-muted-foreground text-center sm:text-left">
-              © {new Date().getFullYear()} Live Win Trade. All rights reserved.
+              © {new Date().getFullYear()} Win-Tradex. All rights reserved.
             </p>
             
             <div className="flex items-center gap-4 text-sm font-body">

@@ -14,9 +14,9 @@ const TrustItem = memo(({ icon: Icon, text }: { icon: typeof Shield; text: strin
 TrustItem.displayName = "TrustItem";
 
 const StatCard = memo(({ value, label }: { value: string; label: string }) => (
-  <div className="p-4 rounded-xl bg-card/60 border border-border/50 backdrop-blur-sm">
-    <div className="text-2xl font-heading font-bold text-primary">{value}</div>
-    <div className="text-xs text-muted-foreground mt-1">{label}</div>
+  <div className="p-3 sm:p-4 rounded-xl bg-card/60 border border-border/50 backdrop-blur-sm">
+    <div className="text-lg sm:text-2xl font-heading font-bold text-primary">{value}</div>
+    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">{label}</div>
   </div>
 ));
 StatCard.displayName = "StatCard";
@@ -35,7 +35,7 @@ export const AnimatedHero = memo(() => {
 
   return (
     <section 
-      className="relative min-h-[90dvh] flex items-center overflow-hidden pt-24 sm:pt-28 pb-16 sm:pb-20"
+      className="relative min-h-[85dvh] sm:min-h-[90dvh] flex items-center overflow-hidden pt-20 sm:pt-28 pb-12 sm:pb-20"
       aria-label="Hero section"
     >
       {/* Deep navy-to-black gradient background */}
@@ -55,13 +55,13 @@ export const AnimatedHero = memo(() => {
       />
       
       <div className="relative z-10 container mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Left column - Text */}
           <div className="max-w-xl">
             {/* Live badge */}
             <div 
               className={cn(
-                "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8",
+                "inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 sm:mb-8",
                 "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
               )}
@@ -70,7 +70,7 @@ export const AnimatedHero = memo(() => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
               </span>
-              <span className="text-sm font-medium text-primary uppercase tracking-widest">
+              <span className="text-xs sm:text-sm font-medium text-primary uppercase tracking-widest">
                 Live Trading Active
               </span>
             </div>
@@ -78,8 +78,8 @@ export const AnimatedHero = memo(() => {
             {/* Main heading - Poppins ExtraBold */}
             <h1 
               className={cn(
-                "font-heading font-extrabold tracking-tight leading-[1.08] mb-6",
-                "text-[2rem] sm:text-[2.5rem] lg:text-[3rem]",
+                "font-heading font-extrabold tracking-tight leading-[1.1] mb-4 sm:mb-6",
+                "text-[1.75rem] sm:text-[2.5rem] lg:text-[3rem]",
                 "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-150",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
               )}
@@ -92,7 +92,7 @@ export const AnimatedHero = memo(() => {
             {/* Subtitle - Inter Medium */}
             <p 
               className={cn(
-                "font-body font-medium text-muted-foreground mb-10 max-w-[520px] leading-relaxed",
+                "font-body font-medium text-muted-foreground mb-8 sm:mb-10 max-w-[520px] leading-relaxed",
                 "text-base sm:text-lg lg:text-xl",
                 "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-300",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -104,7 +104,7 @@ export const AnimatedHero = memo(() => {
             {/* CTA Buttons - Binance style */}
             <div 
               className={cn(
-                "flex flex-col sm:flex-row gap-3 sm:gap-4 mb-10",
+                "flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-10",
                 "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[450ms]",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
@@ -113,7 +113,7 @@ export const AnimatedHero = memo(() => {
                 <Button 
                   size="lg" 
                   className={cn(
-                    "group w-full sm:w-auto min-h-[52px] px-8 text-base font-semibold font-body rounded-lg",
+                    "group w-full sm:w-auto min-h-[48px] sm:min-h-[52px] px-6 sm:px-8 text-sm sm:text-base font-semibold font-body rounded-lg",
                     "bg-primary hover:bg-primary/90 text-primary-foreground",
                     "shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40",
                     "transition-all duration-300 hover:-translate-y-0.5"
@@ -128,7 +128,7 @@ export const AnimatedHero = memo(() => {
                 variant="outline" 
                 onClick={handleWatchDemo}
                 className={cn(
-                  "w-full sm:w-auto min-h-[52px] px-8 text-base font-medium font-body rounded-lg",
+                  "w-full sm:w-auto min-h-[48px] sm:min-h-[52px] px-6 sm:px-8 text-sm sm:text-base font-medium font-body rounded-lg",
                   "border-primary/50 text-primary hover:bg-primary/10",
                   "transition-all duration-300 group hover:-translate-y-0.5"
                 )}
@@ -152,10 +152,10 @@ export const AnimatedHero = memo(() => {
             </div>
           </div>
 
-          {/* Right column - Dashboard mockup */}
+          {/* Right column - Dashboard mockup (visible on md+) */}
           <div 
             className={cn(
-              "hidden lg:block",
+              "hidden md:block",
               "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] delay-500",
               isLoaded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
             )}
@@ -165,7 +165,7 @@ export const AnimatedHero = memo(() => {
               <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-3xl" aria-hidden="true" />
               
               {/* Dashboard mockup card */}
-              <div className="relative rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-6 space-y-5">
+              <div className="relative rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -187,7 +187,7 @@ export const AnimatedHero = memo(() => {
                 </div>
 
                 {/* Chart placeholder */}
-                <div className="h-32 rounded-xl bg-muted/30 border border-border/30 flex items-end p-3 gap-1">
+                <div className="h-24 sm:h-32 rounded-xl bg-muted/30 border border-border/30 flex items-end p-2 sm:p-3 gap-0.5 sm:gap-1">
                   {[40, 55, 35, 65, 50, 70, 45, 80, 60, 75, 85, 70, 90, 65, 95].map((h, i) => (
                     <div 
                       key={i} 

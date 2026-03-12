@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import logo from "@/assets/lwt-logo.png";
+import logo from "@/assets/wtx-logo.png";
 import { cn } from "@/lib/utils";
 
 export const Header = () => {
@@ -73,18 +73,15 @@ export const Header = () => {
               />
               <img 
                 src={logo} 
-                alt="Live Win Trade Investment logo" 
-                width={40}
-                height={40}
-                className="relative w-10 h-10 rounded-xl object-cover border border-border/50 transition-all duration-300 group-hover:border-primary/50 group-hover:scale-105"
+                alt="Win-Tradex logo" 
+                width={36}
+                height={36}
+                className="relative w-9 h-9 object-contain transition-all duration-300 group-hover:scale-105"
               />
             </div>
-            <div className="hidden sm:flex flex-col">
-              <span className="font-heading font-bold text-lg text-foreground leading-tight transition-colors duration-300 group-hover:text-primary">
-                Live Win Trade
-              </span>
-              <span className="text-xs text-muted-foreground font-body">AI Trading Platform</span>
-            </div>
+            <span className="hidden sm:block font-heading font-bold text-lg text-foreground leading-tight transition-colors duration-300 group-hover:text-primary">
+              Win-Tradex
+            </span>
           </Link>
 
           {/* Desktop Navigation - Frosted glass pill */}

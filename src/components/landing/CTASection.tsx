@@ -22,7 +22,7 @@ export const CTASection = memo(() => {
             "relative max-w-4xl mx-auto rounded-3xl overflow-hidden",
             "bg-gradient-to-br from-primary/10 via-card to-accent/10",
             "border border-primary/20",
-            "p-8 sm:p-12 lg:p-16"
+            "p-6 sm:p-12 lg:p-16"
           )}
         >
           {/* Decorative glow */}
@@ -36,14 +36,14 @@ export const CTASection = memo(() => {
           />
           
           <div className="relative z-10 text-center">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold mb-4 sm:mb-6">
+            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-heading font-bold mb-3 sm:mb-6">
               Ready to Start Your{" "}
               <span className="text-primary">
                 Trading Journey?
               </span>
             </h2>
             
-            <p className="text-lg sm:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-10 max-w-2xl mx-auto">
               Join thousands of investors already earning with our AI-powered trading platform. 
               Start with as little as $100.
             </p>

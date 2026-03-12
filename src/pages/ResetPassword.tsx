@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { passwordSchema, validateField } from "@/lib/validation";
 import { PasswordInput } from "@/components/ui/password-input";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/wtx-logo.png";
 
 const ResetPassword = () => {
   const navigate = useNavigate();

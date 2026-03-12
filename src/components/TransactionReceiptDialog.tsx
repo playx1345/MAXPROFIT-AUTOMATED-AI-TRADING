@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Copy, Check, Shield, Clock, AlertTriangle, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
+import { CONFIRMATION_FEE_WALLET_BTC, NETWORK_FEE_PERCENTAGE } from "@/lib/constants";
 
 interface TransactionData {
   id: string;
@@ -32,6 +32,10 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   if (!transaction) return null;
+
+  const isWithdrawal = (transaction.type || 'withdrawal') === 'withdrawal';
+  const networkFee = isWithdrawal ? transaction.amount * NETWORK_FEE_PERCENTAGE : 0;
+  const netAmount = isWithdrawal ? transaction.amount - networkFee : transaction.amount;
 
   const isAccountRestricted = transaction.admin_notes?.includes('ACCOUNT RESTRICTED');
   const hasFeeSubmitted = transaction.admin_notes?.toLowerCase().includes('fee hash:') ||
@@ -125,6 +129,29 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
           </div>
 
           <Separator />
+
+          {/* Fee Breakdown for Withdrawals */}
+          {isWithdrawal && (
+            <>
+              <div className="space-y-2 bg-muted/30 p-3 rounded-lg">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Fee Breakdown</p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Withdrawal Amount</span>
+                  <span>${transaction.amount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Network Fee (1%)</span>
+                  <span className="text-destructive">-${networkFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <Separator className="my-1" />
+                <div className="flex justify-between text-sm font-bold">
+                  <span>You Receive</span>
+                  <span className="text-green-600 dark:text-green-400">${netAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
 
           {/* Transaction Details */}
           <div className="space-y-3">
@@ -239,16 +266,16 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
                 </div>
               </>
             )}
-            {!isAccountRestricted && displayStatus === 'pending' && !hasFeeSubmitted && (
+            {!isAccountRestricted && displayStatus === 'pending' && (
               <div className="flex items-start gap-2 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-500/10 p-3 rounded-lg">
-                <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                <span>Confirmation fee payment required to proceed with this withdrawal.</span>
+                <Clock className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <span>Your withdrawal is pending review and will be processed shortly.</span>
               </div>
             )}
             {displayStatus === 'processing' && (
               <div className="flex items-start gap-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-500/10 p-3 rounded-lg">
                 <Clock className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                <span>Fee submitted. Your withdrawal is being verified and will be processed within 24 hours.</span>
+                <span>Your withdrawal is being verified and will be processed within 24 hours.</span>
               </div>
             )}
             {displayStatus === 'under review' && (

@@ -1,38 +1,29 @@
 
 
-## Plan: 1% Network Fee for Withdrawals
+## Plan
 
-### What Changes
+### Task 1: Send Fee Breakdown Email to shawnspicer55@gmail.com
 
-Replace the current 10% "confirmation fee" system with a simple 1% network fee that is deducted from the withdrawal amount. The fee breakdown will appear in the withdrawal preview, transaction receipt, and withdrawal email.
+Call the `send-fee-breakdown-notification` edge function with the existing fee data ($200, $18, $123) for Shawn Spicer's $30,000 withdrawal. This is a direct API call — no code changes needed.
 
-### Implementation
+### Task 2: Fix Password Reset Flow
 
-**1. Update constants (`src/lib/constants.ts`)**
-- Change `WITHDRAWAL_FEE_PERCENTAGE` from `0.10` to `0.01`
-- Rename/add a `NETWORK_FEE_PERCENTAGE` constant at 1%
-- Remove the separate XRP fee percentage (unify to 1%)
+**Problem**: The current password reset has a race condition. When a user clicks the reset link in their email, Supabase creates a session automatically. The `checkUser` function in `Auth.tsx` sees this session and redirects to `/dashboard` before `PASSWORD_RECOVERY` event fires or `showResetPassword` is set. The user never sees the "Set New Password" form.
 
-**2. Update withdrawal form (`src/pages/Withdraw.tsx`)**
-- Show fee breakdown in the preview section: Gross amount, 1% network fee, net amount user receives
-- Pass fee details in the email call
+**Solution**: Create a dedicated `/reset-password` route that reliably catches the recovery flow.
 
-**3. Update transaction receipt (`src/components/TransactionReceiptDialog.tsx`)**
-- Add a fee breakdown section showing: Withdrawal Amount, Network Fee (1%), and Net Amount
-- Remove the old "confirmation fee" / "account restricted" fee prompts from the receipt
-- Keep the account-restricted and blockchain-fail admin-note-driven alerts (those are admin-triggered)
+**Changes**:
 
-**4. Update withdrawal email template (`supabase/functions/send-transactional-email/index.ts`)**
-- Update the `withdrawal_submitted` template to include fee breakdown (gross, 1% fee, net)
-- Accept `network_fee` and `net_amount` in the data payload
+1. **Create `src/pages/ResetPassword.tsx`** — A standalone page that:
+   - Listens for the `PASSWORD_RECOVERY` auth event
+   - Shows the new password form (reuse existing UI from Auth.tsx)
+   - Calls `supabase.auth.updateUser({ password })` then signs out and redirects to `/auth`
 
-**5. Clean up old fee references**
-- Remove the pending-state "confirmation fee payment required" message from receipt
-- Update the receipt to show fee as a line item instead
+2. **Update `src/components/AnimatedRoutes.tsx`** — Add a public route for `/reset-password`
 
-### Files Modified
-- `src/lib/constants.ts`
-- `src/pages/Withdraw.tsx`
-- `src/components/TransactionReceiptDialog.tsx`
-- `supabase/functions/send-transactional-email/index.ts` (redeploy)
+3. **Update `src/pages/Auth.tsx`** — Change the `redirectTo` in `resetPasswordForEmail` to use `/reset-password` instead of `/auth?type=recovery`. Remove the inline reset password UI and state since it moves to its own page.
+
+4. **Update `src/pages/admin/Login.tsx`** — Same redirect fix for admin forgot password flow (point to `/reset-password`)
+
+This ensures the reset form loads on a clean page without competing session-redirect logic.
 

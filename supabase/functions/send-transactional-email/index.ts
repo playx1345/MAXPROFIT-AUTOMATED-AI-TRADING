@@ -68,7 +68,10 @@ const templates: Record<string, (data: Record<string, unknown>) => { subject: st
         Your withdrawal request has been submitted and is pending review.
       </p>
       <div style="background:#faf5e6;border:1px solid #d4af37;border-radius:8px;padding:16px;margin:0 0 20px;">
-        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>Amount:</strong> $${Number(data.amount).toLocaleString()} ${escapeHtml(data.currency as string || 'USDT')}</p>
+        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>Withdrawal Amount:</strong> $${Number(data.amount).toLocaleString()} ${escapeHtml(data.currency as string || 'USDT')}</p>
+        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>Network Fee (1%):</strong> -$${Number(data.network_fee || Number(data.amount) * 0.01).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>You Receive:</strong> <span style="color:#22c55e;font-weight:bold;">$${Number(data.net_amount || Number(data.amount) * 0.99).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+        <hr style="border:none;border-top:1px solid #e5e5e5;margin:8px 0;" />
         <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>Wallet:</strong> ${escapeHtml(((data.wallet_address as string) || '').slice(0, 8))}...${escapeHtml(((data.wallet_address as string) || '').slice(-6))}</p>
         <p style="margin:0;font-size:14px;color:#4a4a5a;"><strong>Status:</strong> <span style="color:#d4af37;font-weight:bold;">Pending</span></p>
       </div>

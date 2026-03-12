@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
+import { MINIMUM_WITHDRAWAL_AMOUNT, NETWORK_FEE_PERCENTAGE } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { PullToRefresh } from "@/components/PullToRefresh";
@@ -164,11 +165,16 @@ const Withdraw = () => {
         setBalance(result.new_balance);
       }
 
+      const networkFee = withdrawalAmount * NETWORK_FEE_PERCENTAGE;
+      const netAmount = withdrawalAmount - networkFee;
+
       // Send withdrawal submitted email (fire-and-forget)
       sendTransactionalEmail("withdrawal_submitted", user.email || "", {
         amount: withdrawalAmount,
         currency: currency.toUpperCase(),
         wallet_address: walletAddress.trim(),
+        network_fee: networkFee,
+        net_amount: netAmount,
       });
 
       toast({
@@ -353,9 +359,18 @@ const Withdraw = () => {
 
             {parseFloat(amount) > 0 && (
               <div className="p-3 bg-muted rounded-lg space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Withdrawal Amount:</span>
+                  <span>${parseFloat(amount).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Network Fee (1%):</span>
+                  <span className="text-destructive">-${(parseFloat(amount) * NETWORK_FEE_PERCENTAGE).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <Separator className="my-1" />
                 <div className="flex justify-between font-bold">
                   <span>{t("withdraw.youWillReceive")}:</span>
-                  <span className="text-success">${parseFloat(amount).toLocaleString()}</span>
+                  <span className="text-success">${(parseFloat(amount) * (1 - NETWORK_FEE_PERCENTAGE)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
             )}

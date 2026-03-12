@@ -119,7 +119,7 @@ serve(async (req: Request): Promise<Response> => {
                 <tr>
                   <td style="padding: 30px 40px; background-color: rgba(0, 0, 0, 0.3); border-top: 1px solid #2a2a35;">
                     <p style="margin: 0; font-size: 12px; color: #71717a; text-align: center;">
-                      This is an automated security notification from Live Win Trade.<br>
+                      This is an automated security notification from Win-Tradex.<br>
                       Please do not reply to this email.
                     </p>
                   </td>

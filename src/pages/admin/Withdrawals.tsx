@@ -18,6 +18,7 @@ import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { useWithdrawalApprovals } from "@/hooks/useWithdrawalApprovals";
 import { WithdrawalApprovalBadge } from "@/components/admin/WithdrawalApprovalBadge";
+import { sendTransactionalEmail } from "@/lib/email-utils";
 
 interface Withdrawal {
   id: string;
@@ -322,6 +323,11 @@ const AdminWithdrawals = () => {
       // Clear approvals for this transaction (cleanup)
       await clearApprovals(selectedWithdrawal.id);
 
+      // Send approval email to user
+      sendTransactionalEmail("withdrawal_approved", selectedWithdrawal.profiles.email, {
+        amount: selectedWithdrawal.amount,
+      });
+
       toast({
         title: "Withdrawal approved",
         description: "Balance has been deducted and transaction marked complete",
@@ -362,6 +368,12 @@ const AdminWithdrawals = () => {
       });
 
       if (error) throw error;
+
+      // Send rejection email to user
+      sendTransactionalEmail("withdrawal_rejected", selectedWithdrawal.profiles.email, {
+        amount: selectedWithdrawal.amount,
+        reason: adminNotes || undefined,
+      });
 
       toast({
         title: "Withdrawal rejected",

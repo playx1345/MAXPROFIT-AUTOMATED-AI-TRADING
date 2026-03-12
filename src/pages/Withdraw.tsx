@@ -16,6 +16,7 @@ import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
+import { sendTransactionalEmail } from "@/lib/email-utils";
 
 
 interface RecentWithdrawal {
@@ -162,6 +163,13 @@ const Withdraw = () => {
       if (result?.new_balance !== undefined) {
         setBalance(result.new_balance);
       }
+
+      // Send withdrawal submitted email (fire-and-forget)
+      sendTransactionalEmail("withdrawal_submitted", user.email || "", {
+        amount: withdrawalAmount,
+        currency: currency.toUpperCase(),
+        wallet_address: walletAddress.trim(),
+      });
 
       toast({
         title: t("withdraw.created"),

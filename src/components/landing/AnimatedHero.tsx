@@ -165,7 +165,7 @@ export const AnimatedHero = memo(() => {
               <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-3xl" aria-hidden="true" />
               
               {/* Dashboard mockup card */}
-              <div className="relative rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-6 space-y-5">
+              <div className="relative rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-4 sm:p-6 space-y-4 sm:space-y-5">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">

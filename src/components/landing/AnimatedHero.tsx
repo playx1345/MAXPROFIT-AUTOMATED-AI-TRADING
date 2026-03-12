@@ -104,7 +104,7 @@ export const AnimatedHero = memo(() => {
             {/* CTA Buttons - Binance style */}
             <div 
               className={cn(
-                "flex flex-col sm:flex-row gap-3 sm:gap-4 mb-10",
+                "flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-10",
                 "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-[450ms]",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}

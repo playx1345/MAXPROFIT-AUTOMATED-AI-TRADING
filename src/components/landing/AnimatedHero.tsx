@@ -35,7 +35,7 @@ export const AnimatedHero = memo(() => {
 
   return (
     <section 
-      className="relative min-h-[90dvh] flex items-center overflow-hidden pt-24 sm:pt-28 pb-16 sm:pb-20"
+      className="relative min-h-[85dvh] sm:min-h-[90dvh] flex items-center overflow-hidden pt-20 sm:pt-28 pb-12 sm:pb-20"
       aria-label="Hero section"
     >
       {/* Deep navy-to-black gradient background */}

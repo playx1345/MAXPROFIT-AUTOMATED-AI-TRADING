@@ -152,10 +152,10 @@ export const AnimatedHero = memo(() => {
             </div>
           </div>
 
-          {/* Right column - Dashboard mockup */}
+          {/* Right column - Dashboard mockup (visible on md+) */}
           <div 
             className={cn(
-              "hidden lg:block",
+              "hidden md:block",
               "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] delay-500",
               isLoaded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
             )}

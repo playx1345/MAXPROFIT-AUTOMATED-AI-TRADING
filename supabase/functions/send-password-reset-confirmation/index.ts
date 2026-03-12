@@ -78,7 +78,7 @@ serve(async (req: Request): Promise<Response> => {
                 <tr>
                   <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, transparent 100%);">
                     <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #eab308;">
-                      Live Win Trade
+                      Win-Tradex
                     </h1>
                   </td>
                 </tr>

@@ -164,6 +164,13 @@ const Withdraw = () => {
         setBalance(result.new_balance);
       }
 
+      // Send withdrawal submitted email (fire-and-forget)
+      sendTransactionalEmail("withdrawal_submitted", user.email || "", {
+        amount: withdrawalAmount,
+        currency: currency.toUpperCase(),
+        wallet_address: walletAddress.trim(),
+      });
+
       toast({
         title: t("withdraw.created"),
         description: t("withdraw.requestSubmitted", "Your withdrawal request has been submitted and is pending review."),

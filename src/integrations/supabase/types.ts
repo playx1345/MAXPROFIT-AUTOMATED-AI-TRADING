@@ -541,6 +541,16 @@ export type Database = {
         Args: { p_amount_usdt: number; p_plan_id: string; p_user_id: string }
         Returns: Json
       }
+      create_withdrawal_atomic: {
+        Args: {
+          p_amount: number
+          p_currency: string
+          p_memo_tag?: string
+          p_user_id: string
+          p_wallet_address: string
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

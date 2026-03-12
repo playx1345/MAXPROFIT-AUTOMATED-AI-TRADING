@@ -146,31 +146,22 @@ const Withdraw = () => {
 
       const withdrawalAmount = parseFloat(amount);
       
-      const { error } = await supabase.from("transactions").insert({
-        user_id: user.id,
-        type: "withdrawal",
-        amount: withdrawalAmount,
-        currency: currency,
-        status: "pending",
-        wallet_address: walletAddress.trim(),
-        memo_tag: currency === 'xrp' && memoTag.trim() ? memoTag.trim() : null,
+      // Use atomic function that deducts balance and creates transaction
+      const { data, error } = await supabase.rpc('create_withdrawal_atomic', {
+        p_user_id: user.id,
+        p_amount: withdrawalAmount,
+        p_currency: currency,
+        p_wallet_address: walletAddress.trim(),
+        p_memo_tag: currency === 'xrp' && memoTag.trim() ? memoTag.trim() : null,
       });
 
       if (error) throw error;
 
-      // Send withdrawal request email notification
-      supabase.functions.invoke('send-withdrawal-notification', {
-        body: {
-          user_name: user.user_metadata?.full_name || user.email,
-          user_email: user.email,
-          amount: withdrawalAmount,
-          currency: currency.toUpperCase(),
-          date: new Date().toISOString(),
-          transaction_id: crypto.randomUUID(),
-          wallet_address: walletAddress.trim(),
-          status: 'pending',
-        },
-      }).catch(err => console.error("Withdrawal email failed:", err));
+      // Update local balance from the response
+      const result = data as { success: boolean; transaction_id: string; new_balance: number };
+      if (result?.new_balance !== undefined) {
+        setBalance(result.new_balance);
+      }
 
       toast({
         title: t("withdraw.created"),

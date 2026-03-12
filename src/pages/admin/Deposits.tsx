@@ -223,6 +223,11 @@ const AdminDeposits = () => {
 
       if (error) throw error;
 
+      // Send deposit approved email to user
+      sendTransactionalEmail("deposit_approved", selectedDeposit.profiles.email, {
+        amount: selectedDeposit.amount,
+      });
+
       toast({
         title: "Deposit approved",
         description: "User balance has been updated",

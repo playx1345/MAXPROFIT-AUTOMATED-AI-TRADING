@@ -187,7 +187,7 @@ export const AnimatedHero = memo(() => {
                 </div>
 
                 {/* Chart placeholder */}
-                <div className="h-32 rounded-xl bg-muted/30 border border-border/30 flex items-end p-3 gap-1">
+                <div className="h-24 sm:h-32 rounded-xl bg-muted/30 border border-border/30 flex items-end p-2 sm:p-3 gap-0.5 sm:gap-1">
                   {[40, 55, 35, 65, 50, 70, 45, 80, 60, 75, 85, 70, 90, 65, 95].map((h, i) => (
                     <div 
                       key={i} 

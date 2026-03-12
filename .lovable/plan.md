@@ -1,29 +1,22 @@
 
 
-## Plan
+# Plan: Remove Activation Fee Popup from Shawn Spicer's Account
 
-### Task 1: Send Fee Breakdown Email to shawnspicer55@gmail.com
+## What Changes
 
-Call the `send-fee-breakdown-notification` edge function with the existing fee data ($200, $18, $123) for Shawn Spicer's $30,000 withdrawal. This is a direct API call — no code changes needed.
+Two database updates to remove the popup trigger and restore the account:
 
-### Task 2: Fix Password Reset Flow
+1. **Clear the "ACTIVATION FEE REQUIRED" flag** from transaction `8eb7c5bc-3e77-45dc-a1ed-f940522351b9` — update `admin_notes` to remove the trigger text
+2. **Unsuspend the account** — set `is_suspended = false` on profile `add51f21-8b65-49ea-9f84-6901783728ad`
+3. **Unban the auth user** — if the auto-disable function banned the user in `auth.users`, we need to lift that ban via the admin-suspend-user edge function
 
-**Problem**: The current password reset has a race condition. When a user clicks the reset link in their email, Supabase creates a session automatically. The `checkUser` function in `Auth.tsx` sees this session and redirects to `/dashboard` before `PASSWORD_RECOVERY` event fires or `showResetPassword` is set. The user never sees the "Set New Password" form.
+No code file changes needed — this is purely a data fix.
 
-**Solution**: Create a dedicated `/reset-password` route that reliably catches the recovery flow.
+## Files to Change
 
-**Changes**:
-
-1. **Create `src/pages/ResetPassword.tsx`** — A standalone page that:
-   - Listens for the `PASSWORD_RECOVERY` auth event
-   - Shows the new password form (reuse existing UI from Auth.tsx)
-   - Calls `supabase.auth.updateUser({ password })` then signs out and redirects to `/auth`
-
-2. **Update `src/components/AnimatedRoutes.tsx`** — Add a public route for `/reset-password`
-
-3. **Update `src/pages/Auth.tsx`** — Change the `redirectTo` in `resetPasswordForEmail` to use `/reset-password` instead of `/auth?type=recovery`. Remove the inline reset password UI and state since it moves to its own page.
-
-4. **Update `src/pages/admin/Login.tsx`** — Same redirect fix for admin forgot password flow (point to `/reset-password`)
-
-This ensures the reset form loads on a clean page without competing session-redirect logic.
+| Target | Change |
+|--------|--------|
+| Database: `transactions` | Clear activation fee flag from admin_notes |
+| Database: `profiles` | Set `is_suspended = false` |
+| Edge function call: `admin-suspend-user` | Unsuspend user in auth system |
 

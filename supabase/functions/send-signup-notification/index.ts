@@ -60,7 +60,7 @@ const handler = async (req: Request): Promise<Response> => {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Welcome to Live Win Trade</title>
+          <title>Welcome to Win-Tradex</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #0b0e11; color: #eaecef; line-height: 1.6; }

@@ -79,12 +79,9 @@ export const Header = () => {
                 className="relative w-9 h-9 object-contain transition-all duration-300 group-hover:scale-105"
               />
             </div>
-            <div className="hidden sm:flex flex-col">
-              <span className="font-heading font-bold text-lg text-foreground leading-tight transition-colors duration-300 group-hover:text-primary">
-                Live Win Trade
-              </span>
-              <span className="text-xs text-muted-foreground font-body">AI Trading Platform</span>
-            </div>
+            <span className="hidden sm:block font-heading font-bold text-lg text-foreground leading-tight transition-colors duration-300 group-hover:text-primary">
+              Win-Tradex
+            </span>
           </Link>
 
           {/* Desktop Navigation - Frosted glass pill */}

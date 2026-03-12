@@ -163,7 +163,7 @@ export const Footer = memo(() => {
         <div className="py-6 border-t border-[hsl(220,14%,14%)]">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs font-body text-muted-foreground text-center sm:text-left">
-              © {new Date().getFullYear()} Live Win Trade. All rights reserved.
+              © {new Date().getFullYear()} Win-Tradex. All rights reserved.
             </p>
             
             <div className="flex items-center gap-4 text-sm font-body">

@@ -110,9 +110,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent opacity-60" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
             <Link to="/" className="relative flex items-center gap-3 group">
-              <img src={logo} alt="Live Win Trade" className="h-10 w-10 rounded-lg object-cover shadow-md group-hover:shadow-glow transition-shadow duration-300" />
+              <img src={logo} alt="Win-Tradex" className="h-10 w-10 object-contain group-hover:scale-105 transition-transform duration-300" />
               <span className="text-gradient-premium font-heading text-xl font-bold">
-                Live Win Trade
+                Win-Tradex
               </span>
             </Link>
           </div>

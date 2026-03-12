@@ -73,10 +73,10 @@ export const Header = () => {
               />
               <img 
                 src={logo} 
-                alt="Live Win Trade Investment logo" 
-                width={40}
-                height={40}
-                className="relative w-10 h-10 rounded-xl object-cover border border-border/50 transition-all duration-300 group-hover:border-primary/50 group-hover:scale-105"
+                alt="Win-Tradex logo" 
+                width={36}
+                height={36}
+                className="relative w-9 h-9 object-contain transition-all duration-300 group-hover:scale-105"
               />
             </div>
             <div className="hidden sm:flex flex-col">

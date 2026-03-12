@@ -35,6 +35,7 @@ const App = () => (
           <Sonner />
           <LiveChat />
           <PWAInstallPrompt />
+          <ScrollToTop />
           <BrowserRouter>
             <AnimatedRoutes />
           </BrowserRouter>

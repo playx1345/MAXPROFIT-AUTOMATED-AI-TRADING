@@ -353,9 +353,18 @@ const Withdraw = () => {
 
             {parseFloat(amount) > 0 && (
               <div className="p-3 bg-muted rounded-lg space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Withdrawal Amount:</span>
+                  <span>${parseFloat(amount).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Network Fee (1%):</span>
+                  <span className="text-destructive">-${(parseFloat(amount) * NETWORK_FEE_PERCENTAGE).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <Separator className="my-1" />
                 <div className="flex justify-between font-bold">
                   <span>{t("withdraw.youWillReceive")}:</span>
-                  <span className="text-success">${parseFloat(amount).toLocaleString()}</span>
+                  <span className="text-success">${(parseFloat(amount) * (1 - NETWORK_FEE_PERCENTAGE)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
             )}

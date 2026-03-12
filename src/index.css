@@ -3,6 +3,17 @@
 @tailwind utilities;
 
 /* ============================================
+   GLOBAL SMOOTH SCROLLING
+   ============================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
    ACCESSIBILITY: Reduced Motion Support
    ============================================ */
 @media (prefers-reduced-motion: reduce) {

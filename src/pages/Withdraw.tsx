@@ -16,6 +16,7 @@ import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import TransactionReceiptDialog from "@/components/TransactionReceiptDialog";
+import { sendTransactionalEmail } from "@/lib/email-utils";
 
 
 interface RecentWithdrawal {

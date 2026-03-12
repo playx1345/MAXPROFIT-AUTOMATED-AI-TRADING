@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="content">
               <p class="greeting">Welcome, ${safeName}! 🎉</p>
               <p class="message">
-                Your Live Win Trade account has been successfully created. You're now part of a growing community of smart investors using AI-powered trading strategies.
+                Your Win-Tradex account has been successfully created. You're now part of a growing community of smart investors using AI-powered trading strategies.
               </p>
               
               <div class="steps">

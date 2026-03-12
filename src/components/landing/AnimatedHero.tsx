@@ -128,7 +128,7 @@ export const AnimatedHero = memo(() => {
                 variant="outline" 
                 onClick={handleWatchDemo}
                 className={cn(
-                  "w-full sm:w-auto min-h-[52px] px-8 text-base font-medium font-body rounded-lg",
+                  "w-full sm:w-auto min-h-[48px] sm:min-h-[52px] px-6 sm:px-8 text-sm sm:text-base font-medium font-body rounded-lg",
                   "border-primary/50 text-primary hover:bg-primary/10",
                   "transition-all duration-300 group hover:-translate-y-0.5"
                 )}

@@ -43,7 +43,7 @@ export const CTASection = memo(() => {
               </span>
             </h2>
             
-            <p className="text-lg sm:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-10 max-w-2xl mx-auto">
               Join thousands of investors already earning with our AI-powered trading platform. 
               Start with as little as $100.
             </p>

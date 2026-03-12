@@ -18,6 +18,7 @@ import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { useWithdrawalApprovals } from "@/hooks/useWithdrawalApprovals";
 import { WithdrawalApprovalBadge } from "@/components/admin/WithdrawalApprovalBadge";
+import { sendTransactionalEmail } from "@/lib/email-utils";
 
 interface Withdrawal {
   id: string;

@@ -206,7 +206,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Cards with sparklines - Enhanced mobile grid */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2.5 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title={t("dashboard.totalBalance", "Available Balance")}
           icon={Wallet}

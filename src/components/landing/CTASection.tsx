@@ -22,7 +22,7 @@ export const CTASection = memo(() => {
             "relative max-w-4xl mx-auto rounded-3xl overflow-hidden",
             "bg-gradient-to-br from-primary/10 via-card to-accent/10",
             "border border-primary/20",
-            "p-8 sm:p-12 lg:p-16"
+            "p-6 sm:p-12 lg:p-16"
           )}
         >
           {/* Decorative glow */}

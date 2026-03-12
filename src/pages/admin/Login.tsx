@@ -11,7 +11,7 @@ import { ArrowLeft, Clock } from "lucide-react";
 import { z } from "zod";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRateLimit } from "@/hooks/useRateLimit";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/wtx-logo.png";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
 const emailSchema = z.string().email("Invalid email address");

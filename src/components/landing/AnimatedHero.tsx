@@ -78,8 +78,8 @@ export const AnimatedHero = memo(() => {
             {/* Main heading - Poppins ExtraBold */}
             <h1 
               className={cn(
-                "font-heading font-extrabold tracking-tight leading-[1.08] mb-6",
-                "text-[2rem] sm:text-[2.5rem] lg:text-[3rem]",
+                "font-heading font-extrabold tracking-tight leading-[1.1] mb-4 sm:mb-6",
+                "text-[1.75rem] sm:text-[2.5rem] lg:text-[3rem]",
                 "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-150",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
               )}

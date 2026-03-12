@@ -29,8 +29,8 @@ export function useDynamicMeta({
       }`;
 
     const fullTitle = title
-      ? `${title} | Live Win Trade`
-      : "Live Win Trade – AI Crypto Investment Platform";
+      ? `${title} | Win-Tradex`
+      : "Win-Tradex – AI Crypto Investment Platform";
 
     const fullDescription =
       description ||

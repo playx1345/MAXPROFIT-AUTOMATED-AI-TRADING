@@ -90,8 +90,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
           </Button>
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Live Win Trade" className="h-8 w-8 rounded-lg object-cover" loading="lazy" />
-            <span className="text-gradient-premium font-heading text-lg font-bold">Live Win Trade</span>
+            <img src={logo} alt="Win-Tradex" className="h-8 w-8 object-contain" loading="lazy" />
+            <span className="text-gradient-premium font-heading text-lg font-bold">Win-Tradex</span>
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />

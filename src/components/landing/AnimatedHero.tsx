@@ -14,9 +14,9 @@ const TrustItem = memo(({ icon: Icon, text }: { icon: typeof Shield; text: strin
 TrustItem.displayName = "TrustItem";
 
 const StatCard = memo(({ value, label }: { value: string; label: string }) => (
-  <div className="p-4 rounded-xl bg-card/60 border border-border/50 backdrop-blur-sm">
-    <div className="text-2xl font-heading font-bold text-primary">{value}</div>
-    <div className="text-xs text-muted-foreground mt-1">{label}</div>
+  <div className="p-3 sm:p-4 rounded-xl bg-card/60 border border-border/50 backdrop-blur-sm">
+    <div className="text-lg sm:text-2xl font-heading font-bold text-primary">{value}</div>
+    <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">{label}</div>
   </div>
 ));
 StatCard.displayName = "StatCard";

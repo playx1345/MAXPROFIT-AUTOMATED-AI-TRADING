@@ -12,7 +12,7 @@ import { Shield, Zap, ArrowLeft, Clock } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRateLimit } from "@/hooks/useRateLimit";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/wtx-logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();

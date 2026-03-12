@@ -92,7 +92,7 @@ export const AnimatedHero = memo(() => {
             {/* Subtitle - Inter Medium */}
             <p 
               className={cn(
-                "font-body font-medium text-muted-foreground mb-10 max-w-[520px] leading-relaxed",
+                "font-body font-medium text-muted-foreground mb-8 sm:mb-10 max-w-[520px] leading-relaxed",
                 "text-base sm:text-lg lg:text-xl",
                 "transition-all duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] delay-300",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"

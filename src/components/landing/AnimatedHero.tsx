@@ -61,7 +61,7 @@ export const AnimatedHero = memo(() => {
             {/* Live badge */}
             <div 
               className={cn(
-                "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8",
+                "inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 sm:mb-8",
                 "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
               )}

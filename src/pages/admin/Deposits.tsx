@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { sendTransactionalEmail } from "@/lib/email-utils";
 
 interface Deposit {
   id: string;

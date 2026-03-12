@@ -125,7 +125,7 @@ const Landing = () => {
         {/* Features Section */}
         <Section 
           id="features" 
-          title="Why Choose Live Win Trade?"
+          title="Why Choose Win-Tradex?"
           subtitle="Advanced technology meets professional trading expertise"
           variant="muted"
         >

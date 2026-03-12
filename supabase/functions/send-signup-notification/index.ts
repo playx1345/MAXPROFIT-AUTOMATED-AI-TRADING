@@ -53,14 +53,14 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Win-Tradex <notifications@win-tradex.com>",
       to: [user_email],
-      subject: "Welcome to Live Win Trade – Your Account is Ready",
+      subject: "Welcome to Win-Tradex – Your Account is Ready",
       html: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Welcome to Live Win Trade</title>
+          <title>Welcome to Win-Tradex</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #0b0e11; color: #eaecef; line-height: 1.6; }
@@ -86,12 +86,12 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="wrapper">
             <div class="header">
-              <span class="logo-text">Live Win Trade</span>
+              <span class="logo-text">Win-Tradex</span>
             </div>
             <div class="content">
               <p class="greeting">Welcome, ${safeName}! 🎉</p>
               <p class="message">
-                Your Live Win Trade account has been successfully created. You're now part of a growing community of smart investors using AI-powered trading strategies.
+                Your Win-Tradex account has been successfully created. You're now part of a growing community of smart investors using AI-powered trading strategies.
               </p>
               
               <div class="steps">
@@ -127,9 +127,9 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
             </div>
             <div class="footer">
-              <p class="brand">Live Win Trade</p>
+              <p class="brand">Win-Tradex</p>
               <p>This is an automated welcome email. Please do not reply.</p>
-              <p>© ${new Date().getFullYear()} Live Win Trade. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} Win-Tradex. All rights reserved.</p>
             </div>
           </div>
         </body>

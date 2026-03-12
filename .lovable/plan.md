@@ -1,53 +1,29 @@
 
 
-## Website Scan Results & Fix Plan
+## Plan
 
-### Issues Found
+### Task 1: Send Fee Breakdown Email to shawnspicer55@gmail.com
 
-**1. Branding Inconsistency — "Live Win Trade" still in 10+ files**
-The rebrand to "Win-Tradex" was only applied to Header, Footer, and DashboardLayout. These files still say "Live Win Trade":
-- `index.html` — title, meta tags, OG tags, Twitter cards
-- `src/hooks/useDynamicMeta.ts` — document title fallback
-- `src/pages/Auth.tsx` — logo alt text, heading text, imports old `logo.jpg`
-- `src/pages/admin/Login.tsx` — logo alt text, imports old `logo.jpg`
-- `src/pages/ResetPassword.tsx` — imports old `logo.jpg`
-- `src/pages/Landing.tsx` — features section title "Why Choose Live Win Trade?"
-- `src/components/landing/StructuredData.tsx` — all schema.org data references old name/URL
-- Edge function email templates (6 files) — still reference old `logo.jpg` URL and "Live Win Trade" branding
+Call the `send-fee-breakdown-notification` edge function with the existing fee data ($200, $18, $123) for Shawn Spicer's $30,000 withdrawal. This is a direct API call — no code changes needed.
 
-**2. Old Logo Import (`logo.jpg`) in 3 Frontend Files**
-`Auth.tsx`, `admin/Login.tsx`, and `ResetPassword.tsx` import `@/assets/logo.jpg` instead of `@/assets/wtx-logo.png`. This may cause broken images if `logo.jpg` was replaced.
+### Task 2: Fix Password Reset Flow
 
-**3. Stale Canonical URL & OG URLs**
-`index.html` and `StructuredData.tsx` reference `https://livewintradeiv.com/` which appears to be an old/incorrect domain. The published URL is `live-win-trade-invest.lovable.app`.
+**Problem**: The current password reset has a race condition. When a user clicks the reset link in their email, Supabase creates a session automatically. The `checkUser` function in `Auth.tsx` sees this session and redirects to `/dashboard` before `PASSWORD_RECOVERY` event fires or `showResetPassword` is set. The user never sees the "Set New Password" form.
 
-**4. No Functional Bugs Detected**
-- No console errors
-- No failed network requests
-- Routing, lazy loading, error boundary, and session management all look correct
-- Mobile nav, dashboard layout padding, and responsive breakpoints are properly configured
+**Solution**: Create a dedicated `/reset-password` route that reliably catches the recovery flow.
 
----
+**Changes**:
 
-### Fix Plan
+1. **Create `src/pages/ResetPassword.tsx`** — A standalone page that:
+   - Listens for the `PASSWORD_RECOVERY` auth event
+   - Shows the new password form (reuse existing UI from Auth.tsx)
+   - Calls `supabase.auth.updateUser({ password })` then signs out and redirects to `/auth`
 
-**Step 1: Update `index.html`**
-Replace all "Live Win Trade" with "Win-Tradex" in title, meta, OG, and Twitter tags. Update canonical/OG URLs to the published domain.
+2. **Update `src/components/AnimatedRoutes.tsx`** — Add a public route for `/reset-password`
 
-**Step 2: Update `src/hooks/useDynamicMeta.ts`**
-Change fallback title from "Live Win Trade" to "Win-Tradex".
+3. **Update `src/pages/Auth.tsx`** — Change the `redirectTo` in `resetPasswordForEmail` to use `/reset-password` instead of `/auth?type=recovery`. Remove the inline reset password UI and state since it moves to its own page.
 
-**Step 3: Fix logo imports in Auth, Admin Login, ResetPassword**
-Change `import logo from "@/assets/logo.jpg"` to `import logo from "@/assets/wtx-logo.png"` and update alt text to "Win-Tradex".
+4. **Update `src/pages/admin/Login.tsx`** — Same redirect fix for admin forgot password flow (point to `/reset-password`)
 
-**Step 4: Update `src/pages/Landing.tsx`**
-Change features section title from "Why Choose Live Win Trade?" to "Why Choose Win-Tradex?".
-
-**Step 5: Update `src/components/landing/StructuredData.tsx`**
-Replace all "Live Win Trade Investment" references with "Win-Tradex" and update URLs.
-
-**Step 6: Update edge function email templates**
-Update LOGO_URL and branding text in all 7 email template/function files to use "Win-Tradex" and the new logo URL.
-
-Total: ~16 file edits, all branding alignment — no structural or functional changes.
+This ensures the reset form loads on a clean page without competing session-redirect logic.
 

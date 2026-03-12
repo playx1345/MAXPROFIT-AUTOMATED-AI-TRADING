@@ -11,7 +11,7 @@ import { ArrowLeft, Clock } from "lucide-react";
 import { z } from "zod";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRateLimit } from "@/hooks/useRateLimit";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/wtx-logo.png";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
 const emailSchema = z.string().email("Invalid email address");
@@ -124,7 +124,7 @@ const AdminLogin = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <img src={logo} alt="Live Win Trade" className="h-16 w-16 rounded-full object-cover shadow-lg" />
+              <img src={logo} alt="Win-Tradex" className="h-16 w-16 rounded-full object-contain shadow-lg" />
             </div>
             <CardTitle className="text-2xl">{t('admin.login.setNewPassword')}</CardTitle>
             <CardDescription>{t('admin.login.setNewPasswordSubtitle')}</CardDescription>
@@ -154,7 +154,7 @@ const AdminLogin = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <img src={logo} alt="Live Win Trade" className="h-16 w-16 rounded-full object-cover shadow-lg" />
+              <img src={logo} alt="Win-Tradex" className="h-16 w-16 rounded-full object-contain shadow-lg" />
             </div>
             <CardTitle className="text-2xl">{t('admin.login.resetTitle')}</CardTitle>
             <CardDescription>{t('admin.login.resetSubtitle')}</CardDescription>
@@ -187,7 +187,7 @@ const AdminLogin = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src={logo} alt="Live Win Trade" className="h-16 w-16 rounded-full object-cover shadow-lg" />
+            <img src={logo} alt="Win-Tradex" className="h-16 w-16 rounded-full object-contain shadow-lg" />
           </div>
           <div className="flex justify-center mb-2"><LanguageSelector /></div>
           <CardTitle className="text-2xl">{t('admin.login.title')}</CardTitle>

@@ -6,7 +6,7 @@ import { Body, Container, Head, Heading, Html, Img, Preview, Section, Text } fro
 
 interface ReauthenticationEmailProps { token: string }
 
-const LOGO = "https://kxjbankkuapchkezjjeq.supabase.co/storage/v1/object/public/email-assets/logo.jpg"
+const LOGO = "https://kxjbankkuapchkezjjeq.supabase.co/storage/v1/object/public/email-assets/wtx-logo.png"
 
 export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
   <Html lang="en" dir="ltr">

@@ -8,7 +8,7 @@ interface DynamicMetaProps {
 }
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SITE_URL = "https://livewintradeiv.com";
+const SITE_URL = "https://live-win-trade-invest.lovable.app";
 
 /**
  * Hook to dynamically update meta tags for SEO and social sharing.
@@ -29,8 +29,8 @@ export function useDynamicMeta({
       }`;
 
     const fullTitle = title
-      ? `${title} | Live Win Trade`
-      : "Live Win Trade – AI Crypto Investment Platform";
+      ? `${title} | Win-Tradex`
+      : "Win-Tradex – AI Crypto Investment Platform";
 
     const fullDescription =
       description ||
@@ -67,7 +67,7 @@ export function useDynamicMeta({
 
     // Cleanup - restore defaults on unmount
     return () => {
-      document.title = "Live Win Trade – AI Crypto Investment Platform";
+      document.title = "Win-Tradex – AI Crypto Investment Platform";
     };
   }, [title, description, page, ogImageUrl]);
 }

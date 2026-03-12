@@ -35,3 +35,5 @@ project_id = "kxjbankkuapchkezjjeq"
     verify_jwt = false
   [functions.verify-withdrawal-confirmation-fee]
     verify_jwt = false
+  [functions.send-transactional-email]
+    verify_jwt = false

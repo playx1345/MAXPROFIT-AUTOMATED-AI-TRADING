@@ -86,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="wrapper">
             <div class="header">
-              <span class="logo-text">Live Win Trade</span>
+              <span class="logo-text">Win-Tradex</span>
             </div>
             <div class="content">
               <p class="greeting">Welcome, ${safeName}! 🎉</p>

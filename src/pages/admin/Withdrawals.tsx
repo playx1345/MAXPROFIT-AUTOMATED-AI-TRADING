@@ -323,6 +323,11 @@ const AdminWithdrawals = () => {
       // Clear approvals for this transaction (cleanup)
       await clearApprovals(selectedWithdrawal.id);
 
+      // Send approval email to user
+      sendTransactionalEmail("withdrawal_approved", selectedWithdrawal.profiles.email, {
+        amount: selectedWithdrawal.amount,
+      });
+
       toast({
         title: "Withdrawal approved",
         description: "Balance has been deducted and transaction marked complete",

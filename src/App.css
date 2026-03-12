@@ -6,10 +6,7 @@
   min-height: 100dvh; /* Use dynamic viewport height for mobile browsers */
 }
 
-/* Ensure smooth scrolling for anchor links */
-html {
-  scroll-behavior: smooth;
-}
+/* Smooth scrolling handled in index.css */
 
 /* Improve text rendering */
 body {

@@ -67,7 +67,7 @@ export function useDynamicMeta({
 
     // Cleanup - restore defaults on unmount
     return () => {
-      document.title = "Live Win Trade – AI Crypto Investment Platform";
+      document.title = "Win-Tradex – AI Crypto Investment Platform";
     };
   }, [title, description, page, ogImageUrl]);
 }

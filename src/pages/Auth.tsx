@@ -462,9 +462,9 @@ const Auth = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Logo and branding */}
         <div className="text-center mb-6 sm:mb-8 animate-fade-in">
-          <img src={logo} alt="Live Win Trade" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-xl shadow-primary/25 mb-3 sm:mb-4 mx-auto object-cover border-2 border-primary/20" />
+          <img src={logo} alt="Win-Tradex" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-xl shadow-primary/25 mb-3 sm:mb-4 mx-auto object-contain border-2 border-primary/20" />
           <h1 className="text-2xl sm:text-3xl font-serif font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wide">
-            Live Win Trade
+            Win-Tradex
           </h1>
           <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">AI-Powered Investment Platform</p>
         </div>

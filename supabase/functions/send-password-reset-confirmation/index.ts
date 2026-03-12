@@ -141,7 +141,7 @@ serve(async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Win-Tradex <notifications@win-tradex.com>",
         to: [email],
-        subject: "Password Successfully Changed - Live Win Trade",
+        subject: "Password Successfully Changed - Win-Tradex",
         html: htmlContent,
       }),
     });

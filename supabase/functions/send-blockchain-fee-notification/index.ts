@@ -160,7 +160,7 @@ const handler = async (req: Request): Promise<Response> => {
               <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
               
               <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">
-                This is an automated message from Live Win Trade. Please do not reply to this email.
+                This is an automated message from Win-Tradex. Please do not reply to this email.
               </p>
             </div>
           </div>

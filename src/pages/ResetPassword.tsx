@@ -121,9 +121,9 @@ const ResetPassword = () => {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8 animate-fade-in">
-          <img src={logo} alt="Live Win Trade" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-cover" />
+          <img src={logo} alt="Win-Tradex" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-contain" />
           <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Live Win Trade
+            Win-Tradex
           </h1>
         </div>
 

@@ -187,7 +187,7 @@ const AdminLogin = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src={logo} alt="Live Win Trade" className="h-16 w-16 rounded-full object-cover shadow-lg" />
+            <img src={logo} alt="Win-Tradex" className="h-16 w-16 rounded-full object-contain shadow-lg" />
           </div>
           <div className="flex justify-center mb-2"><LanguageSelector /></div>
           <CardTitle className="text-2xl">{t('admin.login.title')}</CardTitle>

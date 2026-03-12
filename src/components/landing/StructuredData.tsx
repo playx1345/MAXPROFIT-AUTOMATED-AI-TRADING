@@ -1,11 +1,13 @@
 import { memo } from "react";
 
+const SITE_URL = "https://live-win-trade-invest.lovable.app";
+
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Live Win Trade Investment",
-  "url": "https://livewintradeiv.com",
-  "logo": "https://livewintradeiv.com/pwa-512x512.png",
+  "name": "Win-Tradex",
+  "url": SITE_URL,
+  "logo": `${SITE_URL}/pwa-512x512.png`,
   "description": "AI-powered cryptocurrency investment platform with automated trading strategies.",
   "foundingDate": "2024",
   "sameAs": [],
@@ -19,12 +21,12 @@ const organizationSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "Live Win Trade Investment",
-  "url": "https://livewintradeiv.com",
+  "name": "Win-Tradex",
+  "url": SITE_URL,
   "description": "Professional cryptocurrency investment platform with AI-powered automated trading strategies.",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://livewintradeiv.com/?q={search_term_string}",
+    "target": `${SITE_URL}/?q={search_term_string}`,
     "query-input": "required name=search_term_string"
   }
 };
@@ -87,11 +89,11 @@ const faqSchema = {
 const investmentProductSchema = {
   "@context": "https://schema.org",
   "@type": "FinancialProduct",
-  "name": "Live Win Trade AI Investment Plans",
+  "name": "Win-Tradex AI Investment Plans",
   "description": "AI-powered cryptocurrency trading plans with automated strategies for different risk profiles.",
   "provider": {
     "@type": "Organization",
-    "name": "Live Win Trade Investment"
+    "name": "Win-Tradex"
   },
   "category": "Cryptocurrency Investment",
   "offers": [

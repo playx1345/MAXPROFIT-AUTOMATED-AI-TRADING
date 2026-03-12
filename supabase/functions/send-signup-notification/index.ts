@@ -127,9 +127,9 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
             </div>
             <div class="footer">
-              <p class="brand">Live Win Trade</p>
+              <p class="brand">Win-Tradex</p>
               <p>This is an automated welcome email. Please do not reply.</p>
-              <p>© ${new Date().getFullYear()} Live Win Trade. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} Win-Tradex. All rights reserved.</p>
             </div>
           </div>
         </body>

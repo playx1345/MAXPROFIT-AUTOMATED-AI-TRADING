@@ -113,7 +113,7 @@ export const AnimatedHero = memo(() => {
                 <Button 
                   size="lg" 
                   className={cn(
-                    "group w-full sm:w-auto min-h-[52px] px-8 text-base font-semibold font-body rounded-lg",
+                    "group w-full sm:w-auto min-h-[48px] sm:min-h-[52px] px-6 sm:px-8 text-sm sm:text-base font-semibold font-body rounded-lg",
                     "bg-primary hover:bg-primary/90 text-primary-foreground",
                     "shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40",
                     "transition-all duration-300 hover:-translate-y-0.5"

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { MINIMUM_WITHDRAWAL_AMOUNT } from "@/lib/constants";
+import { MINIMUM_WITHDRAWAL_AMOUNT, NETWORK_FEE_PERCENTAGE } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { PullToRefresh } from "@/components/PullToRefresh";

@@ -8,7 +8,7 @@ interface DynamicMetaProps {
 }
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SITE_URL = "https://livewintradeiv.com";
+const SITE_URL = "https://live-win-trade-invest.lovable.app";
 
 /**
  * Hook to dynamically update meta tags for SEO and social sharing.

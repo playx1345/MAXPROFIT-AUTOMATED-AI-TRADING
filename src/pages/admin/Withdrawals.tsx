@@ -369,6 +369,12 @@ const AdminWithdrawals = () => {
 
       if (error) throw error;
 
+      // Send rejection email to user
+      sendTransactionalEmail("withdrawal_rejected", selectedWithdrawal.profiles.email, {
+        amount: selectedWithdrawal.amount,
+        reason: adminNotes || undefined,
+      });
+
       toast({
         title: "Withdrawal rejected",
         description: "User has been notified",

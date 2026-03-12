@@ -6,7 +6,7 @@ import { Body, Button, Container, Head, Heading, Html, Img, Link, Preview, Secti
 
 interface InviteEmailProps { siteName: string; siteUrl: string; confirmationUrl: string }
 
-const LOGO = "https://kxjbankkuapchkezjjeq.supabase.co/storage/v1/object/public/email-assets/logo.jpg"
+const LOGO = "https://kxjbankkuapchkezjjeq.supabase.co/storage/v1/object/public/email-assets/wtx-logo.png"
 
 export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailProps) => (
   <Html lang="en" dir="ltr">

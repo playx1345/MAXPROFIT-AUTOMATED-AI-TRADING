@@ -9,7 +9,7 @@ import {
   Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/lwt-logo.png";
+import logo from "@/assets/wtx-logo.png";
 import { toast } from "sonner";
 
 const footerLinks = {

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/wtx-logo.png";
 
 
 import { LanguageSelector } from "@/components/LanguageSelector";

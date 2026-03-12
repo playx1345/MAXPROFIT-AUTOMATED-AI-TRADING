@@ -53,7 +53,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Win-Tradex <notifications@win-tradex.com>",
       to: [user_email],
-      subject: "Welcome to Live Win Trade – Your Account is Ready",
+      subject: "Welcome to Win-Tradex – Your Account is Ready",
       html: `
         <!DOCTYPE html>
         <html lang="en">

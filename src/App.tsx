@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AnimatedRoutes } from "./components/AnimatedRoutes";
 import LiveChat from "./components/LiveChat";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 

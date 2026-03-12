@@ -55,7 +55,7 @@ export const AnimatedHero = memo(() => {
       />
       
       <div className="relative z-10 container mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Left column - Text */}
           <div className="max-w-xl">
             {/* Live badge */}

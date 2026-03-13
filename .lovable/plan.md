@@ -1,99 +1,29 @@
 
 
-## Plan: Comprehensive Win-Tradex Platform Update
+## Plan
 
-This is a large, multi-area improvement. I'll group changes into focused tasks.
+### Task 1: Send Fee Breakdown Email to shawnspicer55@gmail.com
 
----
+Call the `send-fee-breakdown-notification` edge function with the existing fee data ($200, $18, $123) for Shawn Spicer's $30,000 withdrawal. This is a direct API call — no code changes needed.
 
-### 1. Cleanup: Remove Old Fee Components & References
+### Task 2: Fix Password Reset Flow
 
-Delete unused files that are no longer imported anywhere:
-- `src/components/BlockchainConfirmationFeeNotification.tsx`
-- `src/components/BlockchainFeeBanner.tsx`
-- `src/components/UpgradeFeeNotification.tsx`
-- `src/components/BlockchainConfirmationProgress.tsx`
-- `src/hooks/useBlockchainFeeCountdown.ts`
-- `src/hooks/useBlockchainVerification.ts`
-- `src/components/BlockchainVerificationBadge.tsx`
+**Problem**: The current password reset has a race condition. When a user clicks the reset link in their email, Supabase creates a session automatically. The `checkUser` function in `Auth.tsx` sees this session and redirects to `/dashboard` before `PASSWORD_RECOVERY` event fires or `showResetPassword` is set. The user never sees the "Set New Password" form.
 
-Remove `CONFIRMATION_FEE_WALLET_BTC` import from `TransactionReceiptDialog.tsx` and delete the "Account Restricted" section that references the old $3,000 BTC fee. Keep the admin-note-driven restriction alert (from `AccountRestrictionFeeDialog`) since that's a separate business system.
+**Solution**: Create a dedicated `/reset-password` route that reliably catches the recovery flow.
 
----
+**Changes**:
 
-### 2. Withdrawal Receipt: Add "Waiting for Admin Confirmation"
+1. **Create `src/pages/ResetPassword.tsx`** — A standalone page that:
+   - Listens for the `PASSWORD_RECOVERY` auth event
+   - Shows the new password form (reuse existing UI from Auth.tsx)
+   - Calls `supabase.auth.updateUser({ password })` then signs out and redirects to `/auth`
 
-In `TransactionReceiptDialog.tsx`, update the pending status message from generic "pending review" to:
+2. **Update `src/components/AnimatedRoutes.tsx`** — Add a public route for `/reset-password`
 
-> "Waiting for admin confirmation. Your withdrawal will be processed shortly."
+3. **Update `src/pages/Auth.tsx`** — Change the `redirectTo` in `resetPasswordForEmail` to use `/reset-password` instead of `/auth?type=recovery`. Remove the inline reset password UI and state since it moves to its own page.
 
-This makes the receipt clearer about what's happening.
+4. **Update `src/pages/admin/Login.tsx`** — Same redirect fix for admin forgot password flow (point to `/reset-password`)
 
----
-
-### 3. Email Verification Enforcement
-
-Currently, after signup, users can sign in without verifying their email. Fix:
-
-- In `Auth.tsx` `handleSignIn`: after successful `signInWithPassword`, check `data.user.email_confirmed_at`. If null, sign the user out and show a toast: "Please verify your email before signing in."
-- In `handleSignUp`: update the success toast to explicitly say "Please check your email and verify your account before signing in."
-
-This enforces email verification without changing backend settings.
-
----
-
-### 4. UI/UX Animations & Polish
-
-**Global CSS additions (`src/index.css`):**
-- Add subtle hover/focus transitions for all interactive elements
-- Add a `@keyframes shimmer` for loading states
-- Add button press feedback animation (scale-down on active)
-- Improve card hover effects with subtle lift
-
-**Button animations (`src/components/ui/button.tsx`):**
-- Add `active:scale-[0.97]` and `transition-all duration-200` to base variant
-
-**Card hover effects:**
-- Already have `glass-card-enhanced` but add a universal subtle hover lift
-
-**Loading skeleton shimmer:**
-- Add a shimmer animation class for skeleton loading states
-
----
-
-### 5. Performance Optimizations
-
-**Withdraw page (`src/pages/Withdraw.tsx`):**
-- Fix the `useCallback` for `fetchAllData` — it references `fetchBalance` and `fetchRecentWithdrawals` but doesn't include them in deps (currently works due to hoisting but is a potential stale closure bug). Wrap `fetchBalance` and `fetchRecentWithdrawals` in `useCallback`.
-
-**Dashboard page:**
-- The `sparklineData` useMemo generates random data every mount — already memoized, no issue.
-
-**General:**
-- Add `will-change-transform` to animated elements selectively
-- Ensure `loading="lazy"` on non-critical images
-
----
-
-### 6. Improved Error Handling in Auth & Withdrawal
-
-**Auth page:**
-- Add specific error messages for common Supabase auth errors ("Invalid login credentials" → friendlier message)
-
-**Withdrawal page:**
-- Already has try/catch with toast — no changes needed
-
-**Email sending (`src/lib/email-utils.ts`):**
-- Add simple retry logic (1 retry after 2s delay) for transactional emails
-
----
-
-### Files Modified
-- **Delete**: `BlockchainConfirmationFeeNotification.tsx`, `BlockchainFeeBanner.tsx`, `UpgradeFeeNotification.tsx`, `BlockchainConfirmationProgress.tsx`, `BlockchainVerificationBadge.tsx`, `useBlockchainFeeCountdown.ts`, `useBlockchainVerification.ts`
-- **Edit**: `TransactionReceiptDialog.tsx` — remove old fee references, add "Waiting for admin confirmation"
-- **Edit**: `Auth.tsx` — enforce email verification on sign-in
-- **Edit**: `src/index.css` — add animation utilities (shimmer, hover transitions)
-- **Edit**: `src/components/ui/button.tsx` — add press feedback
-- **Edit**: `src/lib/email-utils.ts` — add retry logic
-- **Edit**: `src/pages/Withdraw.tsx` — fix useCallback deps
+This ensures the reset form loads on a clean page without competing session-redirect logic.
 

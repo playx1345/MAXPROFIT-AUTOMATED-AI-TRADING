@@ -44,27 +44,7 @@ const Withdraw = () => {
   const [errors, setErrors] = useState<{ amount?: string; wallet?: string; memoTag?: string }>({});
   const { toast } = useToast();
 
-  const fetchAllData = useCallback(async () => {
-    await Promise.all([fetchBalance(), fetchRecentWithdrawals()]);
-  }, []);
-
-  useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
-
-  useEffect(() => {
-    if (walletAddress) {
-      const walletSchema = getWalletAddressSchema(currency);
-      const walletValidation = validateField(walletSchema, walletAddress);
-      if (walletValidation.isValid) {
-        setErrors((prev) => ({ ...prev, wallet: undefined }));
-      } else {
-        setErrors((prev) => ({ ...prev, wallet: walletValidation.error }));
-      }
-    }
-  }, [currency, walletAddress]);
-
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -80,9 +60,9 @@ const Withdraw = () => {
     } catch (error: unknown) {
       console.error("Error fetching balance:", error);
     }
-  };
+  }, []);
 
-  const fetchRecentWithdrawals = async () => {
+  const fetchRecentWithdrawals = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -100,7 +80,29 @@ const Withdraw = () => {
     } catch (error: unknown) {
       console.error("Error fetching withdrawals:", error);
     }
-  };
+  }, []);
+
+  const fetchAllData = useCallback(async () => {
+    await Promise.all([fetchBalance(), fetchRecentWithdrawals()]);
+  }, [fetchBalance, fetchRecentWithdrawals]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
+
+  useEffect(() => {
+    if (walletAddress) {
+      const walletSchema = getWalletAddressSchema(currency);
+      const walletValidation = validateField(walletSchema, walletAddress);
+      if (walletValidation.isValid) {
+        setErrors((prev) => ({ ...prev, wallet: undefined }));
+      } else {
+        setErrors((prev) => ({ ...prev, wallet: walletValidation.error }));
+      }
+    }
+  }, [currency, walletAddress]);
+
+  // fetchBalance and fetchRecentWithdrawals are now defined above as useCallback
 
   const validateForm = (): boolean => {
     const newErrors: { amount?: string; wallet?: string; memoTag?: string } = {};

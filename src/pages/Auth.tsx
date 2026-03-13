@@ -123,7 +123,7 @@ const Auth = () => {
 
         toast({
           title: "Account created successfully!",
-          description: "You can now sign in to your account. Check your email for a welcome message.",
+          description: "Please check your email and verify your account before signing in.",
         });
         setSignUpData({ email: "", password: "", confirmPassword: "", fullName: "" });
       }
@@ -164,6 +164,16 @@ const Auth = () => {
 
       if (error) throw error;
 
+      if (data.user && !data.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Email not verified",
+          description: "Please check your inbox and verify your email address before signing in.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (data.session) {
         toast({
           title: "Welcome back!",
@@ -172,7 +182,10 @@ const Auth = () => {
         navigate("/dashboard");
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Invalid email or password";
+      const rawMessage = error instanceof Error ? error.message : "Invalid email or password";
+      const errorMessage = rawMessage === "Invalid login credentials"
+        ? "Incorrect email or password. Please try again."
+        : rawMessage;
       toast({
         title: "Sign in failed",
         description: errorMessage,

@@ -917,6 +917,33 @@ p, span, h1, h2, h3, h4, h5, h6, a, label {
     opacity: 0.9;
   }
 
+  /* ========== Skeleton Shimmer ========== */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 25%,
+      hsl(var(--muted-foreground) / 0.08) 50%,
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ========== Card Hover Lift ========== */
+  .card-hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
   /* ========== NEW: Scroll Snap Container ========== */
   .scroll-snap-x {
     scroll-snap-type: x mandatory;

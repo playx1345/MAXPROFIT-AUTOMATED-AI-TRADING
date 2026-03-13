@@ -182,7 +182,10 @@ const Auth = () => {
         navigate("/dashboard");
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Invalid email or password";
+      const rawMessage = error instanceof Error ? error.message : "Invalid email or password";
+      const errorMessage = rawMessage === "Invalid login credentials"
+        ? "Incorrect email or password. Please try again."
+        : rawMessage;
       toast({
         title: "Sign in failed",
         description: errorMessage,

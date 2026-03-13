@@ -102,43 +102,7 @@ const Withdraw = () => {
     }
   }, [currency, walletAddress]);
 
-  const fetchBalance = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("balance_usdt")
-        .eq("id", user.id)
-        .single();
-
-      if (error) throw error;
-      setBalance(data?.balance_usdt || 0);
-    } catch (error: unknown) {
-      console.error("Error fetching balance:", error);
-    }
-  };
-
-  const fetchRecentWithdrawals = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("transactions")
-        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash, admin_notes, memo_tag")
-        .eq("user_id", user.id)
-        .eq("type", "withdrawal")
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-      setRecentWithdrawals(data || []);
-    } catch (error: unknown) {
-      console.error("Error fetching withdrawals:", error);
-    }
-  };
+  // fetchBalance and fetchRecentWithdrawals are now defined above as useCallback
 
   const validateForm = (): boolean => {
     const newErrors: { amount?: string; wallet?: string; memoTag?: string } = {};

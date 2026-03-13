@@ -44,9 +44,47 @@ const Withdraw = () => {
   const [errors, setErrors] = useState<{ amount?: string; wallet?: string; memoTag?: string }>({});
   const { toast } = useToast();
 
+  const fetchBalance = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("balance_usdt")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      setBalance(data?.balance_usdt || 0);
+    } catch (error: unknown) {
+      console.error("Error fetching balance:", error);
+    }
+  }, []);
+
+  const fetchRecentWithdrawals = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("id, amount, currency, status, created_at, wallet_address, transaction_hash, admin_notes, memo_tag")
+        .eq("user_id", user.id)
+        .eq("type", "withdrawal")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      setRecentWithdrawals(data || []);
+    } catch (error: unknown) {
+      console.error("Error fetching withdrawals:", error);
+    }
+  }, []);
+
   const fetchAllData = useCallback(async () => {
     await Promise.all([fetchBalance(), fetchRecentWithdrawals()]);
-  }, []);
+  }, [fetchBalance, fetchRecentWithdrawals]);
 
   useEffect(() => {
     fetchAllData();

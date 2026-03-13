@@ -49,7 +49,7 @@ const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
 const AdminRoute = ({ children }: { children: React.ReactNode }) => (
   <AdminProtectedRoute>
     <AdminLayout>
-      <PageTransition>{children}</PageTransition>
+      <PageTransition variant="fade">{children}</PageTransition>
     </AdminLayout>
   </AdminProtectedRoute>
 );

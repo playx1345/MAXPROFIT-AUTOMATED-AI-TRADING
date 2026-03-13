@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Copy, Check, Shield, Clock, AlertTriangle, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CONFIRMATION_FEE_WALLET_BTC, NETWORK_FEE_PERCENTAGE } from "@/lib/constants";
+import { NETWORK_FEE_PERCENTAGE } from "@/lib/constants";
 
 interface TransactionData {
   id: string;

@@ -123,7 +123,7 @@ const Auth = () => {
 
         toast({
           title: "Account created successfully!",
-          description: "You can now sign in to your account. Check your email for a welcome message.",
+          description: "Please check your email and verify your account before signing in.",
         });
         setSignUpData({ email: "", password: "", confirmPassword: "", fullName: "" });
       }

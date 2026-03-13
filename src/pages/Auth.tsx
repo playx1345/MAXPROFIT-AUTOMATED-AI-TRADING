@@ -164,6 +164,16 @@ const Auth = () => {
 
       if (error) throw error;
 
+      if (data.user && !data.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Email not verified",
+          description: "Please check your inbox and verify your email address before signing in.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (data.session) {
         toast({
           title: "Welcome back!",

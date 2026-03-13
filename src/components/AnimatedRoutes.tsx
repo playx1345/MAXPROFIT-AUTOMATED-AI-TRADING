@@ -41,7 +41,7 @@ const CookiePolicy = lazy(() => import("@/pages/legal/CookiePolicy"));
 const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute>
     <DashboardLayout>
-      <PageTransition>{children}</PageTransition>
+      <PageTransition variant="fade">{children}</PageTransition>
     </DashboardLayout>
   </ProtectedRoute>
 );

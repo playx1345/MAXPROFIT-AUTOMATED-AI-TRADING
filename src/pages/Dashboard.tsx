@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { StatCard } from "@/components/ui/stat-card";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Sparkline } from "@/components/ui/sparkline";
-import { Wallet, TrendingUp, ArrowDownLeft, ArrowUpRight, Loader2, AlertCircle, Shield } from "lucide-react";
+import { Wallet, TrendingUp, ArrowDownLeft, ArrowUpRight, AlertCircle, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -177,12 +177,55 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="relative">
-          <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
-          <Loader2 className="h-10 w-10 text-primary animate-spin relative z-10" />
+      <div className="space-y-6 pb-20 md:pb-6">
+        {/* Header skeleton */}
+        <div className="space-y-2">
+          <div className="h-8 w-48 rounded-lg bg-muted skeleton-shimmer" />
+          <div className="h-4 w-72 rounded-md bg-muted skeleton-shimmer" />
         </div>
-        <div className="animate-pulse text-muted-foreground font-medium">{t("common.loading", "Loading dashboard...")}</div>
+
+        {/* Stat cards skeleton */}
+        <div className="grid gap-2.5 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <Card key={i} variant="glass" className="overflow-hidden border-border/30">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+                <div className="h-3 w-24 rounded bg-muted skeleton-shimmer" />
+                <div className="h-9 w-9 rounded-xl bg-muted skeleton-shimmer" />
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <div className="h-7 w-28 rounded bg-muted skeleton-shimmer mb-2" />
+                <div className="h-3 w-16 rounded bg-muted skeleton-shimmer" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* KYC card skeleton */}
+        <Card className="glass-card-enhanced border-border/50">
+          <CardHeader>
+            <div className="h-5 w-52 rounded bg-muted skeleton-shimmer" />
+            <div className="h-3 w-64 rounded bg-muted skeleton-shimmer mt-2" />
+          </CardHeader>
+        </Card>
+
+        {/* Transactions skeleton */}
+        <Card className="glass-card-enhanced border-border/50">
+          <CardHeader>
+            <div className="h-5 w-44 rounded bg-muted skeleton-shimmer" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex items-center gap-3 py-2">
+                <div className="h-10 w-10 rounded-xl bg-muted skeleton-shimmer shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-24 rounded bg-muted skeleton-shimmer" />
+                  <div className="h-3 w-20 rounded bg-muted skeleton-shimmer" />
+                </div>
+                <div className="h-4 w-16 rounded bg-muted skeleton-shimmer" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     );
   }

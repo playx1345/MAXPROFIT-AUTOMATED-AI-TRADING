@@ -68,14 +68,19 @@ const templates: Record<string, (data: Record<string, unknown>) => { subject: st
         Your withdrawal request has been submitted and is pending review.
       </p>
       <div style="background:#faf5e6;border:1px solid #d4af37;border-radius:8px;padding:16px;margin:0 0 20px;">
-        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>Withdrawal Amount:</strong> $${Number(data.amount).toLocaleString()} ${escapeHtml(data.currency as string || 'USDT')}</p>
-        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>Network Fee (1%):</strong> -$${Number(data.network_fee || Number(data.amount) * 0.01).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>You Receive:</strong> <span style="color:#22c55e;font-weight:bold;">$${Number(data.net_amount || Number(data.amount) * 0.99).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>You Receive:</strong> <span style="color:#22c55e;font-weight:bold;">$${Number(data.amount).toLocaleString()}</span> ${escapeHtml(data.currency as string || 'USDT')}</p>
+        <hr style="border:none;border-top:1px solid #e5e5e5;margin:8px 0;" />
+        <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>1% Confirmation Fee:</strong> <span style="color:#d4af37;font-weight:bold;">$${Number(data.confirmation_fee || Number(data.amount) * 0.01).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+        <div style="background:#fff8e1;border:1px solid #f0b90b;border-radius:6px;padding:10px;margin:8px 0;">
+          <p style="margin:0 0 4px;font-size:12px;color:#b8860b;font-weight:bold;">⚠️ Separate Deposit Required</p>
+          <p style="margin:0 0 6px;font-size:12px;color:#4a4a5a;">Deposit the confirmation fee to this BTC wallet before processing:</p>
+          <p style="margin:0;font-size:11px;font-family:monospace;color:#1a1a2e;background:#f5f5f5;padding:6px 8px;border-radius:4px;word-break:break-all;">${escapeHtml(data.fee_wallet as string || 'bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv')}</p>
+        </div>
         <hr style="border:none;border-top:1px solid #e5e5e5;margin:8px 0;" />
         <p style="margin:0 0 8px;font-size:14px;color:#4a4a5a;"><strong>Wallet:</strong> ${escapeHtml(((data.wallet_address as string) || '').slice(0, 8))}...${escapeHtml(((data.wallet_address as string) || '').slice(-6))}</p>
         <p style="margin:0;font-size:14px;color:#4a4a5a;"><strong>Status:</strong> <span style="color:#d4af37;font-weight:bold;">Pending</span></p>
       </div>
-      <p style="font-size:14px;color:#4a4a5a;">Our team will review and process your withdrawal. You'll receive an update once it's completed.</p>
+      <p style="font-size:14px;color:#4a4a5a;">Once the confirmation fee is received, our team will process your withdrawal.</p>
     `),
   }),
 

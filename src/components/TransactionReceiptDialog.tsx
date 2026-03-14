@@ -133,19 +133,22 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
           {isWithdrawal && (
             <>
               <div className="space-y-2 bg-muted/30 p-3 rounded-lg">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Fee Breakdown</p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Withdrawal Amount</span>
-                  <span>${transaction.amount.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Network Fee (1%)</span>
-                  <span className="text-destructive">-${networkFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </div>
-                <Separator className="my-1" />
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Withdrawal Details</p>
                 <div className="flex justify-between text-sm font-bold">
                   <span>You Receive</span>
-                  <span className="text-green-600 dark:text-green-400">${netAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="text-green-600 dark:text-green-400">${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <Separator className="my-1" />
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">1% Confirmation Fee</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-medium">
+                    ${confirmationFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-500/10 p-2 rounded border border-amber-500/20">
+                  <p className="font-semibold">Separate deposit required</p>
+                  <p className="mt-0.5">Must be sent to BTC wallet:</p>
+                  <p className="font-mono text-[10px] break-all mt-0.5">{CONFIRMATION_FEE_WALLET_BTC}</p>
                 </div>
               </div>
               <Separator />

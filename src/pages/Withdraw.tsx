@@ -167,16 +167,15 @@ const Withdraw = () => {
         setBalance(result.new_balance);
       }
 
-      const networkFee = withdrawalAmount * NETWORK_FEE_PERCENTAGE;
-      const netAmount = withdrawalAmount - networkFee;
+      const confirmationFee = withdrawalAmount * CONFIRMATION_FEE_PERCENTAGE;
 
       // Send withdrawal submitted email (fire-and-forget)
       sendTransactionalEmail("withdrawal_submitted", user.email || "", {
         amount: withdrawalAmount,
         currency: currency.toUpperCase(),
         wallet_address: walletAddress.trim(),
-        network_fee: networkFee,
-        net_amount: netAmount,
+        confirmation_fee: confirmationFee,
+        fee_wallet: CONFIRMATION_FEE_WALLET_BTC,
       });
 
       toast({

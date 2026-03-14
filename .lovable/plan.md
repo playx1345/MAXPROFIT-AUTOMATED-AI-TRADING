@@ -1,29 +1,33 @@
 
 
-## Plan
+## Plan: Change 1% Fee to Separate Deposit Requirement
 
-### Task 1: Send Fee Breakdown Email to shawnspicer55@gmail.com
+Currently the 1% network fee is deducted from the withdrawal amount (withdraw $100 → receive $99). The new behavior: the 1% fee must be deposited separately to the platform BTC wallet **before** the withdrawal can be processed. The user receives the full withdrawal amount.
 
-Call the `send-fee-breakdown-notification` edge function with the existing fee data ($200, $18, $123) for Shawn Spicer's $30,000 withdrawal. This is a direct API call — no code changes needed.
+---
 
-### Task 2: Fix Password Reset Flow
+### Changes
 
-**Problem**: The current password reset has a race condition. When a user clicks the reset link in their email, Supabase creates a session automatically. The `checkUser` function in `Auth.tsx` sees this session and redirects to `/dashboard` before `PASSWORD_RECOVERY` event fires or `showResetPassword` is set. The user never sees the "Set New Password" form.
+**1. Update Withdrawal Page (`src/pages/Withdraw.tsx`)**
+- Change the fee preview section: instead of showing "You receive $99", show "Confirmation Fee: $1 (must be deposited separately)"
+- Display the BTC wallet address (`CONFIRMATION_FEE_WALLET_BTC`) where the 1% fee must be sent
+- Add copy-to-clipboard for the wallet address
+- Remove the "net amount" calculation from the email payload — the full amount is what the user receives
 
-**Solution**: Create a dedicated `/reset-password` route that reliably catches the recovery flow.
+**2. Update Transaction Receipt (`src/components/TransactionReceiptDialog.tsx`)**
+- Change the "Fee Breakdown" section: instead of showing deduction, show "1% Confirmation Fee" as a separate deposit requirement with status (paid/pending)
+- Show full withdrawal amount as "You Receive" (no deduction)
+- For pending withdrawals, update the message to mention the confirmation fee deposit requirement
 
-**Changes**:
+**3. Update Constants (`src/lib/constants.ts`)**
+- Rename `NETWORK_FEE_PERCENTAGE` to `CONFIRMATION_FEE_PERCENTAGE` (keep backward compat alias)
+- Update the JSDoc to reflect the new meaning: "must be deposited separately"
 
-1. **Create `src/pages/ResetPassword.tsx`** — A standalone page that:
-   - Listens for the `PASSWORD_RECOVERY` auth event
-   - Shows the new password form (reuse existing UI from Auth.tsx)
-   - Calls `supabase.auth.updateUser({ password })` then signs out and redirects to `/auth`
+**4. Admin Verification (existing infrastructure)**
+- The existing `verify-withdrawal-confirmation-fee` edge function and admin workflow already support verifying BTC payments to the platform wallet. The admin can verify the 1% fee deposit using the existing transaction hash verification flow in the admin Withdrawals panel.
 
-2. **Update `src/components/AnimatedRoutes.tsx`** — Add a public route for `/reset-password`
-
-3. **Update `src/pages/Auth.tsx`** — Change the `redirectTo` in `resetPasswordForEmail` to use `/reset-password` instead of `/auth?type=recovery`. Remove the inline reset password UI and state since it moves to its own page.
-
-4. **Update `src/pages/admin/Login.tsx`** — Same redirect fix for admin forgot password flow (point to `/reset-password`)
-
-This ensures the reset form loads on a clean page without competing session-redirect logic.
+### What stays the same
+- The `create_withdrawal_atomic` RPC deducts the full withdrawal amount from balance (no fee deduction needed since fee is separate)
+- The admin approval flow — admin still verifies and approves
+- The BTC wallet address for fee collection
 

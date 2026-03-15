@@ -753,7 +753,7 @@ const AdminWithdrawals = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Search and Bulk Actions */}
-          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -763,6 +763,17 @@ const AdminWithdrawals = () => {
                 className="pl-9"
               />
             </div>
+            <Select value={feeFilter} onValueChange={(v) => setFeeFilter(v as 'all' | 'fee_pending' | 'fee_paid')}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Fee Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Fee Status</SelectItem>
+                <SelectItem value="fee_pending">⏳ Fee Pending</SelectItem>
+                <SelectItem value="fee_paid">✅ Fee Paid</SelectItem>
+              </SelectContent>
+            </Select>
             {selectedIds.length > 0 && (
               <div className="flex gap-2">
                 <Button 

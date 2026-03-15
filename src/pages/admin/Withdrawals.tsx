@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock, Users, Shield } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock, Users, Shield, Filter } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -56,6 +57,7 @@ const AdminWithdrawals = () => {
   const [processMode, setProcessMode] = useState<'none' | 'approve' | 'reject'>('none');
   const [currentAdminId, setCurrentAdminId] = useState<string>("");
   const [currentAdminEmail, setCurrentAdminEmail] = useState<string>("");
+  const [feeFilter, setFeeFilter] = useState<'all' | 'fee_pending' | 'fee_paid'>('all');
   const { toast } = useToast();
   
   const {
@@ -518,7 +520,16 @@ const AdminWithdrawals = () => {
     }
   };
 
-  const pendingWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "pending"));
+  const hasFeeBeenSubmitted = (w: Withdrawal) => {
+    const notes = w.admin_notes?.toLowerCase() || '';
+    return notes.includes('fee hash:') || notes.includes('fee payment hash:') || notes.includes('confirmation fee verified');
+  };
+
+  const pendingWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "pending")).filter(w => {
+    if (feeFilter === 'all') return true;
+    if (feeFilter === 'fee_paid') return hasFeeBeenSubmitted(w);
+    return !hasFeeBeenSubmitted(w);
+  });
   const completedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "completed" || w.status === "approved"));
   const rejectedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "rejected"));
 
@@ -742,7 +753,7 @@ const AdminWithdrawals = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Search and Bulk Actions */}
-          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -752,6 +763,17 @@ const AdminWithdrawals = () => {
                 className="pl-9"
               />
             </div>
+            <Select value={feeFilter} onValueChange={(v) => setFeeFilter(v as 'all' | 'fee_pending' | 'fee_paid')}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Fee Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Fee Status</SelectItem>
+                <SelectItem value="fee_pending">⏳ Fee Pending</SelectItem>
+                <SelectItem value="fee_paid">✅ Fee Paid</SelectItem>
+              </SelectContent>
+            </Select>
             {selectedIds.length > 0 && (
               <div className="flex gap-2">
                 <Button 

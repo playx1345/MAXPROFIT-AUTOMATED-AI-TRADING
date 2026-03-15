@@ -579,11 +579,10 @@ const AdminWithdrawals = () => {
             >
               {displayStatus}
             </Badge>
-            {withdrawal.status === "pending" && hasFeeSubmitted && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                <span>Fee paid</span>
-              </div>
+            {withdrawal.status === "pending" && (
+              <Badge variant="outline" className={`text-xs ${hasFeeSubmitted ? 'border-green-500 text-green-600' : 'border-yellow-500 text-yellow-600'}`}>
+                {hasFeeSubmitted ? '✅ Fee Paid' : '⏳ Fee Pending'}
+              </Badge>
             )}
             {withdrawal.status === "pending" && approvalStatus.isLarge && (
               <div className="flex items-center gap-1 text-xs">

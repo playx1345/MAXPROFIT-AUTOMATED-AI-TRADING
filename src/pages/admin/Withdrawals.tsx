@@ -56,6 +56,7 @@ const AdminWithdrawals = () => {
   const [processMode, setProcessMode] = useState<'none' | 'approve' | 'reject'>('none');
   const [currentAdminId, setCurrentAdminId] = useState<string>("");
   const [currentAdminEmail, setCurrentAdminEmail] = useState<string>("");
+  const [feeFilter, setFeeFilter] = useState<'all' | 'fee_pending' | 'fee_paid'>('all');
   const { toast } = useToast();
   
   const {

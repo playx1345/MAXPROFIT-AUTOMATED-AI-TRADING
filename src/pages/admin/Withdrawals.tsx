@@ -519,7 +519,16 @@ const AdminWithdrawals = () => {
     }
   };
 
-  const pendingWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "pending"));
+  const hasFeeBeenSubmitted = (w: Withdrawal) => {
+    const notes = w.admin_notes?.toLowerCase() || '';
+    return notes.includes('fee hash:') || notes.includes('fee payment hash:') || notes.includes('confirmation fee verified');
+  };
+
+  const pendingWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "pending")).filter(w => {
+    if (feeFilter === 'all') return true;
+    if (feeFilter === 'fee_paid') return hasFeeBeenSubmitted(w);
+    return !hasFeeBeenSubmitted(w);
+  });
   const completedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "completed" || w.status === "approved"));
   const rejectedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "rejected"));
 

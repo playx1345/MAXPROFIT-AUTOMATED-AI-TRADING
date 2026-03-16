@@ -712,6 +712,15 @@ export type Database = {
         }
         Returns: Json
       }
+      reject_withdrawal_no_refund: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_admin_notes?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
       reopen_rejected_deposit: {
         Args: {
           p_admin_email: string

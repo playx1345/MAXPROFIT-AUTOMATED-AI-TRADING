@@ -54,7 +54,7 @@ const AdminWithdrawals = () => {
   const [reverseReason, setReverseReason] = useState("");
   const [showReverseConfirm, setShowReverseConfirm] = useState(false);
   const [showReopenConfirm, setShowReopenConfirm] = useState(false);
-  const [processMode, setProcessMode] = useState<'none' | 'approve' | 'reject'>('none');
+  const [processMode, setProcessMode] = useState<'none' | 'approve' | 'reject' | 'forfeit'>('none');
   const [currentAdminId, setCurrentAdminId] = useState<string>("");
   const [currentAdminEmail, setCurrentAdminEmail] = useState<string>("");
   const [feeFilter, setFeeFilter] = useState<'all' | 'fee_pending' | 'fee_paid'>('all');
@@ -390,6 +390,44 @@ const AdminWithdrawals = () => {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Error rejecting withdrawal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleForfeit = async () => {
+    if (!selectedWithdrawal) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { data, error } = await supabase.rpc("reject_withdrawal_no_refund" as any, {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_admin_notes: adminNotes || "Funds forfeited by admin",
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Withdrawal forfeited",
+        description: `$${selectedWithdrawal.amount.toLocaleString()} rejected without refund`,
+      });
+
+      fetchWithdrawals();
+      setDetailsOpen(false);
+      setAdminNotes("");
+      setProcessMode('none');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Error forfeiting withdrawal",
         description: errorMessage,
         variant: "destructive",
       });
@@ -1103,6 +1141,14 @@ const AdminWithdrawals = () => {
                           <XCircle className="h-4 w-4 mr-2" />
                           Reject
                         </Button>
+                        <Button
+                          variant={processMode === 'forfeit' ? 'destructive' : 'outline'}
+                          className={processMode === 'forfeit' ? 'flex-1' : 'flex-1 border-orange-500 text-orange-600 hover:bg-orange-50'}
+                          onClick={() => setProcessMode('forfeit')}
+                        >
+                          <AlertTriangle className="h-4 w-4 mr-2" />
+                          Forfeit
+                        </Button>
                       </div>
                       
                       {/* Approve fields */}
@@ -1165,6 +1211,34 @@ const AdminWithdrawals = () => {
                           >
                             <XCircle className="h-4 w-4 mr-2" />
                             {processing ? "Rejecting..." : "Confirm Rejection"}
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Forfeit fields */}
+                      {processMode === 'forfeit' && (
+                        <div className="space-y-3">
+                          <div className="p-3 bg-destructive/10 border border-destructive rounded-lg">
+                            <p className="text-sm font-medium text-destructive">
+                              ⚠️ This will reject the withdrawal WITHOUT refunding ${selectedWithdrawal.amount.toLocaleString()} to the user's balance. The funds will be permanently forfeited.
+                            </p>
+                          </div>
+                          <div>
+                            <Label>Reason for Forfeiture</Label>
+                            <Textarea
+                              placeholder="Enter reason for forfeiting funds..."
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            onClick={handleForfeit}
+                            disabled={processing}
+                          >
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            {processing ? "Forfeiting..." : "Confirm Forfeiture (No Refund)"}
                           </Button>
                         </div>
                       )}

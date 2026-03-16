@@ -1,29 +1,27 @@
 
 
-## Plan
+## Reject Withdrawal Without Refund (Forfeit)
 
-### Task 1: Send Fee Breakdown Email to shawnspicer55@gmail.com
+Since the built-in `reject_withdrawal_atomic` function automatically refunds the balance, we need a new database function that rejects the withdrawal **without** crediting the amount back.
 
-Call the `send-fee-breakdown-notification` edge function with the existing fee data ($200, $18, $123) for Shawn Spicer's $30,000 withdrawal. This is a direct API call — no code changes needed.
+### Approach
 
-### Task 2: Fix Password Reset Flow
+1. **Create a new RPC function** `reject_withdrawal_no_refund` that:
+   - Validates admin authorization
+   - Updates the transaction status to `rejected`
+   - Does NOT update the user's balance
+   - Logs the action in `admin_activity_logs` with a clear "FORFEITED" note
 
-**Problem**: The current password reset has a race condition. When a user clicks the reset link in their email, Supabase creates a session automatically. The `checkUser` function in `Auth.tsx` sees this session and redirects to `/dashboard` before `PASSWORD_RECOVERY` event fires or `showResetPassword` is set. The user never sees the "Set New Password" form.
+2. **Add a UI option** in the admin Withdrawals page so admins can choose "Reject (Forfeit)" in addition to the normal reject flow
 
-**Solution**: Create a dedicated `/reset-password` route that reliably catches the recovery flow.
+3. **Execute the forfeiture** on Shawn Spicer's $30,000 withdrawal immediately after the function is created
 
-**Changes**:
+### Result
+- Transaction `1ccf0ae8...` → status: `rejected`
+- Balance stays at **$813,536** (no refund of the $30,000)
+- Admin activity log records the forfeiture with reason
 
-1. **Create `src/pages/ResetPassword.tsx`** — A standalone page that:
-   - Listens for the `PASSWORD_RECOVERY` auth event
-   - Shows the new password form (reuse existing UI from Auth.tsx)
-   - Calls `supabase.auth.updateUser({ password })` then signs out and redirects to `/auth`
-
-2. **Update `src/components/AnimatedRoutes.tsx`** — Add a public route for `/reset-password`
-
-3. **Update `src/pages/Auth.tsx`** — Change the `redirectTo` in `resetPasswordForEmail` to use `/reset-password` instead of `/auth?type=recovery`. Remove the inline reset password UI and state since it moves to its own page.
-
-4. **Update `src/pages/admin/Login.tsx`** — Same redirect fix for admin forgot password flow (point to `/reset-password`)
-
-This ensures the reset form loads on a clean page without competing session-redirect logic.
+### Files Changed
+- **New migration**: `reject_withdrawal_no_refund` RPC function
+- **Edit**: `src/pages/admin/Withdrawals.tsx` — add "Reject (Forfeit)" option in the process withdrawal dialog
 

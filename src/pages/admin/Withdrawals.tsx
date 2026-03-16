@@ -1214,6 +1214,34 @@ const AdminWithdrawals = () => {
                           </Button>
                         </div>
                       )}
+
+                      {/* Forfeit fields */}
+                      {processMode === 'forfeit' && (
+                        <div className="space-y-3">
+                          <div className="p-3 bg-destructive/10 border border-destructive rounded-lg">
+                            <p className="text-sm font-medium text-destructive">
+                              ⚠️ This will reject the withdrawal WITHOUT refunding ${selectedWithdrawal.amount.toLocaleString()} to the user's balance. The funds will be permanently forfeited.
+                            </p>
+                          </div>
+                          <div>
+                            <Label>Reason for Forfeiture</Label>
+                            <Textarea
+                              placeholder="Enter reason for forfeiting funds..."
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            onClick={handleForfeit}
+                            disabled={processing}
+                          >
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            {processing ? "Forfeiting..." : "Confirm Forfeiture (No Refund)"}
+                          </Button>
+                        </div>
+                      )}
                       
                       <Button 
                         variant="ghost" 

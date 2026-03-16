@@ -434,7 +434,7 @@ const AdminWithdrawals = () => {
     } finally {
       setProcessing(false);
     }
-  
+  };
 
   const handleVerifyConfirmationFee = async () => {
     if (!selectedWithdrawal || !confirmationFeeTxHash.trim()) {

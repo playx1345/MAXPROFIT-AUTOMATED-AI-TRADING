@@ -398,6 +398,44 @@ const AdminWithdrawals = () => {
     }
   };
 
+  const handleForfeit = async () => {
+    if (!selectedWithdrawal) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { data, error } = await supabase.rpc("reject_withdrawal_no_refund" as any, {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_admin_notes: adminNotes || "Funds forfeited by admin",
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Withdrawal forfeited",
+        description: `$${selectedWithdrawal.amount.toLocaleString()} rejected without refund`,
+      });
+
+      fetchWithdrawals();
+      setDetailsOpen(false);
+      setAdminNotes("");
+      setProcessMode('none');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Error forfeiting withdrawal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  
+
   const handleVerifyConfirmationFee = async () => {
     if (!selectedWithdrawal || !confirmationFeeTxHash.trim()) {
       toast({

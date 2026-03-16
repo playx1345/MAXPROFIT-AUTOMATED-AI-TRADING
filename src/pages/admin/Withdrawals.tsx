@@ -1141,6 +1141,14 @@ const AdminWithdrawals = () => {
                           <XCircle className="h-4 w-4 mr-2" />
                           Reject
                         </Button>
+                        <Button
+                          variant={processMode === 'forfeit' ? 'destructive' : 'outline'}
+                          className={processMode === 'forfeit' ? 'flex-1' : 'flex-1 border-orange-500 text-orange-600 hover:bg-orange-50'}
+                          onClick={() => setProcessMode('forfeit')}
+                        >
+                          <AlertTriangle className="h-4 w-4 mr-2" />
+                          Forfeit
+                        </Button>
                       </div>
                       
                       {/* Approve fields */}

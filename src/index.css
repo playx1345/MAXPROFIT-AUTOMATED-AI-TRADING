@@ -569,6 +569,18 @@ p, span, h1, h2, h3, h4, h5, h6, a, label {
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
+  /* Mobile-optimized scrolling */
+  .overflow-y-auto,
+  main {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  @media (max-width: 767px) {
+    main {
+      touch-action: pan-y;
+    }
+  }
+
   /* ========== Scroll Animations ========== */
   .scroll-fade-up {
     opacity: 0;

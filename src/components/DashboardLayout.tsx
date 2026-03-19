@@ -185,7 +185,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       )}
 
       {/* Main Content with smooth transition */}
-      <main className="flex-1 overflow-auto scroll-smooth pt-[52px] pb-[72px] lg:pt-0 lg:pb-0 overscroll-contain">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth pt-[52px] pb-[88px] lg:pt-0 lg:pb-0 -webkit-overflow-scrolling-touch">
         <div className="container mx-auto p-3 sm:p-5 lg:p-8">{children}</div>
       </main>
       

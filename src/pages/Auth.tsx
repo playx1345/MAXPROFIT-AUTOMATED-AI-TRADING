@@ -457,7 +457,7 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 sm:p-6 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-background px-4 py-8 sm:p-6 md:p-8 relative overflow-y-auto overflow-x-hidden">
       {/* Theme Toggle - Fixed position */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
         <ThemeToggle />

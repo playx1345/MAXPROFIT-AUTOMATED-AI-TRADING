@@ -576,6 +576,55 @@ const AdminUsers = () => {
     }
   };
 
+  const handleSetWithdrawalRestriction = async () => {
+    if (!selectedUser) return;
+    setSettingRestriction(true);
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const deadline = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
+
+      const { error } = await supabase.from("user_restrictions").insert({
+        user_id: selectedUser.id,
+        restriction_type: "withdrawal_deadline",
+        deadline,
+        created_by: adminUser.id,
+        admin_email: adminUser.email || "",
+        status: "active",
+        message: restrictMessage.trim() || null,
+      });
+
+      if (error) throw error;
+
+      await supabase.from("admin_activity_logs").insert({
+        admin_id: adminUser.id,
+        admin_email: adminUser.email || "",
+        action: "set_withdrawal_restriction",
+        target_type: "user",
+        target_id: selectedUser.id,
+        target_email: selectedUser.email,
+        details: { deadline, message: restrictMessage.trim() || null },
+      });
+
+      toast({
+        title: "Withdrawal Restriction Set",
+        description: `${selectedUser.email} has 12 hours to complete a withdrawal.`,
+      });
+
+      setRestrictDialogOpen(false);
+      setRestrictMessage("");
+    } catch (error: any) {
+      toast({
+        title: "Error setting restriction",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSettingRestriction(false);
+    }
+  };
+
   const getKycBadgeColor = (status: string) => {
     switch (status) {
       case "verified":

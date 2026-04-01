@@ -77,6 +77,11 @@ const AdminUsers = () => {
   const [recordingFee, setRecordingFee] = useState(false);
   const [setFeeExemptAfterPayment, setSetFeeExemptAfterPayment] = useState(true);
   
+  // Withdrawal restriction state
+  const [restrictDialogOpen, setRestrictDialogOpen] = useState(false);
+  const [restrictMessage, setRestrictMessage] = useState("");
+  const [settingRestriction, setSettingRestriction] = useState(false);
+  
   const { toast } = useToast();
 
   useEffect(() => {

@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { SecurityBadge } from "@/components/ui/security-badge";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { AccountRestrictionFeeDialog } from "@/components/AccountRestrictionFeeDialog";
+import { WithdrawalRestrictionBanner } from "@/components/WithdrawalRestrictionBanner";
 
 
 interface DashboardStats {

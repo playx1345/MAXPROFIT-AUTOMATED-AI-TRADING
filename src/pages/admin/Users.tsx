@@ -1134,10 +1134,61 @@ const AdminUsers = () => {
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
+
+                  {/* 12-Hour Withdrawal Restriction */}
+                  <Button
+                    variant="outline"
+                    className="w-full border-yellow-500 text-yellow-600 hover:bg-yellow-500/10"
+                    onClick={() => setRestrictDialogOpen(true)}
+                  >
+                    <Clock className="h-4 w-4 mr-2" />
+                    Set 12-Hour Withdrawal Restriction
+                  </Button>
                 </div>
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Withdrawal Restriction Dialog */}
+      <Dialog open={restrictDialogOpen} onOpenChange={setRestrictDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Set 12-Hour Withdrawal Restriction</DialogTitle>
+            <DialogDescription>
+              This will give <strong>{selectedUser?.email}</strong> 12 hours to complete a withdrawal. 
+              If they fail to do so, their account will be automatically suspended.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Message to user (optional)</Label>
+              <Textarea
+                placeholder="e.g., Please complete your pending withdrawal to keep your account active."
+                value={restrictMessage}
+                onChange={(e) => setRestrictMessage(e.target.value)}
+              />
+            </div>
+            <Alert className="border-yellow-500 bg-yellow-500/10">
+              <AlertDescription className="text-sm">
+                <strong>Warning:</strong> After 12 hours, if the user has no approved or completed withdrawal, 
+                their account will be suspended until further notice. The user will see a countdown timer on their dashboard.
+              </AlertDescription>
+            </Alert>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRestrictDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSetWithdrawalRestriction}
+              disabled={settingRestriction}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white"
+            >
+              {settingRestriction ? "Setting..." : "Confirm Restriction"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

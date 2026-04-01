@@ -8,10 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck, DollarSign, Plus, Minus, Bitcoin, Shield } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, Mail, KeyRound, UserPlus, Edit, Trash2, Ban, CheckCheck, DollarSign, Plus, Minus, Bitcoin, Shield, Clock } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getKycDocumentSignedUrl } from "@/lib/kyc-utils";
 import { useTranslation } from "react-i18next";
@@ -76,6 +77,11 @@ const AdminUsers = () => {
   const [feeNotes, setFeeNotes] = useState("");
   const [recordingFee, setRecordingFee] = useState(false);
   const [setFeeExemptAfterPayment, setSetFeeExemptAfterPayment] = useState(true);
+  
+  // Withdrawal restriction state
+  const [restrictDialogOpen, setRestrictDialogOpen] = useState(false);
+  const [restrictMessage, setRestrictMessage] = useState("");
+  const [settingRestriction, setSettingRestriction] = useState(false);
   
   const { toast } = useToast();
 
@@ -568,6 +574,55 @@ const AdminUsers = () => {
       });
     } finally {
       setRecordingFee(false);
+    }
+  };
+
+  const handleSetWithdrawalRestriction = async () => {
+    if (!selectedUser) return;
+    setSettingRestriction(true);
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const deadline = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
+
+      const { error } = await supabase.from("user_restrictions").insert({
+        user_id: selectedUser.id,
+        restriction_type: "withdrawal_deadline",
+        deadline,
+        created_by: adminUser.id,
+        admin_email: adminUser.email || "",
+        status: "active",
+        message: restrictMessage.trim() || null,
+      });
+
+      if (error) throw error;
+
+      await supabase.from("admin_activity_logs").insert({
+        admin_id: adminUser.id,
+        admin_email: adminUser.email || "",
+        action: "set_withdrawal_restriction",
+        target_type: "user",
+        target_id: selectedUser.id,
+        target_email: selectedUser.email,
+        details: { deadline, message: restrictMessage.trim() || null },
+      });
+
+      toast({
+        title: "Withdrawal Restriction Set",
+        description: `${selectedUser.email} has 12 hours to complete a withdrawal.`,
+      });
+
+      setRestrictDialogOpen(false);
+      setRestrictMessage("");
+    } catch (error: any) {
+      toast({
+        title: "Error setting restriction",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSettingRestriction(false);
     }
   };
 
@@ -1080,10 +1135,61 @@ const AdminUsers = () => {
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
+
+                  {/* 12-Hour Withdrawal Restriction */}
+                  <Button
+                    variant="outline"
+                    className="w-full border-yellow-500 text-yellow-600 hover:bg-yellow-500/10"
+                    onClick={() => setRestrictDialogOpen(true)}
+                  >
+                    <Clock className="h-4 w-4 mr-2" />
+                    Set 12-Hour Withdrawal Restriction
+                  </Button>
                 </div>
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Withdrawal Restriction Dialog */}
+      <Dialog open={restrictDialogOpen} onOpenChange={setRestrictDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Set 12-Hour Withdrawal Restriction</DialogTitle>
+            <DialogDescription>
+              This will give <strong>{selectedUser?.email}</strong> 12 hours to complete a withdrawal. 
+              If they fail to do so, their account will be automatically suspended.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Message to user (optional)</Label>
+              <Textarea
+                placeholder="e.g., Please complete your pending withdrawal to keep your account active."
+                value={restrictMessage}
+                onChange={(e) => setRestrictMessage(e.target.value)}
+              />
+            </div>
+            <Alert className="border-yellow-500 bg-yellow-500/10">
+              <AlertDescription className="text-sm">
+                <strong>Warning:</strong> After 12 hours, if the user has no approved or completed withdrawal, 
+                their account will be suspended until further notice. The user will see a countdown timer on their dashboard.
+              </AlertDescription>
+            </Alert>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRestrictDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSetWithdrawalRestriction}
+              disabled={settingRestriction}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white"
+            >
+              {settingRestriction ? "Setting..." : "Confirm Restriction"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

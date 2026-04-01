@@ -550,6 +550,45 @@ export type Database = {
           },
         ]
       }
+      user_restrictions: {
+        Row: {
+          admin_email: string
+          created_at: string
+          created_by: string
+          deadline: string
+          id: string
+          message: string | null
+          restriction_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_email: string
+          created_at?: string
+          created_by: string
+          deadline: string
+          id?: string
+          message?: string | null
+          restriction_type?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_email?: string
+          created_at?: string
+          created_by?: string
+          deadline?: string
+          id?: string
+          message?: string | null
+          restriction_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

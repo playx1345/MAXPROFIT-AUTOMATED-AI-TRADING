@@ -1,29 +1,43 @@
 
+## 12-Hour Withdrawal Restriction System
 
-## Plan
+### Overview
+Admins can impose a 12-hour restriction on specific users requiring them to complete a withdrawal. Users see a countdown timer on their dashboard. If the deadline passes without an approved withdrawal, the account is automatically suspended.
 
-### Task 1: Send Fee Breakdown Email to shawnspicer55@gmail.com
+### Database Changes
 
-Call the `send-fee-breakdown-notification` edge function with the existing fee data ($200, $18, $123) for Shawn Spicer's $30,000 withdrawal. This is a direct API call — no code changes needed.
+**1. New `user_restrictions` table**
+- `id`, `user_id`, `restriction_type` (e.g., 'withdrawal_deadline'), `deadline` (timestamp), `created_by` (admin UUID), `admin_email`, `status` ('active', 'expired', 'completed', 'suspended'), `message` (custom message), `created_at`
+- RLS: Admins can CRUD, users can read own active restrictions
 
-### Task 2: Fix Password Reset Flow
+### Backend Changes
 
-**Problem**: The current password reset has a race condition. When a user clicks the reset link in their email, Supabase creates a session automatically. The `checkUser` function in `Auth.tsx` sees this session and redirects to `/dashboard` before `PASSWORD_RECOVERY` event fires or `showResetPassword` is set. The user never sees the "Set New Password" form.
+**2. Edge function: `auto-suspend-restricted-accounts`**
+- Scheduled via pg_cron every 5 minutes
+- Checks for active restrictions past deadline where user has no approved/completed withdrawal
+- Suspends the user account (`is_suspended = true`) and updates restriction status to 'suspended'
 
-**Solution**: Create a dedicated `/reset-password` route that reliably catches the recovery flow.
+### Admin UI Changes
 
-**Changes**:
+**3. Add "Restrict User" button in admin Users page**
+- Dialog to set a 12-hour withdrawal deadline on a user
+- Optional custom message field
+- Logs action in admin_activity_logs
 
-1. **Create `src/pages/ResetPassword.tsx`** — A standalone page that:
-   - Listens for the `PASSWORD_RECOVERY` auth event
-   - Shows the new password form (reuse existing UI from Auth.tsx)
-   - Calls `supabase.auth.updateUser({ password })` then signs out and redirects to `/auth`
+### User Dashboard Changes
 
-2. **Update `src/components/AnimatedRoutes.tsx`** — Add a public route for `/reset-password`
+**4. Withdrawal restriction countdown on Dashboard**
+- Query active restrictions for current user
+- Show prominent countdown timer with message
+- "If you are having challenges, contact admin support"
+- When completed (approved withdrawal exists), mark restriction as 'completed'
 
-3. **Update `src/pages/Auth.tsx`** — Change the `redirectTo` in `resetPasswordForEmail` to use `/reset-password` instead of `/auth?type=recovery`. Remove the inline reset password UI and state since it moves to its own page.
+### Withdrawal Flow
+The existing flow remains: pending → approved/completed or rejected. The restriction simply monitors whether an approved withdrawal exists before the deadline.
 
-4. **Update `src/pages/admin/Login.tsx`** — Same redirect fix for admin forgot password flow (point to `/reset-password`)
-
-This ensures the reset form loads on a clean page without competing session-redirect logic.
-
+### Files
+- Migration: `user_restrictions` table + RLS policies
+- `supabase/functions/auto-suspend-restricted-accounts/index.ts`
+- `src/components/WithdrawalRestrictionBanner.tsx` (countdown UI)
+- `src/pages/Dashboard.tsx` (add restriction banner)
+- `src/pages/admin/Users.tsx` (add restrict button + dialog)

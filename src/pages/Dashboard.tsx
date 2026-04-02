@@ -15,6 +15,7 @@ import { SecurityBadge } from "@/components/ui/security-badge";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { AccountRestrictionFeeDialog } from "@/components/AccountRestrictionFeeDialog";
 import { WithdrawalRestrictionBanner } from "@/components/WithdrawalRestrictionBanner";
+import { DepositRequirementDialog } from "@/components/DepositRequirementDialog";
 
 
 interface DashboardStats {
@@ -49,6 +50,7 @@ const Dashboard = () => {
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [showActivationFee, setShowActivationFee] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
+  const [depositRestriction, setDepositRestriction] = useState<{id: string; deadline: string; message: string | null} | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -101,6 +103,21 @@ const Dashboard = () => {
         (tx: any) => tx.admin_notes?.includes("ACTIVATION FEE REQUIRED")
       );
       setShowActivationFee(!!hasActivationFee);
+
+      // Check for deposit_required restriction
+      const { data: depositRestrictions } = await supabase
+        .from("user_restrictions")
+        .select("id, deadline, message")
+        .eq("user_id", user.id)
+        .eq("restriction_type", "deposit_required")
+        .eq("status", "active")
+        .limit(1);
+
+      if (depositRestrictions && depositRestrictions.length > 0) {
+        setDepositRestriction(depositRestrictions[0]);
+      } else {
+        setDepositRestriction(null);
+      }
     } catch (error: any) {
       toast({
         title: "Error loading dashboard",
@@ -235,6 +252,9 @@ const Dashboard = () => {
     <PullToRefresh onRefresh={fetchData}>
     <div className="space-y-6 pb-20 md:pb-6">
       <AccountRestrictionFeeDialog open={showActivationFee} userId={currentUserId} />
+      {depositRestriction && currentUserId && (
+        <DepositRequirementDialog restriction={depositRestriction} userId={currentUserId} />
+      )}
       <WithdrawalRestrictionBanner />
 
       {/* Header with fade-in animation */}

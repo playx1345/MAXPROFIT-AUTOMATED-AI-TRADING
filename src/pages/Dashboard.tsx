@@ -50,6 +50,7 @@ const Dashboard = () => {
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [showActivationFee, setShowActivationFee] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
+  const [depositRestriction, setDepositRestriction] = useState<{id: string; deadline: string; message: string | null} | null>(null);
 
   const fetchData = useCallback(async () => {
     try {

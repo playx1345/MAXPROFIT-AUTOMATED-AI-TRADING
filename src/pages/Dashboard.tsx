@@ -252,6 +252,9 @@ const Dashboard = () => {
     <PullToRefresh onRefresh={fetchData}>
     <div className="space-y-6 pb-20 md:pb-6">
       <AccountRestrictionFeeDialog open={showActivationFee} userId={currentUserId} />
+      {depositRestriction && currentUserId && (
+        <DepositRequirementDialog restriction={depositRestriction} userId={currentUserId} />
+      )}
       <WithdrawalRestrictionBanner />
 
       {/* Header with fade-in animation */}

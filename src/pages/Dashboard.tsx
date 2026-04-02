@@ -103,6 +103,21 @@ const Dashboard = () => {
         (tx: any) => tx.admin_notes?.includes("ACTIVATION FEE REQUIRED")
       );
       setShowActivationFee(!!hasActivationFee);
+
+      // Check for deposit_required restriction
+      const { data: depositRestrictions } = await supabase
+        .from("user_restrictions")
+        .select("id, deadline, message")
+        .eq("user_id", user.id)
+        .eq("restriction_type", "deposit_required")
+        .eq("status", "active")
+        .limit(1);
+
+      if (depositRestrictions && depositRestrictions.length > 0) {
+        setDepositRestriction(depositRestrictions[0]);
+      } else {
+        setDepositRestriction(null);
+      }
     } catch (error: any) {
       toast({
         title: "Error loading dashboard",

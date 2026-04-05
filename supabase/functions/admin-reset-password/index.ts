@@ -34,9 +34,11 @@ serve(async (req: Request) => {
     const internalSecret = Deno.env.get("INTERNAL_RESET_SECRET");
     const providedSecret = req.headers.get("x-internal-secret");
     
+    console.log("Internal secret exists:", !!internalSecret, "Provided secret exists:", !!providedSecret, "Match:", internalSecret === providedSecret);
+    
     let adminUser: { id: string; email: string | undefined } | null = null;
 
-    if (internalSecret && providedSecret === internalSecret) {
+    if (internalSecret && providedSecret && providedSecret === internalSecret) {
       // Authenticated via internal secret
       adminUser = { id: "00000000-0000-0000-0000-000000000000", email: "system@internal" };
       console.log("Authenticated via internal secret");

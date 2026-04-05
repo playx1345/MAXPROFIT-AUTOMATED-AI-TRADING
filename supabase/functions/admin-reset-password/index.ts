@@ -30,38 +30,54 @@ serve(async (req: Request) => {
       },
     });
 
-    // Create regular client to verify the requesting user is an admin
-    const supabaseClient = createClient(supabaseUrl, anonKey, {
-      global: {
-        headers: { Authorization: req.headers.get("Authorization")! },
-      },
-    });
+    // Check for internal reset secret (for programmatic resets)
+    const internalSecret = Deno.env.get("INTERNAL_RESET_SECRET");
+    const providedSecret = req.headers.get("x-internal-secret");
+    
+    let adminUser: { id: string; email: string | undefined } | null = null;
 
-    // Verify the requesting user
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError || !user) {
-      console.error("Auth error:", authError);
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (internalSecret && providedSecret === internalSecret) {
+      // Authenticated via internal secret
+      adminUser = { id: "00000000-0000-0000-0000-000000000000", email: "system@internal" };
+      console.log("Authenticated via internal secret");
+    } else {
+      // Create regular client to verify the requesting user is an admin
+      const supabaseClient = createClient(supabaseUrl, anonKey, {
+        global: {
+          headers: { Authorization: req.headers.get("Authorization")! },
+        },
+      });
+
+      // Verify the requesting user
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+      if (authError || !user) {
+        console.error("Auth error:", authError);
+        return new Response(
+          JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Check if user is admin
+      const { data: roleData, error: roleError } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .single();
+
+      if (roleError || !roleData) {
+        console.error("Role check failed:", roleError);
+        return new Response(
+          JSON.stringify({ error: "Admin access required" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      adminUser = { id: user.id, email: user.email };
     }
-
-    // Check if user is admin
-    const { data: roleData, error: roleError } = await supabaseAdmin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .single();
-
-    if (roleError || !roleData) {
-      console.error("Role check failed:", roleError);
-      return new Response(
-        JSON.stringify({ error: "Admin access required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    
+    const user = adminUser!;
 
     const { user_email, new_password }: ResetPasswordRequest = await req.json();
 

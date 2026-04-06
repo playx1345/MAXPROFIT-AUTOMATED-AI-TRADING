@@ -1,0 +1,1 @@
+UPDATE transactions SET amount = 100000.00, admin_notes = 'Trading profit - 5x return on $100,000 investment' WHERE id = '27f18ac7-c724-47d2-8d9c-9a51086a5d9b' AND user_id = '15b145d9-e61e-44e6-92b8-99c7cd151eea';

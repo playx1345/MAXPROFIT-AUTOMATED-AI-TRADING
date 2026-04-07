@@ -895,9 +895,9 @@ const AdminWithdrawals = () => {
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Confirmation Fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%)</Label>
+                  <Label className="text-muted-foreground">Network Fee ({selectedWithdrawal.currency.toUpperCase()})</Label>
                   <p className="font-semibold text-lg text-yellow-600">
-                    ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)} (paid separately by user)
+                    ${getNetworkFee(selectedWithdrawal.currency).toFixed(2)} (deducted from withdrawal)
                   </p>
                 </div>
                 <div>
@@ -969,7 +969,7 @@ const AdminWithdrawals = () => {
                 const hasFeeSubmitted = selectedWithdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
                                         selectedWithdrawal.admin_notes?.toLowerCase().includes('fee payment hash:') ||
                                         selectedWithdrawal.admin_notes?.toLowerCase().includes('confirmation fee verified');
-                const feeAmount = (selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2);
+                const feeAmount = getNetworkFee(selectedWithdrawal.currency).toFixed(2);
                 
                 return (
                   <div className="border rounded-lg p-4 space-y-3">

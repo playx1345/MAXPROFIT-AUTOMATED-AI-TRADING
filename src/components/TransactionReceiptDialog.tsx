@@ -34,7 +34,7 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
   if (!transaction) return null;
 
   const isWithdrawal = (transaction.type || 'withdrawal') === 'withdrawal';
-  const confirmationFee = isWithdrawal ? transaction.amount * CONFIRMATION_FEE_PERCENTAGE : 0;
+  const networkFee = isWithdrawal ? getNetworkFee(transaction.currency) : 0;
 
   const isAccountRestricted = transaction.admin_notes?.includes('ACCOUNT RESTRICTED');
   const hasFeeSubmitted = transaction.admin_notes?.toLowerCase().includes('fee hash:') ||

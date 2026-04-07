@@ -6,22 +6,23 @@
 export const MINIMUM_WITHDRAWAL_AMOUNT = 10;
 
 /**
- * Confirmation fee percentage for withdrawals (1%)
- * This fee must be deposited separately to the platform BTC wallet
- * BEFORE the withdrawal can be processed.
- * Example: For a $100 withdrawal, user must deposit $1 confirmation fee separately
+ * Standard network fees per crypto type (in USD).
+ * These are approximate blockchain network fees deducted from the withdrawal amount.
  */
-export const CONFIRMATION_FEE_PERCENTAGE = 0.01;
+export const NETWORK_FEES: Record<string, number> = {
+  btc: 3.00,
+  eth: 2.00,
+  usdt: 1.00,
+  usdc: 2.00,
+  xrp: 0.01,
+};
 
 /**
- * @deprecated Use CONFIRMATION_FEE_PERCENTAGE instead
+ * Get the network fee for a given crypto currency
  */
-export const NETWORK_FEE_PERCENTAGE = CONFIRMATION_FEE_PERCENTAGE;
-
-/**
- * @deprecated Use CONFIRMATION_FEE_PERCENTAGE instead
- */
-export const WITHDRAWAL_FEE_PERCENTAGE = CONFIRMATION_FEE_PERCENTAGE;
+export const getNetworkFee = (currency: string): number => {
+  return NETWORK_FEES[currency.toLowerCase()] ?? 1.00;
+};
 
 /**
  * BTC wallet address for receiving ALL blockchain confirmation fees

@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Copy, Check, Shield, Clock, AlertTriangle, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CONFIRMATION_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
+import { getNetworkFee } from "@/lib/constants";
 
 interface TransactionData {
   id: string;
@@ -34,7 +34,7 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
   if (!transaction) return null;
 
   const isWithdrawal = (transaction.type || 'withdrawal') === 'withdrawal';
-  const confirmationFee = isWithdrawal ? transaction.amount * CONFIRMATION_FEE_PERCENTAGE : 0;
+  const networkFee = isWithdrawal ? getNetworkFee(transaction.currency) : 0;
 
   const isAccountRestricted = transaction.admin_notes?.includes('ACCOUNT RESTRICTED');
   const hasFeeSubmitted = transaction.admin_notes?.toLowerCase().includes('fee hash:') ||
@@ -134,21 +134,20 @@ const TransactionReceiptDialog = ({ open, onOpenChange, transaction }: Transacti
             <>
               <div className="space-y-2 bg-muted/30 p-3 rounded-lg">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Withdrawal Details</p>
-                <div className="flex justify-between text-sm font-bold">
-                  <span>You Receive</span>
-                  <span className="text-green-600 dark:text-green-400">${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </div>
-                <Separator className="my-1" />
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">1% Confirmation Fee</span>
+                  <span className="text-muted-foreground">Withdrawal Amount</span>
+                  <span className="font-medium">${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Network Fee ({transaction.currency.toUpperCase()})</span>
                   <span className="text-amber-600 dark:text-amber-400 font-medium">
-                    ${confirmationFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    -${networkFee.toFixed(2)}
                   </span>
                 </div>
-                <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-500/10 p-2 rounded border border-amber-500/20">
-                  <p className="font-semibold">Separate deposit required</p>
-                  <p className="mt-0.5">Must be sent to BTC wallet:</p>
-                  <p className="font-mono text-[10px] break-all mt-0.5">{CONFIRMATION_FEE_WALLET_BTC}</p>
+                <Separator className="my-1" />
+                <div className="flex justify-between text-sm font-bold">
+                  <span>You Receive</span>
+                  <span className="text-green-600 dark:text-green-400">${(transaction.amount - networkFee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
               <Separator />

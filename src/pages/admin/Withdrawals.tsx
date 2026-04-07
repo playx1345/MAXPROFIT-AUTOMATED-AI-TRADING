@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
+import { getNetworkFee, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { useWithdrawalApprovals } from "@/hooks/useWithdrawalApprovals";

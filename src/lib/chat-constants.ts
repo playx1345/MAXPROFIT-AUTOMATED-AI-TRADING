@@ -14,12 +14,12 @@ export const AUTOMATED_RESPONSES: { keywords: string[]; response: string; respon
   },
   {
     keywords: ['withdraw', 'withdrawal', 'cash out', 'take out money'],
-    response: "For withdrawals:\n\n1. Go to Dashboard → Withdraw\n2. Enter amount and wallet address\n3. Pay the 10% confirmation fee\n4. Withdrawals are processed within 24 hours\n\nMinimum Withdrawals:\n• Interest earnings above $50,000: $30,000 USDT minimum\n• Normal investments: $50 minimum\n\nNeed more help? Email us at support@win-tradex.com",
+    response: "For withdrawals:\n\n1. Go to Dashboard → Withdraw\n2. Enter amount and wallet address\n3. Network fee is deducted based on crypto type (BTC: $3, ETH: $2, USDT: $1, USDC: $2, XRP: $0.01)\n4. Withdrawals are processed within 24 hours\n\nMinimum withdrawal: $1\n\n⚠️ A CCIC Code fee may be required for compliance verification before your withdrawal can be released.\n\nNeed more help? Email us at support@win-tradex.com",
     responseKey: 'withdrawal'
   },
   {
     keywords: ['deposit', 'add money', 'fund', 'top up'],
-    response: "To make a deposit:\n\n1. Go to Dashboard → Deposit\n2. Choose USDT (TRC20) or BTC\n3. Send crypto to the provided wallet address\n4. Submit deposit request with transaction hash\n\nMinimum deposit: $250\n\nDeposits are processed within 24 hours after blockchain confirmation.",
+    response: "To make a deposit:\n\n1. Go to Dashboard → Deposit\n2. Choose USDT (TRC20) or BTC\n3. Send crypto to the provided wallet address\n4. Submit deposit request with transaction hash\n\nMinimum deposit: $1\n\nDeposits are processed within 24 hours after blockchain confirmation.",
     responseKey: 'deposit'
   },
   {
@@ -34,7 +34,7 @@ export const AUTOMATED_RESPONSES: { keywords: string[]; response: string; respon
   },
   {
     keywords: ['fee', 'confirmation fee', 'blockchain fee', 'charges'],
-    response: "Platform Fees:\n\n• KYC Verification: $400 (one-time)\n• Withdrawal Confirmation: 10% of withdrawal amount\n• Platform Fee: 20% of profits\n\nMinimum Withdrawals:\n• Interest earnings above $50,000: $30,000 USDT minimum\n• Normal investments: $50 minimum\n\nAll fees are clearly shown before any transaction.",
+    response: "Platform Fees:\n\n• KYC Verification: $400 (one-time)\n• Network Fees (deducted from withdrawal): BTC $3, ETH $2, USDT $1, USDC $2, XRP $0.01\n• CCIC Code Fee: Required for compliance verification on certain withdrawals\n• Platform Fee: 20% of profits\n\nMinimum withdrawal: $1\nMinimum deposit: $1\n\nAll fees are clearly shown before any transaction.",
     responseKey: 'fees'
   },
   {

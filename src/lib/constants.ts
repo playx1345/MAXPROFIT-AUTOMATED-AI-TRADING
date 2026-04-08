@@ -3,7 +3,7 @@
 /**
  * Minimum withdrawal amount in USD
  */
-export const MINIMUM_WITHDRAWAL_AMOUNT = 10;
+export const MINIMUM_WITHDRAWAL_AMOUNT = 1;
 
 /**
  * Standard network fees per crypto type (in USD).

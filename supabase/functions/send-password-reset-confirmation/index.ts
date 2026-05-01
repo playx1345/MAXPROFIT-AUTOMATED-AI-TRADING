@@ -1,10 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface PasswordResetConfirmationRequest {
@@ -18,6 +19,30 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authenticate the caller
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { email, isAdmin }: PasswordResetConfirmationRequest = await req.json();
 
     if (!email) {
@@ -53,7 +78,7 @@ serve(async (req: Request): Promise<Response> => {
                 <tr>
                   <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, transparent 100%);">
                     <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #eab308;">
-                      Live Win Trade
+                      Win-Tradex
                     </h1>
                   </td>
                 </tr>
@@ -94,7 +119,7 @@ serve(async (req: Request): Promise<Response> => {
                 <tr>
                   <td style="padding: 30px 40px; background-color: rgba(0, 0, 0, 0.3); border-top: 1px solid #2a2a35;">
                     <p style="margin: 0; font-size: 12px; color: #71717a; text-align: center;">
-                      This is an automated security notification from Live Win Trade.<br>
+                      This is an automated security notification from Win-Tradex.<br>
                       Please do not reply to this email.
                     </p>
                   </td>
@@ -114,9 +139,9 @@ serve(async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Live Win Trade <onboarding@resend.dev>",
+        from: "Win-Tradex <notifications@win-tradex.com>",
         to: [email],
-        subject: "Password Successfully Changed - Live Win Trade",
+        subject: "Password Successfully Changed - Win-Tradex",
         html: htmlContent,
       }),
     });

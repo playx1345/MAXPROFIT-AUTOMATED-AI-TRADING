@@ -50,6 +50,36 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          is_user_message: boolean
+          message: string
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          is_user_message?: boolean
+          message: string
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          is_user_message?: boolean
+          message?: string
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -77,6 +107,93 @@ export type Database = {
           name?: string
           status?: string
           subject?: string
+        }
+        Relationships: []
+      }
+      email_send_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          message_id: string | null
+          metadata: Json | null
+          recipient_email: string
+          status: string
+          template_name: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          recipient_email: string
+          status: string
+          template_name: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          metadata?: Json | null
+          recipient_email?: string
+          status?: string
+          template_name?: string
+        }
+        Relationships: []
+      }
+      email_send_state: {
+        Row: {
+          auth_email_ttl_minutes: number
+          batch_size: number
+          id: number
+          retry_after_until: string | null
+          send_delay_ms: number
+          transactional_email_ttl_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          auth_email_ttl_minutes?: number
+          batch_size?: number
+          id?: number
+          retry_after_until?: string | null
+          send_delay_ms?: number
+          transactional_email_ttl_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          auth_email_ttl_minutes?: number
+          batch_size?: number
+          id?: number
+          retry_after_until?: string | null
+          send_delay_ms?: number
+          transactional_email_ttl_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_unsubscribe_tokens: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          token?: string
+          used_at?: string | null
         }
         Relationships: []
       }
@@ -176,11 +293,39 @@ export type Database = {
           },
         ]
       }
+      platform_settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           balance_usdt: number
           created_at: string
           email: string
+          fee_exempt: boolean
           full_name: string | null
           id: string
           is_suspended: boolean
@@ -189,12 +334,15 @@ export type Database = {
           phone: string | null
           upgrade_fee_paid: boolean
           wallet_btc: string | null
+          wallet_eth: string | null
+          wallet_usdc: string | null
           wallet_usdt: string | null
         }
         Insert: {
           balance_usdt?: number
           created_at?: string
           email: string
+          fee_exempt?: boolean
           full_name?: string | null
           id: string
           is_suspended?: boolean
@@ -203,12 +351,15 @@ export type Database = {
           phone?: string | null
           upgrade_fee_paid?: boolean
           wallet_btc?: string | null
+          wallet_eth?: string | null
+          wallet_usdc?: string | null
           wallet_usdt?: string | null
         }
         Update: {
           balance_usdt?: number
           created_at?: string
           email?: string
+          fee_exempt?: boolean
           full_name?: string | null
           id?: string
           is_suspended?: boolean
@@ -217,6 +368,8 @@ export type Database = {
           phone?: string | null
           upgrade_fee_paid?: boolean
           wallet_btc?: string | null
+          wallet_eth?: string | null
+          wallet_usdc?: string | null
           wallet_usdt?: string | null
         }
         Relationships: []
@@ -263,6 +416,30 @@ export type Database = {
           },
         ]
       }
+      suppressed_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          metadata: Json | null
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          metadata?: Json | null
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string
+        }
+        Relationships: []
+      }
       trading_bot_performance: {
         Row: {
           action: string
@@ -308,11 +485,14 @@ export type Database = {
         Row: {
           admin_notes: string | null
           amount: number
+          blockchain_confirmations: number
           created_at: string
           currency: string
           id: string
+          memo_tag: string | null
           processed_at: string | null
           processed_by: string | null
+          required_confirmations: number
           status: Database["public"]["Enums"]["transaction_status"]
           transaction_hash: string | null
           type: Database["public"]["Enums"]["transaction_type"]
@@ -322,11 +502,14 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           amount: number
+          blockchain_confirmations?: number
           created_at?: string
           currency?: string
           id?: string
+          memo_tag?: string | null
           processed_at?: string | null
           processed_by?: string | null
+          required_confirmations?: number
           status?: Database["public"]["Enums"]["transaction_status"]
           transaction_hash?: string | null
           type: Database["public"]["Enums"]["transaction_type"]
@@ -336,11 +519,14 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           amount?: number
+          blockchain_confirmations?: number
           created_at?: string
           currency?: string
           id?: string
+          memo_tag?: string | null
           processed_at?: string | null
           processed_by?: string | null
+          required_confirmations?: number
           status?: Database["public"]["Enums"]["transaction_status"]
           transaction_hash?: string | null
           type?: Database["public"]["Enums"]["transaction_type"]
@@ -364,6 +550,45 @@ export type Database = {
           },
         ]
       }
+      user_restrictions: {
+        Row: {
+          admin_email: string
+          created_at: string
+          created_by: string
+          deadline: string
+          id: string
+          message: string | null
+          restriction_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_email: string
+          created_at?: string
+          created_by: string
+          deadline: string
+          id?: string
+          message?: string | null
+          restriction_type?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_email?: string
+          created_at?: string
+          created_by?: string
+          deadline?: string
+          id?: string
+          message?: string | null
+          restriction_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -385,11 +610,60 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_approvals: {
+        Row: {
+          admin_email: string
+          admin_id: string
+          approved_at: string
+          id: string
+          notes: string | null
+          transaction_id: string
+        }
+        Insert: {
+          admin_email: string
+          admin_id: string
+          approved_at?: string
+          id?: string
+          notes?: string | null
+          transaction_id: string
+        }
+        Update: {
+          admin_email?: string
+          admin_id?: string
+          approved_at?: string
+          id?: string
+          notes?: string | null
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_approvals_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      adjust_user_balance: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_amount: number
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      admin_credit_balance: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: number
+      }
       approve_deposit_atomic: {
         Args: {
           p_admin_email: string
@@ -417,12 +691,47 @@ export type Database = {
         Args: { p_amount_usdt: number; p_plan_id: string; p_user_id: string }
         Returns: Json
       }
+      create_withdrawal_atomic: {
+        Args: {
+          p_amount: number
+          p_currency: string
+          p_memo_tag?: string
+          p_user_id: string
+          p_wallet_address: string
+        }
+        Returns: Json
+      }
+      delete_email: {
+        Args: { message_id: number; queue_name: string }
+        Returns: boolean
+      }
+      enqueue_email: {
+        Args: { payload: Json; queue_name: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      move_to_dlq: {
+        Args: {
+          dlq_name: string
+          message_id: number
+          payload: Json
+          source_queue: string
+        }
+        Returns: number
+      }
+      read_email_batch: {
+        Args: { batch_size: number; queue_name: string; vt: number }
+        Returns: {
+          message: Json
+          msg_id: number
+          read_ct: number
+        }[]
       }
       reject_deposit_atomic: {
         Args: {
@@ -438,6 +747,51 @@ export type Database = {
           p_admin_email: string
           p_admin_id: string
           p_admin_notes?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reject_withdrawal_no_refund: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_admin_notes?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reopen_rejected_deposit: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reopen_rejected_withdrawal: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reverse_approved_deposit: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
+          p_transaction_id: string
+        }
+        Returns: Json
+      }
+      reverse_approved_withdrawal: {
+        Args: {
+          p_admin_email: string
+          p_admin_id: string
+          p_reason?: string
           p_transaction_id: string
         }
         Returns: Json

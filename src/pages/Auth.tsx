@@ -12,7 +12,7 @@ import { Shield, Zap, ArrowLeft, Clock } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRateLimit } from "@/hooks/useRateLimit";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/wtx-logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -113,9 +113,17 @@ const Auth = () => {
       if (error) throw error;
 
       if (data.user) {
+        // Send welcome email (fire and forget)
+        supabase.functions.invoke('send-signup-notification', {
+          body: {
+            user_name: signUpData.fullName,
+            user_email: signUpData.email,
+          },
+        }).catch(err => console.error("Welcome email failed:", err));
+
         toast({
           title: "Account created successfully!",
-          description: "You can now sign in to your account.",
+          description: "Please check your email and verify your account before signing in.",
         });
         setSignUpData({ email: "", password: "", confirmPassword: "", fullName: "" });
       }
@@ -156,6 +164,16 @@ const Auth = () => {
 
       if (error) throw error;
 
+      if (data.user && !data.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Email not verified",
+          description: "Please check your inbox and verify your email address before signing in.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (data.session) {
         toast({
           title: "Welcome back!",
@@ -164,7 +182,10 @@ const Auth = () => {
         navigate("/dashboard");
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Invalid email or password";
+      const rawMessage = error instanceof Error ? error.message : "Invalid email or password";
+      const errorMessage = rawMessage === "Invalid login credentials"
+        ? "Incorrect email or password. Please try again."
+        : rawMessage;
       toast({
         title: "Sign in failed",
         description: errorMessage,
@@ -203,7 +224,7 @@ const Auth = () => {
       recordAttempt();
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/auth?type=recovery`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (error) throw error;
@@ -287,7 +308,7 @@ const Auth = () => {
 
   if (showResetPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-background p-4 relative overflow-y-auto overflow-x-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,hsl(var(--primary)/0.15),transparent_50%)]" />
           <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_right,hsl(var(--accent)/0.2),transparent_50%)]" />
@@ -297,9 +318,9 @@ const Auth = () => {
 
         <div className="w-full max-w-md relative z-10">
           <div className="text-center mb-8 animate-fade-in">
-            <img src={logo} alt="Live Win Trade" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-cover" />
+            <img src={logo} alt="Win-Tradex" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-contain" />
             <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Live Win Trade
+              Win-Tradex
             </h1>
           </div>
 
@@ -363,7 +384,7 @@ const Auth = () => {
 
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-background p-4 relative overflow-y-auto overflow-x-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,hsl(var(--primary)/0.15),transparent_50%)]" />
           <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_right,hsl(var(--accent)/0.2),transparent_50%)]" />
@@ -373,9 +394,9 @@ const Auth = () => {
 
         <div className="w-full max-w-md relative z-10">
           <div className="text-center mb-8 animate-fade-in">
-            <img src={logo} alt="Live Win Trade" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-cover" />
+            <img src={logo} alt="Win-Tradex" className="w-24 h-24 rounded-2xl shadow-xl shadow-primary/25 mb-4 mx-auto object-contain" />
             <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Live Win Trade
+              Win-Tradex
             </h1>
           </div>
 
@@ -436,7 +457,7 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 sm:p-6 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-background px-4 py-8 sm:p-6 md:p-8 relative overflow-y-auto overflow-x-hidden">
       {/* Theme Toggle - Fixed position */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
         <ThemeToggle />
@@ -454,9 +475,9 @@ const Auth = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Logo and branding */}
         <div className="text-center mb-6 sm:mb-8 animate-fade-in">
-          <img src={logo} alt="Live Win Trade" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-xl shadow-primary/25 mb-3 sm:mb-4 mx-auto object-cover border-2 border-primary/20" />
+          <img src={logo} alt="Win-Tradex" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-xl shadow-primary/25 mb-3 sm:mb-4 mx-auto object-contain border-2 border-primary/20" />
           <h1 className="text-2xl sm:text-3xl font-serif font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wide">
-            Live Win Trade
+            Win-Tradex
           </h1>
           <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">AI-Powered Investment Platform</p>
         </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const KYC_FEE_AMOUNT = 400;
 
@@ -36,15 +37,13 @@ const Profile = () => {
     email: "",
     wallet_btc: "",
     wallet_usdt: "",
+    wallet_eth: "",
+    wallet_usdc: "",
     kyc_status: "pending",
   });
   const [kycIdCardUrl, setKycIdCardUrl] = useState("");
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -64,9 +63,10 @@ const Profile = () => {
           email: data.email || "",
           wallet_btc: data.wallet_btc || "",
           wallet_usdt: data.wallet_usdt || "",
+          wallet_eth: data.wallet_eth || "",
+          wallet_usdc: data.wallet_usdc || "",
           kyc_status: data.kyc_status,
         });
-        // KYC ID card URL is stored separately (not in profiles table)
       }
     } catch (error: any) {
       toast({
@@ -77,7 +77,11 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleSave = async () => {
     try {
@@ -92,6 +96,8 @@ const Profile = () => {
           phone: profile.phone,
           wallet_btc: profile.wallet_btc,
           wallet_usdt: profile.wallet_usdt,
+          wallet_eth: profile.wallet_eth,
+          wallet_usdc: profile.wallet_usdc,
         })
         .eq("id", user.id);
 
@@ -295,6 +301,7 @@ const Profile = () => {
   }
 
   return (
+    <PullToRefresh onRefresh={fetchProfile}>
     <div className="space-y-6 max-w-3xl">
       <div>
         <h1 className="text-3xl font-bold mb-2">Profile & KYC</h1>
@@ -431,6 +438,26 @@ const Profile = () => {
               placeholder="T..."
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="wallet_eth">Ethereum (ETH) Address</Label>
+            <Input
+              id="wallet_eth"
+              value={profile.wallet_eth}
+              onChange={(e) => setProfile({ ...profile, wallet_eth: e.target.value })}
+              placeholder="0x..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="wallet_usdc">USDC (ERC20) Address</Label>
+            <Input
+              id="wallet_usdc"
+              value={profile.wallet_usdc}
+              onChange={(e) => setProfile({ ...profile, wallet_usdc: e.target.value })}
+              placeholder="0x..."
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -478,6 +505,7 @@ const Profile = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </PullToRefresh>
   );
 };
 

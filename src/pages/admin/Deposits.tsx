@@ -3,17 +3,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle, XCircle, ExternalLink, Shield, AlertTriangle } from "lucide-react";
+import { CheckCircle, XCircle, ExternalLink, Shield, AlertTriangle, Search } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { sendTransactionalEmail } from "@/lib/email-utils";
 
 interface Deposit {
   id: string;
@@ -35,8 +38,14 @@ const AdminDeposits = () => {
   const [selectedDeposit, setSelectedDeposit] = useState<Deposit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  const [reverseReason, setReverseReason] = useState("");
   const [processing, setProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [showReverseConfirm, setShowReverseConfirm] = useState(false);
+  const [showReopenConfirm, setShowReopenConfirm] = useState(false);
   const { toast } = useToast();
   const { verifying, result, verifyTransaction, clearResult } = useBlockchainVerification();
 
@@ -80,6 +89,123 @@ const AdminDeposits = () => {
     }
   };
 
+  // Filter deposits based on search term
+  const filterDeposits = (items: Deposit[]) => {
+    if (!searchTerm) return items;
+    const term = searchTerm.toLowerCase();
+    return items.filter(d => 
+      d.profiles?.email?.toLowerCase().includes(term) ||
+      d.profiles?.full_name?.toLowerCase().includes(term) ||
+      d.transaction_hash?.toLowerCase().includes(term) ||
+      d.amount.toString().includes(term)
+    );
+  };
+
+  // Toggle selection for bulk actions
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = (items: Deposit[]) => {
+    if (selectedIds.length === items.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(items.map(d => d.id));
+    }
+  };
+
+  // Bulk approve selected deposits
+  const handleBulkApprove = async () => {
+    if (selectedIds.length === 0) return;
+    setBulkProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const id of selectedIds) {
+        try {
+          const { error } = await supabase.rpc("approve_deposit_atomic" as any, {
+            p_transaction_id: id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_admin_notes: "Bulk approved by admin",
+          });
+          if (error) throw error;
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk approval complete",
+        description: `${successCount} approved, ${failCount} failed`,
+      });
+
+      setSelectedIds([]);
+      fetchDeposits();
+    } catch (error: any) {
+      toast({
+        title: "Bulk approval failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  // Bulk reject selected deposits
+  const handleBulkReject = async () => {
+    if (selectedIds.length === 0) return;
+    setBulkProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const id of selectedIds) {
+        try {
+          const { error } = await supabase.rpc("reject_deposit_atomic" as any, {
+            p_transaction_id: id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_admin_notes: "Bulk rejected by admin",
+          });
+          if (error) throw error;
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk rejection complete",
+        description: `${successCount} rejected, ${failCount} failed`,
+      });
+
+      setSelectedIds([]);
+      fetchDeposits();
+    } catch (error: any) {
+      toast({
+        title: "Bulk rejection failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
   const handleApprove = async () => {
     if (!selectedDeposit) return;
     setProcessing(true);
@@ -96,6 +222,11 @@ const AdminDeposits = () => {
       });
 
       if (error) throw error;
+
+      // Send deposit approved email to user
+      sendTransactionalEmail("deposit_approved", selectedDeposit.profiles.email, {
+        amount: selectedDeposit.amount,
+      });
 
       toast({
         title: "Deposit approved",
@@ -152,6 +283,80 @@ const AdminDeposits = () => {
     }
   };
 
+  const handleReverseDeposit = async () => {
+    if (!selectedDeposit) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reverse_approved_deposit" as any, {
+        p_transaction_id: selectedDeposit.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Deposit reversed",
+        description: "Amount deducted from user balance and deposit marked as rejected",
+      });
+
+      fetchDeposits();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReverseConfirm(false);
+    } catch (error: any) {
+      toast({
+        title: "Error reversing deposit",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReopenDeposit = async () => {
+    if (!selectedDeposit) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reopen_rejected_deposit" as any, {
+        p_transaction_id: selectedDeposit.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Deposit re-approved",
+        description: "Amount credited to user balance and deposit marked as approved",
+      });
+
+      fetchDeposits();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReopenConfirm(false);
+    } catch (error: any) {
+      toast({
+        title: "Error re-approving deposit",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleVerifyBlockchain = () => {
     if (selectedDeposit?.transaction_hash) {
       verifyTransaction(
@@ -169,14 +374,22 @@ const AdminDeposits = () => {
     return `https://blockchair.com/bitcoin/transaction/${deposit.transaction_hash}`;
   };
 
-  const pendingDeposits = deposits.filter((d) => d.status === "pending");
-  const completedDeposits = deposits.filter((d) => d.status === "approved");
-  const rejectedDeposits = deposits.filter((d) => d.status === "rejected");
+  const pendingDeposits = filterDeposits(deposits.filter((d) => d.status === "pending"));
+  const completedDeposits = filterDeposits(deposits.filter((d) => d.status === "approved"));
+  const rejectedDeposits = filterDeposits(deposits.filter((d) => d.status === "rejected"));
 
-  const DepositTable = ({ data }: { data: Deposit[] }) => (
+  const DepositTable = ({ data, showCheckbox = false }: { data: Deposit[]; showCheckbox?: boolean }) => (
     <Table>
       <TableHeader>
         <TableRow>
+          {showCheckbox && (
+            <TableHead className="w-12">
+              <Checkbox
+                checked={selectedIds.length === data.length && data.length > 0}
+                onCheckedChange={() => selectAll(data)}
+              />
+            </TableHead>
+          )}
           <TableHead>User</TableHead>
           <TableHead>Amount</TableHead>
           <TableHead>Currency</TableHead>
@@ -188,13 +401,21 @@ const AdminDeposits = () => {
       <TableBody>
         {data.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={6} className="text-center text-muted-foreground">
+            <TableCell colSpan={showCheckbox ? 7 : 6} className="text-center text-muted-foreground">
               No deposits found
             </TableCell>
           </TableRow>
         ) : (
           data.map((deposit) => (
             <TableRow key={deposit.id}>
+              {showCheckbox && (
+                <TableCell>
+                  <Checkbox
+                    checked={selectedIds.includes(deposit.id)}
+                    onCheckedChange={() => toggleSelection(deposit.id)}
+                  />
+                </TableCell>
+              )}
               <TableCell>
                 <div>
                   <p className="font-medium">{deposit.profiles?.full_name || "N/A"}</p>
@@ -265,7 +486,42 @@ const AdminDeposits = () => {
           <CardTitle>All Deposits</CardTitle>
           <CardDescription>Manage platform deposits</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Search and Bulk Actions */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by email, name, tx hash, or amount..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            {selectedIds.length > 0 && (
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={handleBulkApprove}
+                  disabled={bulkProcessing}
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Approve ({selectedIds.length})
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive"
+                  onClick={handleBulkReject}
+                  disabled={bulkProcessing}
+                >
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Reject ({selectedIds.length})
+                </Button>
+              </div>
+            )}
+          </div>
+
           <Tabs defaultValue="pending">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="pending">
@@ -280,7 +536,7 @@ const AdminDeposits = () => {
             </TabsList>
 
             <TabsContent value="pending" className="mt-4">
-              <DepositTable data={pendingDeposits} />
+              <DepositTable data={pendingDeposits} showCheckbox />
             </TabsContent>
 
             <TabsContent value="completed" className="mt-4">
@@ -475,6 +731,98 @@ const AdminDeposits = () => {
                       Reject
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {/* Reverse approved deposit */}
+              {selectedDeposit.status === "approved" && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReverseConfirm ? (
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => setShowReverseConfirm(true)}
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Reverse This Deposit
+                    </Button>
+                  ) : (
+                    <div className="p-4 border border-destructive rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-destructive">
+                        ⚠️ This will deduct ${selectedDeposit.amount.toLocaleString()} from the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for reversal</Label>
+                        <Textarea
+                          placeholder="Why are you reversing this deposit?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReverseConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1"
+                          onClick={handleReverseDeposit}
+                          disabled={processing}
+                        >
+                          {processing ? "Reversing..." : "Confirm Reversal"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Re-approve rejected deposit */}
+              {selectedDeposit.status === "rejected" && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReopenConfirm ? (
+                    <Button
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={() => setShowReopenConfirm(true)}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Re-approve This Deposit
+                    </Button>
+                  ) : (
+                    <div className="p-4 border border-green-500 rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-green-600">
+                        ✓ This will credit ${selectedDeposit.amount.toLocaleString()} to the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for re-approval</Label>
+                        <Textarea
+                          placeholder="Why are you re-approving this deposit?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReopenConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={handleReopenDeposit}
+                          disabled={processing}
+                        >
+                          {processing ? "Re-approving..." : "Confirm Re-approval"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

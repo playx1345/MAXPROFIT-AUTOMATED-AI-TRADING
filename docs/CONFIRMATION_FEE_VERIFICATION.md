@@ -17,7 +17,7 @@ When a user requests a withdrawal:
 The user must:
 1. Calculate 10% of their withdrawal amount in USD
 2. Convert that USD amount to BTC at current market rates
-3. Send the BTC to the platform's confirmation fee wallet: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+3. Send the BTC to the platform's confirmation fee wallet: `bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv`
 4. Obtain the transaction hash from the Bitcoin blockchain
 
 ### 3. Admin Verifies Confirmation Fee
@@ -59,7 +59,7 @@ Content-Type: application/json
   "fee_paid": true,
   "expected_fee_btc": 0.00123456,
   "actual_amount_btc": 0.00123450,
-  "to_address": "bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny",
+  "to_address": "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv",
   "from_address": "user-btc-address",
   "confirmations": 3,
   "transaction_hash": "bitcoin-tx-hash",
@@ -94,7 +94,7 @@ The edge function performs the following checks:
 3. **Fee Calculation**: Calculates expected fee: `withdrawal_amount * 0.10 / btc_price_usd`
 4. **Blockchain Verification**: 
    - Fetches the BTC transaction from Blockchair
-   - Verifies payment went to correct address: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+   - Verifies payment went to correct address: `bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv`
    - Checks amount matches expected fee (±1% tolerance for price fluctuations)
    - Requires at least 1 blockchain confirmation
 5. **Database Update**: Updates transaction with verification status
@@ -151,7 +151,7 @@ supabase db push
 
 ## Constants
 
-- **Confirmation Fee Wallet**: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+- **Confirmation Fee Wallet**: `bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv`
 - **Fee Percentage**: 10% (0.10)
 - **Required Confirmations**: 1
 - **Amount Tolerance**: ±1%
@@ -191,7 +191,7 @@ The admin withdrawal approval page should be updated to:
 ### Common Issues
 
 **"Payment not sent to correct BTC address"**
-- Ensure the BTC was sent to: `bc1q3jjvkvy9wt54tn05qzk7spryramhkz7qltn2ny`
+- Ensure the BTC was sent to: `bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv`
 
 **"Amount mismatch"**
 - Check that the correct amount was sent (10% of withdrawal in BTC)

@@ -3,129 +3,189 @@
 @tailwind utilities;
 
 /* ============================================
+   GLOBAL SMOOTH SCROLLING
+   ============================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   ACCESSIBILITY: Reduced Motion Support
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   SKIP NAVIGATION LINK (Accessibility)
+   ============================================ */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.5rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0.5rem;
+  z-index: 100;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* ============================================
    DESIGN SYSTEM CONFIGURATION
    All colors MUST be in HSL format for consistency
    ============================================ */
 
 @layer base {
+  /* ========== LIGHT MODE (Default) - Rich Warm Theme ========== */
   :root {
-    /* ========== Background Colors - Navy Blue Theme ========== */
-    /* Deep navy backgrounds inspired by the logo */
-    --background: 215 55% 8%;
-    --foreground: 210 20% 95%;
+    /* ========== Background Colors - Refined Cream/Ivory ========== */
+    --background: 38 30% 96%;
+    --foreground: 25 25% 15%;
 
     /* ========== Component Colors ========== */
-    --card: 215 50% 11%;
-    --card-foreground: 210 20% 95%;
+    --card: 42 35% 98%;
+    --card-foreground: 25 25% 15%;
 
-    --popover: 215 50% 11%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 42 35% 98%;
+    --popover-foreground: 25 25% 15%;
 
     /* ========== Brand Colors ========== */
-    /* Binance Yellow - Primary Brand Color */
-    --primary: 45 93% 49%;
-    --primary-foreground: 215 55% 8%;
-    --primary-glow: 45 95% 55%;
+    /* Gold - Primary Brand Color (balanced warm gold) */
+    --primary: 42 80% 45%;
+    --primary-foreground: 42 35% 98%;
+    --primary-glow: 40 85% 50%;
 
-    /* Gold/Amber Accent */
-    --accent: 38 92% 50%;
-    --accent-foreground: 215 55% 8%;
+    /* Amber Accent (refined warm amber) */
+    --accent: 35 75% 45%;
+    --accent-foreground: 42 35% 98%;
 
-    /* Logo Teal - Secondary accent from chart lines */
-    --logo-teal: 185 100% 38%;
+    /* Teal accent from logo */
+    --logo-teal: 185 100% 32%;
 
     /* ========== Semantic Colors ========== */
-    --secondary: 215 48% 12%;
-    --secondary-foreground: 210 20% 95%;
+    --secondary: 35 25% 92%;
+    --secondary-foreground: 25 25% 15%;
 
-    --muted: 215 45% 14%;
-    --muted-foreground: 210 15% 55%;
+    --muted: 38 20% 90%;
+    --muted-foreground: 30 15% 42%;
 
-    /* Binance Red for Destructive Actions */
-    --destructive: 355 90% 62%;
-    --destructive-foreground: 210 20% 95%;
+    /* Destructive Red (refined terracotta) */
+    --destructive: 5 65% 50%;
+    --destructive-foreground: 42 35% 98%;
 
-    /* Binance Green for Success States */
-    --success: 160 85% 43%;
-    --success-foreground: 210 20% 95%;
+    /* Success Green (refined warm sage) */
+    --success: 145 50% 38%;
+    --success-foreground: 42 35% 98%;
 
-    /* Warning Color */
-    --warning: 45 93% 49%;
-    --warning-foreground: 215 55% 8%;
+    /* Warning */
+    --warning: 42 80% 45%;
+    --warning-foreground: 25 25% 15%;
 
     /* ========== Border & Input ========== */
-    --border: 215 40% 18%;
-    --input: 215 40% 18%;
-    --ring: 45 93% 49%;
+    --border: 35 20% 85%;
+    --input: 35 20% 85%;
+    --ring: 42 80% 45%;
     --radius: 0.75rem;
 
     /* ========== Sidebar Colors ========== */
-    --sidebar-background: 215 55% 7%;
-    --sidebar-foreground: 210 20% 95%;
-    --sidebar-primary: 45 93% 49%;
-    --sidebar-primary-foreground: 215 55% 8%;
-    --sidebar-accent: 215 48% 12%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 215 40% 14%;
-    --sidebar-ring: 45 93% 49%;
+    --sidebar-background: 42 35% 98%;
+    --sidebar-foreground: 25 25% 15%;
+    --sidebar-primary: 42 80% 45%;
+    --sidebar-primary-foreground: 42 35% 98%;
+    --sidebar-accent: 38 22% 94%;
+    --sidebar-accent-foreground: 25 25% 15%;
+    --sidebar-border: 35 20% 85%;
+    --sidebar-ring: 42 80% 45%;
 
-    /* ========== Gradients ========== */
-    /* Navy Blue with Gold accents */
-    --gradient-primary: linear-gradient(135deg, hsl(45 93% 49%) 0%, hsl(38 92% 55%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(32 95% 52%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(215 55% 8%) 0%, hsl(215 50% 11%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(215 50% 11%) 0%, hsl(215 48% 14%) 100%);
-    --gradient-premium: linear-gradient(135deg, hsl(215 55% 7%) 0%, hsl(215 50% 10%) 40%, hsl(45 30% 12%) 100%);
-    --gradient-hero: linear-gradient(145deg, hsl(215 55% 8%) 0%, hsl(215 58% 5%) 50%, hsl(215 50% 10%) 100%);
-    --gradient-cyber: linear-gradient(135deg, hsl(45 93% 49% / 0.1) 0%, hsl(38 92% 50% / 0.1) 100%);
+    /* ========== Gradients (Refined Warm Light Mode) ========== */
+    --gradient-primary: linear-gradient(135deg, hsl(42 80% 45%) 0%, hsl(35 75% 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(35 75% 45%) 0%, hsl(28 70% 48%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(38 30% 96%) 0%, hsl(38 25% 94%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(42 35% 98%) 0%, hsl(38 30% 96%) 100%);
+    --gradient-premium: linear-gradient(135deg, hsl(40 30% 97%) 0%, hsl(38 25% 95%) 40%, hsl(35 35% 96%) 100%);
+    --gradient-hero: linear-gradient(145deg, hsl(38 30% 96%) 0%, hsl(40 35% 94%) 50%, hsl(38 30% 96%) 100%);
+    --gradient-cyber: linear-gradient(135deg, hsl(42 80% 45% / 0.1) 0%, hsl(35 75% 45% / 0.1) 100%);
 
-    /* ========== Shadows - Gold Glow Effects ========== */
-    --shadow-sm: 0 2px 8px hsl(215 60% 3% / 0.4);
-    --shadow-md: 0 4px 20px hsl(215 60% 3% / 0.5);
-    --shadow-lg: 0 8px 40px hsl(215 60% 3% / 0.6);
-    --shadow-elegant: 0 12px 50px -15px hsl(45 93% 49% / 0.4);
-    --shadow-glow: 0 0 60px hsl(45 93% 49% / 0.3);
-    --shadow-accent: 0 8px 30px -10px hsl(38 92% 50% / 0.5);
-    --shadow-neon: 0 0 20px hsl(45 93% 49% / 0.4), 0 0 40px hsl(45 93% 49% / 0.2);
+    /* ========== Shadows - Refined Warm Tones ========== */
+    --shadow-sm: 0 2px 8px hsl(30 25% 18% / 0.06);
+    --shadow-md: 0 4px 20px hsl(30 25% 18% / 0.08);
+    --shadow-lg: 0 8px 40px hsl(30 25% 18% / 0.1);
+    --shadow-elegant: 0 12px 50px -15px hsl(42 80% 45% / 0.3);
+    --shadow-glow: 0 0 60px hsl(42 80% 45% / 0.2);
+    --shadow-accent: 0 8px 30px -10px hsl(35 75% 45% / 0.35);
+    --shadow-neon: 0 0 20px hsl(42 80% 45% / 0.25), 0 0 40px hsl(42 80% 45% / 0.12);
 
     /* ========== Legacy Support ========== */
-    /* Bitcoin/Crypto Brand Color - Now matches Binance Yellow */
-    --bitcoin-orange: 45 93% 49%;
+    --bitcoin-orange: 42 80% 45%;
 
     /* ========== 3D Perspective ========== */
     --perspective: 1200px;
+
+    /* ========== Mobile & Crypto Enhancement Tokens ========== */
+    --touch-target-min: 44px;
+    --mobile-padding: clamp(1rem, 4vw, 1.5rem);
+    --card-padding-mobile: clamp(0.75rem, 3vw, 1.25rem);
+    
+    /* Crypto Data Colors (refined warm tones) */
+    --crypto-green: 145 50% 42%;
+    --crypto-red: 5 65% 54%;
+    --holographic-gradient: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary-glow)), hsl(var(--primary)));
+    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.3);
   }
 
-  /* ========== Dark Mode Overrides ========== */
+  /* ========== DARK MODE - Binance-Inspired ========== */
   .dark {
-    --background: 215 58% 5%;
-    --foreground: 210 20% 95%;
+    --background: 222 53% 5%;
+    --foreground: 0 0% 100%;
 
-    --card: 215 52% 8%;
-    --card-foreground: 210 20% 95%;
+    --card: 220 30% 8%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 215 52% 8%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 220 30% 8%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 45 95% 52%;
-    --primary-foreground: 215 58% 5%;
-    --primary-glow: 45 97% 58%;
+    --primary: 45 93% 49%;
+    --primary-foreground: 222 53% 5%;
+    --primary-glow: 45 95% 55%;
 
-    --secondary: 215 50% 10%;
-    --secondary-foreground: 210 20% 95%;
+    --secondary: 220 20% 10%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 215 48% 12%;
-    --muted-foreground: 210 12% 50%;
+    --muted: 220 18% 13%;
+    --muted-foreground: 0 0% 64%;
 
-    --accent: 38 94% 52%;
-    --accent-foreground: 215 58% 5%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 355 90% 62%;
     --destructive-foreground: 210 20% 95%;
 
-    --border: 215 42% 15%;
-    --input: 215 42% 15%;
-    --ring: 45 95% 52%;
+    --success: 160 85% 43%;
+    --success-foreground: 210 20% 95%;
+
+    --warning: 45 95% 52%;
+    --warning-foreground: 215 58% 5%;
+
+    --border: 220 14% 16%;
+    --input: 220 14% 16%;
+    --ring: 45 93% 49%;
 
     --sidebar-background: 215 58% 4%;
     --sidebar-foreground: 210 20% 95%;
@@ -145,14 +205,62 @@
     --gradient-card: linear-gradient(135deg, hsl(215 52% 8%) 0%, hsl(215 50% 11%) 100%);
     --gradient-premium: linear-gradient(135deg, hsl(215 60% 4%) 0%, hsl(215 52% 7%) 40%, hsl(45 30% 10%) 100%);
     --gradient-hero: linear-gradient(145deg, hsl(215 58% 5%) 0%, hsl(215 60% 3%) 50%, hsl(215 52% 7%) 100%);
+    --gradient-cyber: linear-gradient(135deg, hsl(45 95% 52% / 0.1) 0%, hsl(38 94% 52% / 0.1) 100%);
 
-    /* Dark mode shadows - enhanced for better depth */
+    /* Dark mode shadows - enhanced glow effects */
     --shadow-sm: 0 2px 8px hsl(215 65% 2% / 0.6);
     --shadow-md: 0 4px 20px hsl(215 65% 2% / 0.7);
     --shadow-lg: 0 8px 40px hsl(215 65% 2% / 0.8);
     --shadow-elegant: 0 12px 50px -15px hsl(45 95% 52% / 0.45);
     --shadow-glow: 0 0 60px hsl(45 95% 52% / 0.35);
     --shadow-accent: 0 8px 30px -10px hsl(38 94% 52% / 0.5);
+    --shadow-neon: 0 0 20px hsl(45 95% 52% / 0.4), 0 0 40px hsl(45 95% 52% / 0.2);
+
+    /* Crypto data colors (brighter for dark bg) */
+    --crypto-green: 142 71% 50%;
+    --crypto-red: 0 84% 65%;
+    --data-glow: 0 0 20px hsl(var(--crypto-green) / 0.5);
+  }
+}
+
+/* ============================================
+   THEME TRANSITION SYSTEM
+   ============================================ */
+
+/* Smooth color transitions for theme switching */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-timing-function: ease;
+  transition-duration: 0.3s;
+}
+
+/* Faster text color transitions */
+p, span, h1, h2, h3, h4, h5, h6, a, label {
+  transition-duration: 0.15s;
+}
+
+/* Disable transitions for animated elements and performance-critical elements */
+[class*="animate-"],
+[class*="transition-"],
+.no-theme-transition,
+.pull-indicator,
+.pull-content {
+  transition-property: none;
+}
+
+/* Re-enable specific transitions for elements that need them */
+[class*="transition-"] {
+  transition-property: var(--tw-transition-property, all);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -206,17 +314,34 @@
 
   /* ========== Glass Morphism Effects ========== */
   .glass-card {
-    @apply backdrop-blur-lg bg-card/40 border border-primary/15;
+    @apply backdrop-blur-lg border;
+    background: hsl(var(--card) / 0.7);
+    border-color: hsl(var(--border));
+  }
+
+  .dark .glass-card {
+    background: hsl(var(--card) / 0.4);
+    border-color: hsl(var(--primary) / 0.15);
   }
 
   .glass-card-enhanced {
     backdrop-filter: blur(20px);
     background: linear-gradient(
       135deg,
+      hsl(var(--card) / 0.9) 0%,
+      hsl(var(--card) / 0.8) 100%
+    );
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-md);
+  }
+
+  .dark .glass-card-enhanced {
+    background: linear-gradient(
+      135deg,
       hsl(var(--card) / 0.7) 0%,
       hsl(var(--card) / 0.5) 100%
     );
-    border: 1px solid hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary) / 0.15);
     box-shadow: 0 8px 32px hsl(0 0% 0% / 0.4),
       inset 0 1px 0 hsl(var(--primary) / 0.08),
       inset 0 0 0 1px hsl(var(--primary) / 0.05);
@@ -304,35 +429,119 @@
     transform: translateZ(0);
     backface-visibility: hidden;
   }
-  
-  /* ========== Selection Styles ========== */
-  ::selection {
-    background-color: hsl(var(--primary) / 0.3);
-    color: hsl(var(--foreground));
+
+  /* ========== Neon Glow Card ========== */
+  .neon-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-md);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
-  ::-moz-selection {
-    background-color: hsl(var(--primary) / 0.3);
-    color: hsl(var(--foreground));
+
+  .neon-card:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: var(--shadow-elegant);
+    transform: translateY(-4px);
   }
-  
-  /* ========== Scrollbar Styles ========== */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+
+  .dark .neon-card {
+    background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6));
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: 
+      0 0 20px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--primary) / 0.1);
   }
-  
-  ::-webkit-scrollbar-track {
-    background: hsl(var(--background));
+
+  .dark .neon-card:hover {
+    border-color: hsl(var(--primary) / 0.6);
+    box-shadow: 
+      0 0 30px hsl(var(--primary) / 0.3),
+      0 0 60px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--primary) / 0.2);
   }
-  
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted));
-    border-radius: 5px;
+
+  /* ========== 3D Card Effect ========== */
+  .card-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
   }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.5);
+
+  .card-3d:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(10px);
+  }
+
+  /* ========== Gradient Border Animation ========== */
+  .gradient-border-wrap {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: 1rem;
+  }
+
+  .gradient-border-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(
+      45deg,
+      hsl(var(--primary)),
+      hsl(var(--accent)),
+      hsl(var(--primary-glow)),
+      hsl(var(--primary))
+    );
+    background-size: 300% 300%;
+    border-radius: inherit;
+    z-index: -1;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  /* ========== Circuit Pattern ========== */
+  .circuit-pattern {
+    background-image: 
+      linear-gradient(90deg, hsl(var(--primary) / 0.03) 1px, transparent 1px),
+      linear-gradient(hsl(var(--primary) / 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* ========== Live Indicator ========== */
+  .live-indicator::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: hsl(var(--success));
+    border-radius: 50%;
+    animation: success-pulse 2s ease-out infinite;
+  }
+
+  /* ========== Shimmer Text ========== */
+  .shimmer-text {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--primary-glow)) 40%,
+      hsl(var(--accent)) 60%,
+      hsl(var(--primary)) 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 3s linear infinite;
+  }
+
+  /* ========== Sparkline Container ========== */
+  .sparkline-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 1px;
+    height: 20px;
+  }
+
+  .sparkline-bar {
+    width: 3px;
+    background: linear-gradient(to top, hsl(var(--primary) / 0.3), hsl(var(--primary)));
+    border-radius: 1px 1px 0 0;
+    transition: height 0.3s ease;
   }
 }
 
@@ -359,21 +568,408 @@
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
-  
-  /* Responsive Typography */
-  .text-responsive {
-    font-size: clamp(1rem, 2vw + 0.5rem, 1.5rem);
+
+  /* Mobile-optimized scrolling */
+  .overflow-y-auto,
+  main {
+    -webkit-overflow-scrolling: touch;
   }
   
-  /* High Contrast Mode Support */
-  @media (prefers-contrast: high) {
-    button,
-    input,
-    select,
-    textarea,
-    a {
-      border-width: 2px !important;
+  @media (max-width: 767px) {
+    main {
+      touch-action: pan-y;
     }
+  }
+
+  /* ========== Scroll Animations ========== */
+  .scroll-fade-up {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scroll-fade-left {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-fade-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .scroll-fade-right {
+    opacity: 0;
+    transform: translateX(60px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-fade-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .scroll-scale {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .scroll-rotate {
+    opacity: 0;
+    transform: rotate(-5deg) scale(0.95);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .scroll-rotate.visible {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+
+  /* ========== Stagger Delays ========== */
+  .stagger-1 { transition-delay: 0.1s; }
+  .stagger-2 { transition-delay: 0.2s; }
+  .stagger-3 { transition-delay: 0.3s; }
+  .stagger-4 { transition-delay: 0.4s; }
+  .stagger-5 { transition-delay: 0.5s; }
+  .stagger-6 { transition-delay: 0.6s; }
+
+  /* ========== Parallax Base ========== */
+  .parallax-slow {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  .parallax-medium {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  .parallax-fast {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  /* ========== Section Dividers ========== */
+  .section-divider {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-divider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, 
+      transparent, 
+      hsl(var(--primary) / 0.5), 
+      hsl(var(--primary)), 
+      hsl(var(--primary) / 0.5), 
+      transparent
+    );
+  }
+
+  /* ========== Floating Animation ========== */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float-custom var(--float-duration, 4s) ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes float-custom {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    25% {
+      transform: translateY(calc(var(--float-amplitude, 10px) * -0.5)) rotate(1deg);
+    }
+    50% {
+      transform: translateY(calc(var(--float-amplitude, 10px) * -1)) rotate(0deg);
+    }
+    75% {
+      transform: translateY(calc(var(--float-amplitude, 10px) * -0.5)) rotate(-1deg);
+    }
+  }
+
+  /* ========== Pulse Soft Animation ========== */
+  .animate-pulse-soft {
+    animation: pulse-soft 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  /* ========== Gradient Shift Animation ========== */
+  .animate-gradient-x {
+    animation: gradient-x 15s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  @keyframes gradient-x {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* ========== Smooth Reveal ========== */
+  .reveal-container {
+    overflow: hidden;
+  }
+
+  .reveal-text {
+    transform: translateY(100%);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal-container.visible .reveal-text {
+    transform: translateY(0);
+  }
+
+
+  /* ========== NEW: Touch Target Utility ========== */
+  .touch-target {
+    min-height: var(--touch-target-min, 44px);
+    min-width: var(--touch-target-min, 44px);
+  }
+
+  /* ========== NEW: Fluid Typography ========== */
+  .fluid-text-xs {
+    font-size: clamp(0.625rem, 0.5rem + 0.5vw, 0.75rem);
+  }
+
+  .fluid-text-sm {
+    font-size: clamp(0.75rem, 0.625rem + 0.5vw, 0.875rem);
+  }
+
+  .fluid-text-base {
+    font-size: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  }
+
+  .fluid-text-lg {
+    font-size: clamp(1rem, 0.875rem + 0.5vw, 1.125rem);
+  }
+
+  .fluid-text-xl {
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.25rem);
+  }
+
+  .fluid-text-2xl {
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+  }
+
+  .fluid-text-3xl {
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+  }
+
+  .fluid-text-4xl {
+    font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.25rem);
+  }
+
+  /* ========== NEW: Mobile Stack ========== */
+  .mobile-stack {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4;
+  }
+
+  /* ========== NEW: Crypto Card Styles ========== */
+  .crypto-card {
+    position: relative;
+    background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .crypto-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--holographic-gradient);
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+  }
+
+  .crypto-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.05), transparent 50%, hsl(var(--accent) / 0.05));
+    pointer-events: none;
+  }
+
+  /* ========== NEW: Data Glow Effect ========== */
+  .data-glow {
+    animation: data-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes data-pulse {
+    0%, 100% {
+      box-shadow: 0 0 10px hsl(var(--crypto-green) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 25px hsl(var(--crypto-green) / 0.6);
+    }
+  }
+
+  /* ========== NEW: Price Ticker Styles ========== */
+  .price-up {
+    color: hsl(var(--crypto-green));
+    animation: price-flash-green 0.3s ease-out;
+  }
+
+  .price-down {
+    color: hsl(var(--crypto-red));
+    animation: price-flash-red 0.3s ease-out;
+  }
+
+  @keyframes price-flash-green {
+    0% { background-color: hsl(var(--crypto-green) / 0.3); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes price-flash-red {
+    0% { background-color: hsl(var(--crypto-red) / 0.3); }
+    100% { background-color: transparent; }
+  }
+
+  /* ========== NEW: Enhanced Glass Card ========== */
+  .glass-card-crypto {
+    backdrop-filter: blur(24px) saturate(180%);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card) / 0.8) 0%,
+      hsl(var(--card) / 0.6) 50%,
+      hsl(var(--card) / 0.4) 100%
+    );
+    border: 1px solid hsl(var(--primary) / 0.2);
+    box-shadow: 
+      0 8px 32px hsl(0 0% 0% / 0.4),
+      inset 0 1px 0 hsl(var(--primary) / 0.1),
+      inset 0 0 0 1px hsl(var(--primary) / 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card-crypto:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 
+      0 12px 48px hsl(0 0% 0% / 0.5),
+      0 0 40px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--primary) / 0.15);
+  }
+
+  /* ========== NEW: Circuit Board Pattern ========== */
+  .circuit-bg {
+    background-image: 
+      radial-gradient(circle at 1px 1px, hsl(var(--primary) / 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+
+  /* ========== NEW: Neon Text Glow ========== */
+  .neon-text {
+    text-shadow: 
+      0 0 10px hsl(var(--primary) / 0.5),
+      0 0 20px hsl(var(--primary) / 0.3),
+      0 0 40px hsl(var(--primary) / 0.2);
+  }
+
+  /* ========== NEW: Press/Active States for Mobile ========== */
+  .press-effect {
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .press-effect:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  /* ========== Skeleton Shimmer ========== */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 25%,
+      hsl(var(--muted-foreground) / 0.08) 50%,
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ========== Card Hover Lift ========== */
+  .card-hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* ========== NEW: Scroll Snap Container ========== */
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .scroll-snap-x::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-snap-item {
+    scroll-snap-align: start;
+    flex-shrink: 0;
   }
 }
 
@@ -420,4 +1016,64 @@
 
 [dir="rtl"] .text-right {
   text-align: left;
+}
+
+/* ============================================
+   MOBILE-FIRST RESPONSIVE OVERRIDES
+   ============================================ */
+
+@media (max-width: 640px) {
+  /* Reduce animation complexity on mobile */
+  .neon-card:hover,
+  .card-3d:hover,
+  .micro-interact:hover {
+    transform: none;
+  }
+
+  /* Faster animations on mobile */
+  .scroll-fade-up,
+  .scroll-fade-left,
+  .scroll-fade-right,
+  .scroll-scale {
+    transition-duration: 0.5s;
+  }
+
+  /* Better touch feedback */
+  .glass-card-enhanced:active,
+  .glass-card-crypto:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
+}
+
+/* ============================================
+   PULL-TO-REFRESH STYLES
+   ============================================ */
+
+.pull-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: none;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.pull-content {
+  will-change: transform;
+}
+
+/* Reduced motion support for pull-to-refresh */
+@media (prefers-reduced-motion: reduce) {
+  .pull-indicator,
+  .pull-content {
+    transition: none !important;
+  }
+  
+  .pull-indicator .animate-spin {
+    animation: none !important;
+  }
 }

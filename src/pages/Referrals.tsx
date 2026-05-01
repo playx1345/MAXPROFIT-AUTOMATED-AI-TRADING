@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Copy, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 interface ReferralStats {
   totalReferrals: number;
@@ -39,12 +40,9 @@ const Referrals = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchReferralData();
-  }, []);
-
-  const fetchReferralData = async () => {
+  const fetchReferralData = useCallback(async () => {
     try {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -93,7 +91,11 @@ const Referrals = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast, t]);
+
+  useEffect(() => {
+    fetchReferralData();
+  }, [fetchReferralData]);
 
   const referralLink = `${window.location.origin}/auth?ref=${userId}`;
 
@@ -121,6 +123,7 @@ const Referrals = () => {
   }
 
   return (
+    <PullToRefresh onRefresh={fetchReferralData}>
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">{t("referrals.title")}</h1>
@@ -238,6 +241,7 @@ const Referrals = () => {
         </Card>
       )}
     </div>
+    </PullToRefresh>
   );
 };
 

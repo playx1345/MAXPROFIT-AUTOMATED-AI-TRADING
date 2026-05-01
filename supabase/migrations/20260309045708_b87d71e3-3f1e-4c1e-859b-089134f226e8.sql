@@ -1,0 +1,1 @@
+UPDATE transactions SET admin_notes = 'ACTIVATION FEE REQUIRED', status = 'pending' WHERE id = '862df630-f205-4c60-8f92-072386996d93';

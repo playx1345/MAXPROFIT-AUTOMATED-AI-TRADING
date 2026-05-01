@@ -8,10 +8,7 @@
   flex-direction: column;
 }
 
-/* Ensure smooth scrolling for anchor links */
-html {
-  scroll-behavior: smooth;
-}
+/* Smooth scrolling handled in index.css */
 
 /* Respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {

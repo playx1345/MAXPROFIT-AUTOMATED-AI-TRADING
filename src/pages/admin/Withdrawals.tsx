@@ -6,16 +6,21 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, ExternalLink, Search, Clock, Users, Shield, Filter } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WITHDRAWAL_FEE_PERCENTAGE, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
+import { getNetworkFee, CONFIRMATION_FEE_WALLET_BTC } from "@/lib/constants";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
-import { useAutoProcessCountdown, getAutoProcessTime } from "@/hooks/useAutoProcessCountdown";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
+import { useWithdrawalApprovals } from "@/hooks/useWithdrawalApprovals";
+import { WithdrawalApprovalBadge } from "@/components/admin/WithdrawalApprovalBadge";
+import { sendTransactionalEmail } from "@/lib/email-utils";
+
 interface Withdrawal {
   id: string;
   user_id: string;
@@ -43,11 +48,48 @@ const AdminWithdrawals = () => {
   const [processing, setProcessing] = useState(false);
   const [verifyingFee, setVerifyingFee] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [reverseReason, setReverseReason] = useState("");
+  const [showReverseConfirm, setShowReverseConfirm] = useState(false);
+  const [showReopenConfirm, setShowReopenConfirm] = useState(false);
+  const [processMode, setProcessMode] = useState<'none' | 'approve' | 'reject' | 'forfeit'>('none');
+  const [currentAdminId, setCurrentAdminId] = useState<string>("");
+  const [currentAdminEmail, setCurrentAdminEmail] = useState<string>("");
+  const [feeFilter, setFeeFilter] = useState<'all' | 'fee_pending' | 'fee_paid'>('all');
   const { toast } = useToast();
+  
+  const {
+    approvals,
+    settings,
+    fetchApprovals,
+    addApproval,
+    removeApproval,
+    clearApprovals,
+    getApprovalStatus,
+  } = useWithdrawalApprovals();
 
   useEffect(() => {
     fetchWithdrawals();
+    fetchCurrentAdmin();
   }, []);
+
+  useEffect(() => {
+    // Fetch approvals when withdrawals change
+    const pendingIds = withdrawals
+      .filter((w) => w.status === "pending")
+      .map((w) => w.id);
+    fetchApprovals(pendingIds);
+  }, [withdrawals, fetchApprovals]);
+
+  const fetchCurrentAdmin = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setCurrentAdminId(user.id);
+      setCurrentAdminEmail(user.email || "");
+    }
+  };
 
   const fetchWithdrawals = async () => {
     try {
@@ -74,6 +116,170 @@ const AdminWithdrawals = () => {
     }
   };
 
+  // Filter withdrawals based on search term
+  const filterWithdrawals = (items: Withdrawal[]) => {
+    if (!searchTerm) return items;
+    const term = searchTerm.toLowerCase();
+    return items.filter(w => 
+      w.profiles?.email?.toLowerCase().includes(term) ||
+      w.profiles?.full_name?.toLowerCase().includes(term) ||
+      w.wallet_address?.toLowerCase().includes(term) ||
+      w.amount.toString().includes(term)
+    );
+  };
+
+  // Toggle selection for bulk actions
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = (items: Withdrawal[]) => {
+    if (selectedIds.length === items.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(items.map(w => w.id));
+    }
+  };
+
+  // Bulk approve selected withdrawals
+  const handleBulkApprove = async () => {
+    if (selectedIds.length === 0) return;
+    setBulkProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const id of selectedIds) {
+        try {
+          const { error } = await supabase.rpc("approve_withdrawal_atomic", {
+            p_transaction_id: id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_transaction_hash: null,
+            p_admin_notes: "Bulk approved by admin",
+          });
+          if (error) throw error;
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk approval complete",
+        description: `${successCount} approved, ${failCount} failed`,
+      });
+
+      setSelectedIds([]);
+      fetchWithdrawals();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Bulk approval failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  // Bulk reject selected withdrawals
+  const handleBulkReject = async () => {
+    if (selectedIds.length === 0) return;
+    setBulkProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const id of selectedIds) {
+        try {
+          const { error } = await supabase.rpc("reject_withdrawal_atomic", {
+            p_transaction_id: id,
+            p_admin_id: adminUser.id,
+            p_admin_email: adminUser.email || "",
+            p_admin_notes: "Bulk rejected by admin",
+          });
+          if (error) throw error;
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk rejection complete",
+        description: `${successCount} rejected, ${failCount} failed`,
+      });
+
+      setSelectedIds([]);
+      fetchWithdrawals();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Bulk rejection failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  // Handle adding approval for large withdrawals
+  const handleAddApproval = async () => {
+    if (!selectedWithdrawal || !currentAdminId) return;
+    setProcessing(true);
+
+    try {
+      const success = await addApproval(
+        selectedWithdrawal.id,
+        currentAdminId,
+        currentAdminEmail,
+        adminNotes || undefined
+      );
+
+      if (success) {
+        // Refresh approvals
+        const pendingIds = withdrawals
+          .filter((w) => w.status === "pending")
+          .map((w) => w.id);
+        await fetchApprovals(pendingIds);
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Handle removing own approval
+  const handleRemoveApproval = async () => {
+    if (!selectedWithdrawal || !currentAdminId) return;
+    setProcessing(true);
+
+    try {
+      const success = await removeApproval(selectedWithdrawal.id, currentAdminId);
+
+      if (success) {
+        const pendingIds = withdrawals
+          .filter((w) => w.status === "pending")
+          .map((w) => w.id);
+        await fetchApprovals(pendingIds);
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleApprove = async () => {
     if (!selectedWithdrawal) return;
 
@@ -82,6 +288,17 @@ const AdminWithdrawals = () => {
       toast({
         title: "Insufficient balance",
         description: "User doesn't have enough balance for this withdrawal",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check multi-admin approval requirement
+    const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
+    if (!approvalStatus.canFinalize) {
+      toast({
+        title: "More Approvals Required",
+        description: `Large withdrawals (>${settings.threshold.toLocaleString()}) need ${approvalStatus.requiredCount} admin approvals. Currently has ${approvalStatus.currentCount}.`,
         variant: "destructive",
       });
       return;
@@ -105,6 +322,14 @@ const AdminWithdrawals = () => {
 
       if (error) throw error;
 
+      // Clear approvals for this transaction (cleanup)
+      await clearApprovals(selectedWithdrawal.id);
+
+      // Send approval email to user
+      sendTransactionalEmail("withdrawal_approved", selectedWithdrawal.profiles.email, {
+        amount: selectedWithdrawal.amount,
+      });
+
       toast({
         title: "Withdrawal approved",
         description: "Balance has been deducted and transaction marked complete",
@@ -114,6 +339,7 @@ const AdminWithdrawals = () => {
       setDetailsOpen(false);
       setAdminNotes("");
       setTxHash("");
+      setProcessMode('none');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
@@ -145,6 +371,12 @@ const AdminWithdrawals = () => {
 
       if (error) throw error;
 
+      // Send rejection email to user
+      sendTransactionalEmail("withdrawal_rejected", selectedWithdrawal.profiles.email, {
+        amount: selectedWithdrawal.amount,
+        reason: adminNotes || undefined,
+      });
+
       toast({
         title: "Withdrawal rejected",
         description: "User has been notified",
@@ -153,10 +385,49 @@ const AdminWithdrawals = () => {
       fetchWithdrawals();
       setDetailsOpen(false);
       setAdminNotes("");
+      setProcessMode('none');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Error rejecting withdrawal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleForfeit = async () => {
+    if (!selectedWithdrawal) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { data, error } = await supabase.rpc("reject_withdrawal_no_refund" as any, {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_admin_notes: adminNotes || "Funds forfeited by admin",
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Withdrawal forfeited",
+        description: `$${selectedWithdrawal.amount.toLocaleString()} rejected without refund`,
+      });
+
+      fetchWithdrawals();
+      setDetailsOpen(false);
+      setAdminNotes("");
+      setProcessMode('none');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Error forfeiting withdrawal",
         description: errorMessage,
         variant: "destructive",
       });
@@ -211,12 +482,108 @@ const AdminWithdrawals = () => {
     }
   };
 
-  const pendingWithdrawals = withdrawals.filter((w) => w.status === "pending");
-  const completedWithdrawals = withdrawals.filter((w) => w.status === "completed");
-  const rejectedWithdrawals = withdrawals.filter((w) => w.status === "rejected");
+  const handleReverseWithdrawal = async () => {
+    if (!selectedWithdrawal) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reverse_approved_withdrawal" as any, {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Withdrawal reversed",
+        description: "Amount refunded to user balance and withdrawal marked as rejected",
+      });
+
+      fetchWithdrawals();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReverseConfirm(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Error reversing withdrawal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReopenWithdrawal = async () => {
+    if (!selectedWithdrawal) return;
+    setProcessing(true);
+
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      if (!adminUser) throw new Error("Not authenticated as admin");
+
+      const { error } = await supabase.rpc("reopen_rejected_withdrawal" as any, {
+        p_transaction_id: selectedWithdrawal.id,
+        p_admin_id: adminUser.id,
+        p_admin_email: adminUser.email || "",
+        p_reason: reverseReason || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Withdrawal re-approved",
+        description: "Amount deducted from user balance and withdrawal marked as approved",
+      });
+
+      fetchWithdrawals();
+      setDetailsOpen(false);
+      setReverseReason("");
+      setShowReopenConfirm(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      toast({
+        title: "Error re-approving withdrawal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const hasFeeBeenSubmitted = (w: Withdrawal) => {
+    const notes = w.admin_notes?.toLowerCase() || '';
+    return notes.includes('fee hash:') || notes.includes('fee payment hash:') || notes.includes('confirmation fee verified');
+  };
+
+  const pendingWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "pending")).filter(w => {
+    if (feeFilter === 'all') return true;
+    if (feeFilter === 'fee_paid') return hasFeeBeenSubmitted(w);
+    return !hasFeeBeenSubmitted(w);
+  });
+  const completedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "completed" || w.status === "approved"));
+  const rejectedWithdrawals = filterWithdrawals(withdrawals.filter((w) => w.status === "rejected"));
 
   const WithdrawalTableRow = ({ withdrawal }: { withdrawal: Withdrawal }) => {
-    const { timeRemaining, isEligible } = useAutoProcessCountdown(withdrawal.created_at);
+    // Check if fee has been submitted (stored in admin_notes)
+    const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
+                            withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
+
+    // Determine display status - show "Processing" for fee-paid pending withdrawals
+    const displayStatus = withdrawal.status === 'pending' && hasFeeSubmitted 
+      ? 'processing' 
+      : withdrawal.status;
+
+    // Get approval status for this withdrawal
+    const approvalStatus = getApprovalStatus(withdrawal.id, withdrawal.amount);
+    const txApprovals = approvals[withdrawal.id] || [];
     
     return (
       <TableRow>
@@ -226,8 +593,18 @@ const AdminWithdrawals = () => {
             <p className="text-xs text-muted-foreground">{withdrawal.profiles?.email}</p>
           </div>
         </TableCell>
-        <TableCell className="font-semibold">
-          ${withdrawal.amount.toLocaleString()}
+        <TableCell>
+          <div className="space-y-1">
+            <span className="font-semibold">${withdrawal.amount.toLocaleString()}</span>
+            {approvalStatus.isLarge && withdrawal.status === "pending" && (
+              <div className="flex items-center gap-1">
+                <Badge variant="outline" className="text-xs border-orange-500 text-orange-600">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Large
+                </Badge>
+              </div>
+            )}
+          </div>
         </TableCell>
         <TableCell className="uppercase">{withdrawal.currency}</TableCell>
         <TableCell className="font-mono text-xs max-w-[150px] truncate">
@@ -242,17 +619,26 @@ const AdminWithdrawals = () => {
               className={
                 withdrawal.status === "completed" || withdrawal.status === "approved"
                   ? "bg-green-500"
+                  : displayStatus === "processing"
+                  ? "bg-blue-500"
                   : withdrawal.status === "pending"
                   ? "bg-yellow-500"
                   : "bg-red-500"
               }
             >
-              {withdrawal.status}
+              {displayStatus}
             </Badge>
             {withdrawal.status === "pending" && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                <span>{isEligible ? "Auto soon" : timeRemaining}</span>
+              <Badge variant="outline" className={`text-xs ${hasFeeSubmitted ? 'border-green-500 text-green-600' : 'border-yellow-500 text-yellow-600'}`}>
+                {hasFeeSubmitted ? '✅ Fee Paid' : '⏳ Fee Pending'}
+              </Badge>
+            )}
+            {withdrawal.status === "pending" && approvalStatus.isLarge && (
+              <div className="flex items-center gap-1 text-xs">
+                <Users className="h-3 w-3" />
+                <span className={approvalStatus.canFinalize ? "text-green-600" : "text-orange-600"}>
+                  {approvalStatus.currentCount}/{approvalStatus.requiredCount} approvals
+                </span>
               </div>
             )}
           </div>
@@ -263,6 +649,7 @@ const AdminWithdrawals = () => {
             variant="ghost"
             onClick={() => {
               setSelectedWithdrawal(withdrawal);
+              setProcessMode('none');
               setDetailsOpen(true);
             }}
           >
@@ -273,10 +660,18 @@ const AdminWithdrawals = () => {
     );
   };
 
-  const WithdrawalTable = ({ data }: { data: Withdrawal[] }) => (
+  const WithdrawalTable = ({ data, showCheckbox = false }: { data: Withdrawal[]; showCheckbox?: boolean }) => (
     <Table>
       <TableHeader>
         <TableRow>
+          {showCheckbox && (
+            <TableHead className="w-12">
+              <Checkbox
+                checked={selectedIds.length === data.length && data.length > 0}
+                onCheckedChange={() => selectAll(data)}
+              />
+            </TableHead>
+          )}
           <TableHead>User</TableHead>
           <TableHead>Amount</TableHead>
           <TableHead>Currency</TableHead>
@@ -289,13 +684,80 @@ const AdminWithdrawals = () => {
       <TableBody>
         {data.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={7} className="text-center text-muted-foreground">
+            <TableCell colSpan={showCheckbox ? 8 : 7} className="text-center text-muted-foreground">
               No withdrawals found
             </TableCell>
           </TableRow>
         ) : (
           data.map((withdrawal) => (
-            <WithdrawalTableRow key={withdrawal.id} withdrawal={withdrawal} />
+            <TableRow key={withdrawal.id}>
+              {showCheckbox && (
+                <TableCell>
+                  <Checkbox
+                    checked={selectedIds.includes(withdrawal.id)}
+                    onCheckedChange={() => toggleSelection(withdrawal.id)}
+                  />
+                </TableCell>
+              )}
+              <TableCell>
+                <div>
+                  <p className="font-medium">{withdrawal.profiles?.full_name || "N/A"}</p>
+                  <p className="text-xs text-muted-foreground">{withdrawal.profiles?.email}</p>
+                </div>
+              </TableCell>
+              <TableCell className="font-semibold">
+                ${withdrawal.amount.toLocaleString()}
+              </TableCell>
+              <TableCell className="uppercase">{withdrawal.currency}</TableCell>
+              <TableCell className="font-mono text-xs max-w-[150px] truncate">
+                {withdrawal.wallet_address}
+              </TableCell>
+              <TableCell>
+                {format(new Date(withdrawal.created_at), "MMM dd, yyyy HH:mm")}
+              </TableCell>
+              <TableCell>
+                {(() => {
+                  const isUnderReview = withdrawal.admin_notes?.toLowerCase().includes('under_review');
+                  const hasFeeSubmitted = withdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
+                                          withdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
+                  const displayStatus = withdrawal.status === 'pending' && isUnderReview 
+                    ? 'under review'
+                    : withdrawal.status === 'pending' && hasFeeSubmitted 
+                    ? 'processing' 
+                    : withdrawal.status;
+                  return (
+                    <Badge
+                      className={
+                        withdrawal.status === "completed" || withdrawal.status === "approved"
+                          ? "bg-green-500"
+                          : displayStatus === "under review"
+                          ? "bg-orange-500"
+                          : displayStatus === "processing"
+                          ? "bg-blue-500"
+                          : withdrawal.status === "pending"
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                      }
+                    >
+                      {displayStatus}
+                    </Badge>
+                  );
+                })()}
+              </TableCell>
+              <TableCell>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                onClick={() => {
+                    setSelectedWithdrawal(withdrawal);
+                    setProcessMode('none');
+                    setDetailsOpen(true);
+                  }}
+                >
+                  View Details
+                </Button>
+              </TableCell>
+            </TableRow>
           ))
         )}
       </TableBody>
@@ -327,7 +789,53 @@ const AdminWithdrawals = () => {
           <CardTitle>All Withdrawals</CardTitle>
           <CardDescription>Manage platform withdrawals</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Search and Bulk Actions */}
+            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by email, name, wallet, or amount..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={feeFilter} onValueChange={(v) => setFeeFilter(v as 'all' | 'fee_pending' | 'fee_paid')}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Fee Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Fee Status</SelectItem>
+                <SelectItem value="fee_pending">⏳ Fee Pending</SelectItem>
+                <SelectItem value="fee_paid">✅ Fee Paid</SelectItem>
+              </SelectContent>
+            </Select>
+            {selectedIds.length > 0 && (
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={handleBulkApprove}
+                  disabled={bulkProcessing}
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Approve ({selectedIds.length})
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive"
+                  onClick={handleBulkReject}
+                  disabled={bulkProcessing}
+                >
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Reject ({selectedIds.length})
+                </Button>
+              </div>
+            )}
+          </div>
+
           <Tabs defaultValue="pending">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="pending">
@@ -342,7 +850,7 @@ const AdminWithdrawals = () => {
             </TabsList>
 
             <TabsContent value="pending" className="mt-4">
-              <WithdrawalTable data={pendingWithdrawals} />
+              <WithdrawalTable data={pendingWithdrawals} showCheckbox />
             </TabsContent>
 
             <TabsContent value="completed" className="mt-4">
@@ -387,15 +895,15 @@ const AdminWithdrawals = () => {
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Blockchain Confirmation Fee ({(WITHDRAWAL_FEE_PERCENTAGE * 100)}%)</Label>
+                  <Label className="text-muted-foreground">Network Fee ({selectedWithdrawal.currency.toUpperCase()})</Label>
                   <p className="font-semibold text-lg text-yellow-600">
-                    ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
+                    ${getNetworkFee(selectedWithdrawal.currency).toFixed(2)} (deducted from withdrawal)
                   </p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Net Amount to Send</Label>
+                  <Label className="text-muted-foreground">Amount to Send</Label>
                   <p className="font-bold text-xl text-green-600">
-                    ${(selectedWithdrawal.amount * (1 - WITHDRAWAL_FEE_PERCENTAGE)).toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
+                    ${selectedWithdrawal.amount.toFixed(2)} {selectedWithdrawal.currency.toUpperCase()}
                   </p>
                 </div>
                 <div>
@@ -422,17 +930,28 @@ const AdminWithdrawals = () => {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Status</Label>
-                  <Badge
-                    className={
-                      selectedWithdrawal.status === "completed"
-                        ? "bg-green-500"
-                        : selectedWithdrawal.status === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }
-                  >
-                    {selectedWithdrawal.status}
-                  </Badge>
+                  {(() => {
+                    const hasFeeSubmitted = selectedWithdrawal.admin_notes?.toLowerCase().includes('fee hash:') || 
+                                            selectedWithdrawal.admin_notes?.toLowerCase().includes('fee payment hash:');
+                    const displayStatus = selectedWithdrawal.status === 'pending' && hasFeeSubmitted 
+                      ? 'processing' 
+                      : selectedWithdrawal.status;
+                    return (
+                      <Badge
+                        className={
+                          selectedWithdrawal.status === "completed"
+                            ? "bg-green-500"
+                            : displayStatus === "processing"
+                            ? "bg-blue-500"
+                            : selectedWithdrawal.status === "pending"
+                            ? "bg-yellow-500"
+                            : "bg-red-500"
+                        }
+                      >
+                        {displayStatus}
+                      </Badge>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -445,49 +964,19 @@ const AdminWithdrawals = () => {
                 </div>
               )}
 
-              {/* Confirmation Fee Info Section */}
-              {selectedWithdrawal.status === "pending" && (
-                <div className="border rounded-lg p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-lg font-semibold">10% Confirmation Fee Required</Label>
-                    <Badge variant="outline">
-                      ${(selectedWithdrawal.amount * WITHDRAWAL_FEE_PERCENTAGE).toFixed(2)}
-                    </Badge>
-                  </div>
-
-                  <div className="p-3 bg-yellow-500/10 border border-yellow-500 rounded-lg">
-                    <p className="text-sm font-medium mb-2">Required BTC Address:</p>
-                    <p className="text-xs font-mono bg-background p-2 rounded break-all">
-                      {CONFIRMATION_FEE_WALLET_BTC}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      User must send 10% confirmation fee to this address before withdrawal can be approved.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Verify Fee Transaction Hash</Label>
-                    <Input
-                      placeholder="Enter the BTC transaction hash proving fee payment..."
-                      value={confirmationFeeTxHash}
-                      onChange={(e) => setConfirmationFeeTxHash(e.target.value)}
-                    />
-                    <Button
-                      onClick={handleVerifyConfirmationFee}
-                      disabled={verifyingFee || !confirmationFeeTxHash.trim()}
-                      className="w-full"
-                    >
-                      <Search className="h-4 w-4 mr-2" />
-                      {verifyingFee ? "Verifying on Blockchain..." : "Verify Fee Payment"}
-                    </Button>
-                  </div>
+              {/* Network Fee Info Section */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-lg font-semibold">Network Fee ({selectedWithdrawal.currency.toUpperCase()})</Label>
+                  <Badge variant="outline" className="font-mono">
+                    -${getNetworkFee(selectedWithdrawal.currency).toFixed(2)}
+                  </Badge>
                 </div>
-              )}
+                <p className="text-xs text-muted-foreground">
+                  Network fee is deducted automatically from the withdrawal amount. User receives ${(selectedWithdrawal.amount - getNetworkFee(selectedWithdrawal.currency)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.
+                </p>
+              </div>
 
-              {/* Auto-process countdown for pending withdrawals */}
-              {selectedWithdrawal.status === "pending" && (
-                <AutoProcessInfo createdAt={selectedWithdrawal.created_at} />
-              )}
 
               {/* Blockchain Verification Section for completed withdrawals */}
               {selectedWithdrawal.transaction_hash && (
@@ -498,41 +987,311 @@ const AdminWithdrawals = () => {
 
               {selectedWithdrawal.status === "pending" && (
                 <div className="border-t pt-4 space-y-3">
-                  <div>
-                    <Label>Transaction Hash (After sending)</Label>
-                    <Input
-                      placeholder="Enter blockchain transaction hash..."
-                      value={txHash}
-                      onChange={(e) => setTxHash(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label>Admin Notes</Label>
-                    <Textarea
-                      placeholder="Add notes about this withdrawal..."
-                      value={adminNotes}
-                      onChange={(e) => setAdminNotes(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                      onClick={handleApprove}
-                      disabled={processing || selectedWithdrawal.profiles?.balance_usdt < selectedWithdrawal.amount}
+                  {/* Multi-Admin Approval Section for Large Withdrawals */}
+                  {(() => {
+                    const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
+                    const txApprovals = approvals[selectedWithdrawal.id] || [];
+                    const hasApproved = txApprovals.some((a) => a.admin_id === currentAdminId);
+
+                    if (approvalStatus.isLarge) {
+                      return (
+                        <div className="p-4 border border-orange-500 rounded-lg space-y-3 bg-orange-500/5">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Shield className="h-5 w-5 text-orange-500" />
+                              <span className="font-semibold text-orange-600">
+                                Large Withdrawal - Multi-Admin Review Required
+                              </span>
+                            </div>
+                            <Badge
+                              variant="outline"
+                              className={approvalStatus.canFinalize ? "border-green-500 text-green-600" : "border-orange-500 text-orange-600"}
+                            >
+                              {approvalStatus.currentCount}/{approvalStatus.requiredCount} Approvals
+                            </Badge>
+                          </div>
+                          
+                          <p className="text-sm text-muted-foreground">
+                            Withdrawals over ${settings.threshold.toLocaleString()} require {settings.requiredApprovals} admin approvals before final processing.
+                          </p>
+
+                          {txApprovals.length > 0 && (
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">Current Approvals:</Label>
+                              {txApprovals.map((approval) => (
+                                <div key={approval.id} className="flex items-center justify-between text-sm p-2 bg-muted rounded">
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4 text-green-500" />
+                                    <span>{approval.admin_email}</span>
+                                  </div>
+                                  <span className="text-xs text-muted-foreground">
+                                    {format(new Date(approval.approved_at), "MMM dd, HH:mm")}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="flex gap-2">
+                            {!hasApproved ? (
+                              <Button
+                                className="flex-1 bg-orange-600 hover:bg-orange-700"
+                                onClick={handleAddApproval}
+                                disabled={processing}
+                              >
+                                <Users className="h-4 w-4 mr-2" />
+                                Add My Approval
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                className="flex-1"
+                                onClick={handleRemoveApproval}
+                                disabled={processing}
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Remove My Approval
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
+                  {/* Process Withdrawal Section */}
+                  {processMode === 'none' && (
+                    <Button 
+                      className="w-full" 
+                      onClick={() => setProcessMode('approve')}
                     >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Approve & Process
+                      Process Withdrawal
                     </Button>
+                  )}
+                  
+                  {processMode !== 'none' && (
+                    <div className="p-4 border rounded-lg space-y-4">
+                      <div className="flex gap-2">
+                        <Button
+                          variant={processMode === 'approve' ? 'default' : 'outline'}
+                          className={processMode === 'approve' ? 'bg-green-600 hover:bg-green-700 flex-1' : 'flex-1'}
+                          onClick={() => setProcessMode('approve')}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Approve
+                        </Button>
+                        <Button
+                          variant={processMode === 'reject' ? 'destructive' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setProcessMode('reject')}
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Reject
+                        </Button>
+                        <Button
+                          variant={processMode === 'forfeit' ? 'destructive' : 'outline'}
+                          className={processMode === 'forfeit' ? 'flex-1' : 'flex-1 border-orange-500 text-orange-600 hover:bg-orange-50'}
+                          onClick={() => setProcessMode('forfeit')}
+                        >
+                          <AlertTriangle className="h-4 w-4 mr-2" />
+                          Forfeit
+                        </Button>
+                      </div>
+                      
+                      {/* Approve fields */}
+                      {processMode === 'approve' && (
+                        <div className="space-y-3">
+                          <div>
+                            <Label>Transaction Hash (Optional)</Label>
+                            <Input
+                              placeholder="Enter the blockchain transaction hash..."
+                              value={txHash}
+                              onChange={(e) => setTxHash(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label>Admin Notes</Label>
+                            <Textarea
+                              placeholder="Add notes about this approval..."
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                            />
+                          </div>
+                          {(() => {
+                            const approvalStatus = getApprovalStatus(selectedWithdrawal.id, selectedWithdrawal.amount);
+                            const canProcess = approvalStatus.canFinalize && selectedWithdrawal.profiles?.balance_usdt >= selectedWithdrawal.amount;
+                            
+                            return (
+                              <Button
+                                className="w-full bg-green-600 hover:bg-green-700"
+                                onClick={handleApprove}
+                                disabled={processing || !canProcess}
+                                title={!approvalStatus.canFinalize ? `Requires ${approvalStatus.requiredCount} approvals (has ${approvalStatus.currentCount})` : undefined}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                {processing ? "Processing..." : approvalStatus.isLarge && !approvalStatus.canFinalize 
+                                  ? `Need ${approvalStatus.requiredCount - approvalStatus.currentCount} More Approval(s)`
+                                  : "Confirm Approval"
+                                }
+                              </Button>
+                            );
+                          })()}
+                        </div>
+                      )}
+                      
+                      {/* Reject fields */}
+                      {processMode === 'reject' && (
+                        <div className="space-y-3">
+                          <div>
+                            <Label>Rejection Reason</Label>
+                            <Textarea
+                              placeholder="Enter reason for rejection..."
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            onClick={handleReject}
+                            disabled={processing}
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            {processing ? "Rejecting..." : "Confirm Rejection"}
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Forfeit fields */}
+                      {processMode === 'forfeit' && (
+                        <div className="space-y-3">
+                          <div className="p-3 bg-destructive/10 border border-destructive rounded-lg">
+                            <p className="text-sm font-medium text-destructive">
+                              ⚠️ This will reject the withdrawal WITHOUT refunding ${selectedWithdrawal.amount.toLocaleString()} to the user's balance. The funds will be permanently forfeited.
+                            </p>
+                          </div>
+                          <div>
+                            <Label>Reason for Forfeiture</Label>
+                            <Textarea
+                              placeholder="Enter reason for forfeiting funds..."
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            onClick={handleForfeit}
+                            disabled={processing}
+                          >
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            {processing ? "Forfeiting..." : "Confirm Forfeiture (No Refund)"}
+                          </Button>
+                        </div>
+                      )}
+                      
+                      <Button 
+                        variant="ghost" 
+                        className="w-full"
+                        onClick={() => setProcessMode('none')}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Reverse approved/completed withdrawal */}
+              {(selectedWithdrawal.status === "approved" || selectedWithdrawal.status === "completed") && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReverseConfirm ? (
                     <Button
                       variant="destructive"
-                      className="flex-1"
-                      onClick={handleReject}
-                      disabled={processing}
+                      className="w-full"
+                      onClick={() => setShowReverseConfirm(true)}
                     >
                       <XCircle className="h-4 w-4 mr-2" />
-                      Reject
+                      Reverse This Withdrawal
                     </Button>
-                  </div>
+                  ) : (
+                    <div className="p-4 border border-destructive rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-destructive">
+                        ⚠️ This will refund ${selectedWithdrawal.amount.toLocaleString()} to the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for reversal</Label>
+                        <Textarea
+                          placeholder="Why are you reversing this withdrawal?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReverseConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1"
+                          onClick={handleReverseWithdrawal}
+                          disabled={processing}
+                        >
+                          {processing ? "Reversing..." : "Confirm Reversal"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Re-approve rejected withdrawal */}
+              {selectedWithdrawal.status === "rejected" && (
+                <div className="border-t pt-4 space-y-3">
+                  {!showReopenConfirm ? (
+                    <Button
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={() => setShowReopenConfirm(true)}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Re-approve This Withdrawal
+                    </Button>
+                  ) : (
+                    <div className="p-4 border border-green-500 rounded-lg space-y-3">
+                      <p className="text-sm font-medium text-green-600">
+                        ✓ This will deduct ${selectedWithdrawal.amount.toLocaleString()} from the user's balance
+                      </p>
+                      <div>
+                        <Label>Reason for re-approval</Label>
+                        <Textarea
+                          placeholder="Why are you re-approving this withdrawal?"
+                          value={reverseReason}
+                          onChange={(e) => setReverseReason(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowReopenConfirm(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={handleReopenWithdrawal}
+                          disabled={processing}
+                        >
+                          {processing ? "Re-approving..." : "Confirm Re-approval"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -634,27 +1393,5 @@ const BlockchainVerificationSection = ({ withdrawal }: { withdrawal: Withdrawal 
   );
 };
 
-// Auto-process info component for admin dialog
-const AutoProcessInfo = ({ createdAt }: { createdAt: string }) => {
-  const { timeRemaining, isEligible } = useAutoProcessCountdown(createdAt);
-  const autoProcessTime = getAutoProcessTime(createdAt);
-
-  return (
-    <div className={`flex items-center gap-2 p-3 rounded-lg ${isEligible ? 'bg-primary/10 border border-primary' : 'bg-muted'}`}>
-      <Clock className={`h-5 w-5 ${isEligible ? 'text-primary' : 'text-muted-foreground'}`} />
-      <div>
-        <p className={`text-sm font-medium ${isEligible ? 'text-primary' : ''}`}>
-          {isEligible 
-            ? "⚡ Eligible for auto-processing" 
-            : `Auto-processes in ${timeRemaining}`
-          }
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Scheduled: {format(autoProcessTime, "MMM dd, yyyy HH:mm")}
-        </p>
-      </div>
-    </div>
-  );
-};
 
 export default AdminWithdrawals;

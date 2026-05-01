@@ -17,12 +17,12 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/logo.jpg";
-import { UpgradeFeeNotification } from "@/components/UpgradeFeeNotification";
-import { BlockchainConfirmationFeeNotification } from "@/components/BlockchainConfirmationFeeNotification";
-import { BlockchainFeeBanner } from "@/components/BlockchainFeeBanner";
+import logo from "@/assets/wtx-logo.png";
+
+
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileNav } from "@/components/MobileNav";
 import { useTranslation } from "react-i18next";
 
 interface DashboardLayoutProps {
@@ -37,15 +37,28 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: t("common.error", "Error signing out"),
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: t("common.success", "Signed out"),
+          description: t("common.signOutSuccess", "You have been signed out successfully."),
+        });
+        navigate("/", { replace: true });
+      }
+    } catch (err) {
+      console.error("Sign out error:", err);
       toast({
-        title: t("common.error", "Error signing out"),
-        description: error.message,
+        title: t("common.error", "Error"),
+        description: t("common.signOutError", "An unexpected error occurred while signing out."),
         variant: "destructive",
       });
-    } else {
-      navigate("/");
     }
   };
 
@@ -60,25 +73,31 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   ];
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
-      {/* Blockchain Fee Banner - Top of screen */}
-      <BlockchainFeeBanner />
+    <div className="min-h-screen min-h-[100dvh] flex flex-col lg:flex-row w-full bg-background">
       
-      {/* Upgrade Fee Notification */}
-      <UpgradeFeeNotification />
       
-      {/* Blockchain Confirmation Fee Notification */}
-      <BlockchainConfirmationFeeNotification />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden transition-all duration-300 hover:scale-110 active:scale-95 glass-card border border-primary/20 hover:border-primary/40 hover:shadow-glow backdrop-blur-lg"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        <div className={`transition-transform duration-300 ${sidebarOpen ? 'rotate-90' : 'rotate-0'}`}>
-          {sidebarOpen ? <X className="text-primary" /> : <Menu className="text-primary" />}
+      {/* Mobile Header with Menu Toggle */}
+      <div className="fixed top-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 safe-area-top">
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="transition-all duration-300 hover:scale-110 active:scale-95 touch-target"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <div className={`transition-transform duration-300 ${sidebarOpen ? 'rotate-90' : 'rotate-0'}`}>
+              {sidebarOpen ? <X className="h-5 w-5 text-primary" /> : <Menu className="h-5 w-5 text-primary" />}
+            </div>
+          </Button>
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="Win-Tradex" className="h-8 w-8 object-contain" loading="lazy" />
+            <span className="text-gradient-premium font-heading text-lg font-bold">Win-Tradex</span>
+          </Link>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+          </div>
         </div>
-      </Button>
+      </div>
 
       {/* Sidebar with Glass Effect */}
       <aside
@@ -91,9 +110,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/5 to-transparent opacity-60" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
             <Link to="/" className="relative flex items-center gap-3 group">
-              <img src={logo} alt="Live Win Trade" className="h-10 w-10 rounded-lg object-cover shadow-md group-hover:shadow-glow transition-shadow duration-300" />
-              <span className="text-gradient-premium font-display text-xl font-bold">
-                Live Win Trade
+              <img src={logo} alt="Win-Tradex" className="h-10 w-10 object-contain group-hover:scale-105 transition-transform duration-300" />
+              <span className="text-gradient-premium font-heading text-xl font-bold">
+                Win-Tradex
               </span>
             </Link>
           </div>
@@ -109,7 +128,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative overflow-hidden",
+                      "flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg transition-all duration-300 group relative overflow-hidden touch-target press-effect",
                       isActive
                         ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-elegant"
                         : "hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/5 hover:translate-x-1 hover:border-primary/20"
@@ -125,13 +144,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     <span className={`absolute inset-0 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${isActive ? 'opacity-0' : ''}`} />
                     
                     <Icon className={cn(
-                      "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary",
+                      "h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary flex-shrink-0",
                       isActive && "drop-shadow-glow"
                     )} />
-                    <span className="relative font-medium">{item.label}</span>
+                    <span className="relative font-body font-medium truncate">{item.label}</span>
                     
                     {/* Arrow indicator with accent color on hover */}
-                    <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent ${isActive ? 'opacity-100 translate-x-0' : ''}`}>
+                    <span className={`ml-auto opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent flex-shrink-0 ${isActive ? 'opacity-100 translate-x-0' : ''}`}>
                       <ArrowUpRight className="h-4 w-4" />
                     </span>
                   </Link>
@@ -166,11 +185,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       )}
 
       {/* Main Content with smooth transition */}
-      <main className="flex-1 overflow-auto">
-        <div className="container mx-auto p-6 lg:p-8 animate-fade-in">
-          {children}
-        </div>
+      <main className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth pt-[52px] pb-[88px] lg:pt-0 lg:pb-0">
+        <div className="container mx-auto p-3 sm:p-5 lg:p-8">{children}</div>
       </main>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileNav />
     </div>
   );
 };

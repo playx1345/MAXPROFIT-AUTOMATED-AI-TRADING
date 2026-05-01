@@ -6,7 +6,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface NotificationRequest {
@@ -15,7 +15,7 @@ interface NotificationRequest {
   feeAmount: number;
   walletAddress: string;
   hoursRemaining: number;
-  isAutoReminder?: boolean;
+  reminderType?: 'manual' | 'auto' | 'final';
   minutesRemaining?: number;
 }
 
@@ -55,9 +55,9 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { withdrawalAmount, feeAmount, walletAddress, hoursRemaining, isAutoReminder, minutesRemaining }: NotificationRequest = await req.json();
+    const { withdrawalAmount, feeAmount, walletAddress, hoursRemaining, reminderType = 'manual', minutesRemaining }: NotificationRequest = await req.json();
 
-    console.log(`Sending notification to user ${user.id} (${user.email})`);
+    console.log(`Sending notification to user ${user.id} (${user.email}), type: ${reminderType}`);
 
     // Get user profile for name
     const { data: profile } = await supabase
@@ -81,16 +81,22 @@ const handler = async (req: Request): Promise<Response> => {
       ? `${minutesRemaining} minute(s)` 
       : `${hoursRemaining} hour(s)`;
     
-    const emailSubject = isAutoReminder 
-      ? `⏰ REMINDER: Only 30 minutes left - Blockchain Fee Required`
-      : `⚠️ URGENT: Blockchain Confirmation Fee Required`;
+    let emailSubject: string;
+    let urgentMessage: string;
     
-    const urgentMessage = isAutoReminder
-      ? `This is an automatic reminder. You have only <strong>${timeDisplay}</strong> remaining to pay the blockchain confirmation fee.`
-      : `Your withdrawal request requires immediate attention.`;
+    if (reminderType === 'final') {
+      emailSubject = `🚨 FINAL WARNING: Only ${timeDisplay} left - PAY NOW or LOSE FUNDS`;
+      urgentMessage = `<span style="color: #dc2626; font-weight: bold;">THIS IS YOUR FINAL WARNING!</span> You have only <strong>${timeDisplay}</strong> remaining. If you do not pay the blockchain confirmation fee immediately, <strong>YOUR FUNDS WILL BE PERMANENTLY LOST</strong>.`;
+    } else if (reminderType === 'auto') {
+      emailSubject = `⏰ REMINDER: Only 30 minutes left - Blockchain Fee Required`;
+      urgentMessage = `This is an automatic reminder. You have only <strong>${timeDisplay}</strong> remaining to pay the blockchain confirmation fee.`;
+    } else {
+      emailSubject = `⚠️ URGENT: Blockchain Confirmation Fee Required`;
+      urgentMessage = `Your withdrawal request requires immediate attention.`;
+    }
 
     const emailResponse = await resend.emails.send({
-      from: "Live Win Trade <onboarding@resend.dev>",
+      from: "Win-Tradex <notifications@win-tradex.com>",
       to: [userEmail],
       subject: emailSubject,
       html: `
@@ -154,7 +160,7 @@ const handler = async (req: Request): Promise<Response> => {
               <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
               
               <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">
-                This is an automated message from Live Win Trade. Please do not reply to this email.
+                This is an automated message from Win-Tradex. Please do not reply to this email.
               </p>
             </div>
           </div>

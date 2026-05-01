@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,11 +13,15 @@ import { format } from "date-fns";
 import { depositAmountSchema, transactionHashSchema, validateField } from "@/lib/validation";
 import { useBlockchainVerification } from "@/hooks/useBlockchainVerification";
 import { BlockchainVerificationBadge } from "@/components/BlockchainVerificationBadge";
-import { BLOCK_CONFIRMATION_FEE } from "@/lib/constants";
+
+import { PullToRefresh } from "@/components/PullToRefresh";
 
 const PLATFORM_WALLETS = {
-  usdt_trc20: "TDrBuPR9s7332so5FWT14ovWFXvjJH75Ur",
-  btc: "bc1qyf87rz5ulfca0409zluqdkvlhyfd5qu008377h",
+  usdt: "TGGJj5ntesS7eCD8mXwxeictvZKFwVTa1E",
+  btc: "bc1qx6hnpju7xhznw6lqewvnk5jrn87devagtrhnsv",
+  eth: "0xe6FD2896583721d1e7e14c8fBB6319E92bD65196",
+  usdc: "0x739B307F28100563d5f14Fba93dDf6F96Cd4d642",
+  xrp: "ranmERjBSRh9Z3Dp9pPsHFv2Uhk6i2aP37",
 };
 
 interface RecentDeposit {
@@ -32,7 +36,7 @@ interface RecentDeposit {
 const Deposit = () => {
   const { t } = useTranslation();
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState<"usdt" | "btc">("usdt");
+  const [currency, setCurrency] = useState<"usdt" | "btc" | "eth" | "usdc" | "xrp">("usdt");
   const [transactionHash, setTransactionHash] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [recentDeposits, setRecentDeposits] = useState<RecentDeposit[]>([]);
@@ -40,27 +44,7 @@ const Deposit = () => {
   const { toast } = useToast();
   const { verifying, result, verifyTransaction, clearResult } = useBlockchainVerification();
 
-  useEffect(() => {
-    fetchRecentDeposits();
-  }, []);
-
-  // Auto-verify when transaction hash changes (debounced)
-  useEffect(() => {
-    if (!transactionHash.trim()) {
-      clearResult();
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      if (transactionHash.trim().length >= 10) {
-        verifyTransaction(transactionHash, currency);
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [transactionHash, currency]);
-
-  const fetchRecentDeposits = async () => {
+  const fetchRecentDeposits = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -78,7 +62,27 @@ const Deposit = () => {
     } catch (error: unknown) {
       console.error("Error fetching deposits:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRecentDeposits();
+  }, [fetchRecentDeposits]);
+
+  // Auto-verify when transaction hash changes (debounced)
+  useEffect(() => {
+    if (!transactionHash.trim()) {
+      clearResult();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (transactionHash.trim().length >= 10) {
+        verifyTransaction(transactionHash, currency);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [transactionHash, currency]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -128,7 +132,7 @@ const Deposit = () => {
         amount: parseFloat(amount),
         currency: currency,
         status: "pending",
-        wallet_address: currency === "usdt" ? PLATFORM_WALLETS.usdt_trc20 : PLATFORM_WALLETS.btc,
+        wallet_address: PLATFORM_WALLETS[currency],
         transaction_hash: transactionHash.trim() || null,
       });
 
@@ -162,22 +166,23 @@ const Deposit = () => {
     }
   };
 
-  const walletAddress = currency === "usdt" ? PLATFORM_WALLETS.usdt_trc20 : PLATFORM_WALLETS.btc;
+  const walletAddress = PLATFORM_WALLETS[currency];
 
   return (
-    <div className="space-y-6">
+    <PullToRefresh onRefresh={fetchRecentDeposits}>
+    <div className="space-y-6 pb-6">
       <div>
-        <h1 className="text-3xl font-bold">{t("deposit.title")}</h1>
-        <p className="text-muted-foreground">{t("deposit.subtitle")}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold">{t("deposit.title")}</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">{t("deposit.subtitle")}</p>
       </div>
 
       <Alert>
-        <AlertDescription>
+        <AlertDescription className="text-sm">
           <strong>{t("deposit.important")}:</strong> {t("deposit.processingNote", { currency: currency.toUpperCase() })}
         </AlertDescription>
       </Alert>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{t("deposit.platformWallet")}</CardTitle>
@@ -185,27 +190,62 @@ const Deposit = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="currency">{t("deposit.selectCurrency")}</Label>
-              <div className="flex gap-2 mt-2">
+              <Label htmlFor="currency" className="text-sm">{t("deposit.selectCurrency")}</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
                 <Button
                   variant={currency === "usdt" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                   onClick={() => {
                     setCurrency("usdt");
                     clearResult();
                   }}
-                  className="flex-1"
                 >
                   USDT (TRC20)
                 </Button>
                 <Button
                   variant={currency === "btc" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
                   onClick={() => {
                     setCurrency("btc");
                     clearResult();
                   }}
-                  className="flex-1"
                 >
                   BTC
+                </Button>
+                <Button
+                  variant={currency === "eth" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
+                  onClick={() => {
+                    setCurrency("eth");
+                    clearResult();
+                  }}
+                >
+                  ETH
+                </Button>
+                <Button
+                  variant={currency === "usdc" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm"
+                  onClick={() => {
+                    setCurrency("usdc");
+                    clearResult();
+                  }}
+                >
+                  USDC (ERC20)
+                </Button>
+                <Button
+                  variant={currency === "xrp" ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs sm:text-sm col-span-2"
+                  onClick={() => {
+                    setCurrency("xrp");
+                    clearResult();
+                  }}
+                >
+                  XRP (Ripple)
                 </Button>
               </div>
             </div>
@@ -227,7 +267,13 @@ const Deposit = () => {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t("deposit.network")}: {currency === "usdt" ? "TRON (TRC20)" : "Bitcoin"}
+                {t("deposit.network")}: {
+                  currency === "usdt" ? "TRON (TRC20)" : 
+                  currency === "btc" ? "Bitcoin" : 
+                  currency === "eth" ? "Ethereum (ERC20)" : 
+                  currency === "xrp" ? "XRP Ledger" :
+                  "Ethereum (ERC20)"
+                }
               </p>
             </div>
 
@@ -354,15 +400,6 @@ const Deposit = () => {
         </Card>
       </div>
 
-      <Alert className="border-yellow-500 bg-yellow-500/10">
-        <AlertTriangle className="h-4 w-4 text-yellow-600" />
-        <AlertDescription className="text-yellow-900 dark:text-yellow-100">
-          <strong>Important: Block Confirmation Fee</strong>
-          <p className="mt-2 text-sm">
-            All deposit transactions require a <strong>${BLOCK_CONFIRMATION_FEE} blockchain confirmation fee</strong> to be processed and verified on the blockchain. This fee ensures the security and integrity of your deposit.
-          </p>
-        </AlertDescription>
-      </Alert>
 
       {recentDeposits.length > 0 && (
         <Card>
@@ -408,6 +445,7 @@ const Deposit = () => {
         </Card>
       )}
     </div>
+    </PullToRefresh>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +40,8 @@ const Transactions = () => {
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [confirmationFeePayment, setConfirmationFeePayment] = useState("");
   const [withdrawalApproved, setWithdrawalApproved] = useState(false);
-  const [vatNotificationShown, setVatNotificationShown] = useState(false);
+  const [paidConfirmationFeeXrp, setPaidConfirmationFeeXrp] = useState<number | null>(null);
+  const vatNotificationShownRef = useRef(false);
   const { toast } = useToast();
   const requiredConfirmationFeeXrp = 89.1;
   const pendingVatXrp = 89.9;
@@ -97,10 +98,10 @@ const Transactions = () => {
   const handlePayConfirmationFee = () => {
     const paidAmount = Number.parseFloat(confirmationFeePayment);
 
-    if (!Number.isFinite(paidAmount)) {
+    if (!Number.isFinite(paidAmount) || paidAmount <= 0) {
       toast({
         title: "Invalid payment amount",
-        description: "Enter a valid XRP amount to continue.",
+        description: "Enter a positive XRP amount to continue.",
         variant: "destructive",
       });
       return;
@@ -116,6 +117,7 @@ const Transactions = () => {
     }
 
     setWithdrawalApproved(true);
+    setPaidConfirmationFeeXrp(paidAmount);
     toast({
       title: "Withdrawal approved",
       description: `${trackedDepositor}'s withdrawal is now approved after confirmation fee payment.`,
@@ -123,7 +125,7 @@ const Transactions = () => {
   };
 
   useEffect(() => {
-    if (withdrawalApproved || vatNotificationShown) {
+    if (withdrawalApproved || vatNotificationShownRef.current) {
       return;
     }
 
@@ -131,8 +133,8 @@ const Transactions = () => {
       title: "VAT pending confirmation",
       description: `${pendingVatXrp} XRP VAT is pending confirmation for ${trackedDepositor}.`,
     });
-    setVatNotificationShown(true);
-  }, [pendingVatXrp, toast, trackedDepositor, vatNotificationShown, withdrawalApproved]);
+    vatNotificationShownRef.current = true;
+  }, [pendingVatXrp, toast, trackedDepositor, withdrawalApproved]);
 
   if (loading) {
     return (
@@ -184,6 +186,12 @@ const Transactions = () => {
               <span>VAT Pending Confirmation</span>
               <span className="font-semibold">{withdrawalApproved ? "0.0" : pendingVatXrp.toFixed(1)} XRP</span>
             </div>
+            {withdrawalApproved && paidConfirmationFeeXrp !== null && (
+              <div className="flex items-center justify-between text-sm">
+                <span>Confirmation Fee Paid</span>
+                <span className="font-semibold">{paidConfirmationFeeXrp.toFixed(1)} XRP</span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

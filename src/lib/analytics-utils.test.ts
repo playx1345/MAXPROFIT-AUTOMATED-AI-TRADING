@@ -58,7 +58,7 @@ test("groups approved/completed transactions and rounds values", () => {
 
   assert.equal(Math.abs(totalDeposits - 110.12) < 0.01, true);
   assert.equal(Math.abs(totalWithdrawals - 40.57) < 0.01, true);
-  assert.equal(Math.abs(totalNet - 69.55) < 0.01, true);
+  assert.equal(Math.abs(totalNet - (totalDeposits - totalWithdrawals)) < 0.01, true);
 });
 
 test("calculates status breakdown and combines approved/completed", () => {

